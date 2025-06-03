@@ -93,10 +93,12 @@ function formatHoursForDisplay(hoursText) {
           const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
           for (let day of dayOrder) {
             const hours = facilityData[day] || 'Not available';
+            const hoursClass = (hours.toLowerCase() === 'closed' || hours.toLowerCase() === 'not available') ? 'closed-not-available' : '';
+            const displayHours = hours.replace(/,\s*/g, '<br>'); // Split multiple time slots
             formattedHtml += `
               <div class="hours-row">
                 <span class="day-name">${day}</span>
-                <span class="hours-time">${hours}</span>
+                <span class="hours-time ${hoursClass}">${displayHours}</span>
               </div>
             `;
           }
@@ -200,10 +202,12 @@ function formatHoursForDisplay(hoursText) {
           const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
           for (let day of dayOrder) {
             const hours = facilityData[day] || 'Not available';
+            const hoursClass = (hours.toLowerCase() === 'closed' || hours.toLowerCase() === 'not available') ? 'closed-not-available' : '';
+            const displayHours = hours.replace(/,\s*/g, '<br>'); // Split multiple time slots
             formattedHtml += `
               <div class="hours-row">
                 <span class="day-name">${day}</span>
-                <span class="hours-time">${hours}</span>
+                <span class="hours-time ${hoursClass}">${displayHours}</span>
               </div>
             `;
           }
@@ -344,10 +348,12 @@ function formatHoursForDisplay(hoursText) {
           const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
           for (let day of dayOrder) {
             const hours = locationData[day] || 'Not available';
+            const hoursClass = (hours.toLowerCase() === 'closed' || hours.toLowerCase() === 'not available') ? 'closed-not-available' : '';
+            const displayHours = hours.replace(/,\s*/g, '<br>'); // Split multiple time slots
             formattedHtml += `
               <div class="hours-row">
                 <span class="day-name">${day}</span>
-                <span class="hours-time">${hours}</span>
+                <span class="hours-time ${hoursClass}">${displayHours}</span>
               </div>
             `;
           }
@@ -375,10 +381,12 @@ function formatHoursForDisplay(hoursText) {
         const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         for (let day of dayOrder) {
           const hours = locationData[day] || 'Not available';
+          const hoursClass = (hours.toLowerCase() === 'closed' || hours.toLowerCase() === 'not available') ? 'closed-not-available' : '';
+          const displayHours = hours.replace(/,\s*/g, '<br>'); // Split multiple time slots
           formattedHtml += `
             <div class="hours-row">
               <span class="day-name">${day}</span>
-              <span class="hours-time">${hours}</span>
+              <span class="hours-time ${hoursClass}">${displayHours}</span>
             </div>
           `;
         }
@@ -509,10 +517,12 @@ function formatHoursForDisplay(hoursText) {
           const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
           for (let day of dayOrder) {
             const hours = sectionData[day] || 'Not available';
+            const hoursClass = (hours.toLowerCase() === 'closed' || hours.toLowerCase() === 'not available') ? 'closed-not-available' : '';
+            const displayHours = hours.replace(/,\s*/g, '<br>'); // Split multiple time slots
             formattedHtml += `
               <div class="hours-row">
                 <span class="day-name">${day}</span>
-                <span class="hours-time">${hours}</span>
+                <span class="hours-time ${hoursClass}">${displayHours}</span>
               </div>
             `;
           }
@@ -540,10 +550,12 @@ function formatHoursForDisplay(hoursText) {
         const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         for (let day of dayOrder) {
           const hours = sectionData[day] || 'Not available';
+          const hoursClass = (hours.toLowerCase() === 'closed' || hours.toLowerCase() === 'not available') ? 'closed-not-available' : '';
+          const displayHours = hours.replace(/,\s*/g, '<br>'); // Split multiple time slots
           formattedHtml += `
             <div class="hours-row">
               <span class="day-name">${day}</span>
-              <span class="hours-time">${hours}</span>
+              <span class="hours-time ${hoursClass}">${displayHours}</span>
             </div>
           `;
         }
@@ -587,10 +599,13 @@ function formatHoursForDisplay(hoursText) {
           timeInfo = 'See details';
         }
         
+        const hoursClass = (timeInfo.toLowerCase() === 'closed' || timeInfo.toLowerCase() === 'not available' || timeInfo.toLowerCase() === 'see details') ? 'closed-not-available' : '';
+        const displayTimeInfo = timeInfo.replace(/,\s*/g, '<br>'); // Split multiple time slots
+        
         formattedHtml += `
           <div class="hours-row">
             <span class="day-name">${day}</span>
-            <span class="hours-time">${timeInfo}</span>
+            <span class="hours-time ${hoursClass}">${displayTimeInfo}</span>
           </div>
         `;
         foundStructuredData = true;
@@ -613,10 +628,13 @@ function formatHoursForDisplay(hoursText) {
           
           const fullDayName = dayNames[shortDayNames.indexOf(day)];
           
+          const hoursClass = (timeInfo.toLowerCase() === 'closed' || timeInfo.toLowerCase() === 'not available' || timeInfo.toLowerCase() === 'see details') ? 'closed-not-available' : '';
+          const displayTimeInfo = timeInfo.replace(/,\s*/g, '<br>'); // Split multiple time slots
+          
           formattedHtml += `
             <div class="hours-row">
               <span class="day-name">${fullDayName}</span>
-              <span class="hours-time">${timeInfo}</span>
+              <span class="hours-time ${hoursClass}">${displayTimeInfo}</span>
             </div>
           `;
           foundStructuredData = true;
@@ -657,86 +675,44 @@ function formatHoursForDisplay(hoursText) {
 ipcRenderer.on('hours', (event, data) => {
   console.log('Received hours data in renderer:', data);
   
-  // Update library hours
-  const libraryContainer = document.getElementById('library-hours');
-  if (data.libraryHours) {
-    if (data.libraryHours.includes('Loading') || data.libraryHours.includes('Error')) {
-      if (data.libraryHours.includes('Loading')) {
-        libraryContainer.innerHTML = `
-          <div class="loading">
-            <div class="loading-spinner"></div>
-            ${data.libraryHours}
-          </div>
-        `;
+  const sections = {
+    library: { containerId: 'library-hours', dataKey: 'libraryHours', link: 'https://www.angelo.edu/library/hours.php', linkText: 'View on Library Website' },
+    gym: { containerId: 'gym-hours', dataKey: 'gymHours', link: 'https://www.angelo.edu/life-on-campus/play/university-recreation/urec-hours-of-operation.php', linkText: 'View on Recreation Website' },
+    dining: { containerId: 'dining-hours', dataKey: 'diningHours', link: 'https://dineoncampus.com/Angelo/hours-of-operation', linkText: 'View on Dining Website' },
+  };
+
+  for (const sectionKey in sections) {
+    const config = sections[sectionKey];
+    const container = document.getElementById(config.containerId);
+    const hoursData = data[config.dataKey];
+
+    if (container && hoursData) {
+      if (hoursData.includes('Loading') || hoursData.includes('Error')) {
+        if (hoursData.includes('Loading')) {
+          container.innerHTML = `
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              ${hoursData}
+            </div>
+          `;
+        } else {
+          container.innerHTML = `<div class="error">${hoursData}</div>`;
+        }
       } else {
-        libraryContainer.innerHTML = `<div class="error">${data.libraryHours}</div>`;
-      }
-    } else {
-      const formattedLibraryHours = formatHoursForDisplay(data.libraryHours);
-      libraryContainer.innerHTML = formattedLibraryHours + `
-        <a href="https://www.angelo.edu/library/hours.php" target="_blank" class="website-link">
-          View on Library Website
-        </a>
-      `;
-      
-      // Setup tabs for library after content is loaded
-      setTimeout(() => setupFacilityTabs(), 100);
-    }
-  }
-  
-  // Update gym hours
-  const gymContainer = document.getElementById('gym-hours');
-  if (data.gymHours) {
-    if (data.gymHours.includes('Loading') || data.gymHours.includes('Error')) {
-      if (data.gymHours.includes('Loading')) {
-        gymContainer.innerHTML = `
-          <div class="loading">
-            <div class="loading-spinner"></div>
-            ${data.gymHours}
-          </div>
+        container.innerHTML = ''; // Clear loading
+        const contentWrapper = document.createElement('div');
+        contentWrapper.classList.add('content-fade-in');
+        const formattedHours = formatHoursForDisplay(hoursData);
+        contentWrapper.innerHTML = formattedHours + `
+          <a href="${config.link}" target="_blank" class="website-link">
+            ${config.linkText}
+          </a>
         `;
-      } else {
-        gymContainer.innerHTML = `<div class="error">${data.gymHours}</div>`;
+        container.appendChild(contentWrapper);
+        
+        // Setup facility-specific tabs (e.g., for gym subsections) if applicable
+        setTimeout(() => setupFacilityTabs(), 100);
       }
-    } else {
-      // For gym hours, don't use formatHoursText since it's already structured
-      const formattedGymHours = formatHoursForDisplay(data.gymHours);
-      gymContainer.innerHTML = formattedGymHours + `
-        <a href="https://www.angelo.edu/life-on-campus/play/university-recreation/urec-hours-of-operation.php" target="_blank" class="website-link">
-          View on Recreation Website
-        </a>
-      `;
-      
-      // Setup tabs for gym after content is loaded
-      setTimeout(() => setupFacilityTabs(), 100);
-    }
-  }
-  
-  // Update dining hours
-  const diningContainer = document.getElementById('dining-hours');
-  if (data.diningHours) {
-    if (data.diningHours.includes('Loading') || data.diningHours.includes('Error')) {
-      if (data.diningHours.includes('Loading')) {
-        diningContainer.innerHTML = `
-          <div class="loading">
-            <div class="loading-spinner"></div>
-            ${data.diningHours}
-          </div>
-        `;
-      } else {
-        diningContainer.innerHTML = `<div class="error">${data.diningHours}</div>`;
-      }
-    } else {
-      // For dining hours, don't use formatHoursText since it's already structured
-      const formattedDiningHours = formatHoursForDisplay(data.diningHours);
-      diningContainer.innerHTML = formattedDiningHours + `
-        <a href="https://dineoncampus.com/Angelo/hours-of-operation" target="_blank" class="website-link">
-          View on Dining Website
-        </a>
-      `;
-      
-      // Setup tabs for dining after content is loaded
-      setTimeout(() => setupFacilityTabs(), 100);
     }
   }
 });
@@ -780,4 +756,51 @@ function setupFacilityTabs() {
       });
     });
   });
-} 
+}
+
+// Function to handle sidebar navigation
+function setupSidebarNavigation() {
+  const navLinks = document.querySelectorAll('.sidebar-nav li a');
+  const contentSections = document.querySelectorAll('.content-section');
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const sectionId = this.getAttribute('data-section');
+      
+      // Update active link
+      navLinks.forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Show corresponding content section
+      contentSections.forEach(section => {
+        if (section.id === `${sectionId}-section-content`) {
+          section.classList.add('active');
+        } else {
+          section.classList.remove('active');
+        }
+      });
+      
+      // Scroll to top of content area for better UX on section switch
+      const mainContentWrapper = document.querySelector('.main-content-wrapper');
+      if (mainContentWrapper) {
+        mainContentWrapper.scrollTop = 0;
+      }
+    });
+  });
+
+  // Activate the first section by default (or based on hash)
+  let initialSection = window.location.hash.substring(1) || 'library';
+  const initialLink = document.querySelector(`.sidebar-nav li a[data-section="${initialSection}"]`);
+  if (initialLink) {
+    initialLink.click(); // Simulate click to set up correctly
+  } else if (navLinks.length > 0) {
+    navLinks[0].click(); // Fallback to first link
+  }
+}
+
+// Initial setup when the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  setupSidebarNavigation();
+  // Note: setupFacilityTabs is now called after data is loaded within the IPC listener
+}); 
