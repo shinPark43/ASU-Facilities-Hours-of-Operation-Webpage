@@ -3,79 +3,31 @@ import React, { useState, useEffect } from 'react';
 const Gym = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('chp');
+  const [activeTab, setActiveTab] = useState('CHP (Fitness Center)');
   const [facilities, setFacilities] = useState(null);
 
   useEffect(() => {
-    // Temporary mock data - will be replaced with API call
-    const mockFacilities = {
-      chp: {
-        name: 'CHP (Fitness Center)',
-        hours: {
-          'Monday': '6:00 AM - 10:00 PM',
-          'Tuesday': '6:00 AM - 10:00 PM',
-          'Wednesday': '6:00 AM - 10:00 PM',
-          'Thursday': '6:00 AM - 10:00 PM',
-          'Friday': '6:00 AM - 8:00 PM',
-          'Saturday': '8:00 AM - 5:00 PM',
-          'Sunday': '1:00 PM - 5:00 PM'
+    const fetchRecreationHours = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:3001/api/facilities/recreation');
+        if (!response.ok) {
+          throw new Error('Failed to fetch recreation hours');
         }
-      },
-      pool: {
-        name: 'Swimming Pool',
-        hours: {
-          'Monday': '6:30 AM - 8:00 PM',
-          'Tuesday': '6:30 AM - 8:00 PM',
-          'Wednesday': '6:30 AM - 8:00 PM',
-          'Thursday': '6:30 AM - 8:00 PM',
-          'Friday': '6:30 AM - 6:00 PM',
-          'Saturday': 'Closed',
-          'Sunday': 'Closed'
+        const data = await response.json();
+        if (data.success) {
+          setFacilities(data.data.sections);
+        } else {
+          throw new Error(data.message || 'Failed to load recreation hours');
         }
-      },
-      climbing: {
-        name: 'Climbing Gym',
-        hours: {
-          'Monday': '3:00 PM - 8:00 PM',
-          'Tuesday': '3:00 PM - 8:00 PM',
-          'Wednesday': '3:00 PM - 8:00 PM',
-          'Thursday': '3:00 PM - 8:00 PM',
-          'Friday': '3:00 PM - 6:00 PM',
-          'Saturday': 'Closed',
-          'Sunday': 'Closed'
-        }
-      },
-      lake: {
-        name: 'Lake House',
-        hours: {
-          'Monday': '3:00 PM - 7:00 PM',
-          'Tuesday': '3:00 PM - 7:00 PM',
-          'Wednesday': '3:00 PM - 7:00 PM',
-          'Thursday': '3:00 PM - 7:00 PM',
-          'Friday': '3:00 PM - 6:00 PM',
-          'Saturday': '10:00 AM - 4:00 PM',
-          'Sunday': 'Closed'
-        }
-      },
-      intramural: {
-        name: 'Intramural Complex',
-        hours: {
-          'Monday': '6:00 AM - 11:00 PM',
-          'Tuesday': '6:00 AM - 11:00 PM',
-          'Wednesday': '6:00 AM - 11:00 PM',
-          'Thursday': '6:00 AM - 11:00 PM',
-          'Friday': '6:00 AM - 9:00 PM',
-          'Saturday': '9:00 AM - 6:00 PM',
-          'Sunday': '1:00 PM - 11:00 PM'
-        }
+      } catch (err) {
+        setError(`Error loading recreation hours: ${err.message}`);
+      } finally {
+        setLoading(false);
       }
     };
 
-    // Simulate API call
-    setTimeout(() => {
-      setFacilities(mockFacilities);
-      setLoading(false);
-    }, 1000);
+    fetchRecreationHours();
   }, []);
 
   if (loading) {
@@ -95,13 +47,16 @@ const Gym = () => {
     );
   }
 
-  const facilityTabs = [
-    { id: 'chp', label: 'CHP (Fitness Center)' },
-    { id: 'pool', label: 'Swimming Pool' },
-    { id: 'climbing', label: 'Climbing Gym' },
-    { id: 'lake', label: 'Lake House' },
-    { id: 'intramural', label: 'Intramural Complex' }
-  ];
+  // Generate facility tabs from actual API data
+  const facilityTabs = facilities ? Object.keys(facilities).map(facilityName => ({
+    id: facilityName,
+    label: facilityName
+  })) : [];
+
+  // Set initial active tab when data loads
+  if (facilities && !facilities[activeTab] && facilityTabs.length > 0) {
+    setActiveTab(facilityTabs[0].id);
+  }
 
   return (
     <div>
@@ -137,14 +92,14 @@ const Gym = () => {
           </select>
         </div>
         
-        {facilities && Object.keys(facilities).map((facilityId) => (
+        {facilities && Object.keys(facilities).map((facilityName) => (
           <div
-            key={facilityId}
-            className={`facility-content ${activeTab === facilityId ? 'active' : ''}`}
+            key={facilityName}
+            className={`facility-content ${activeTab === facilityName ? 'active' : ''}`}
           >
-            <h3 className="facility-name">{facilities[facilityId].name}</h3>
+            <h3 className="facility-name">{facilityName}</h3>
             <div className="facility-hours">
-              {Object.entries(facilities[facilityId].hours).map(([day, hours]) => (
+              {Object.entries(facilities[facilityName]).map(([day, hours]) => (
                 <div key={day} className="hours-row">
                   <span className="day-name">{day}</span>
                   <span className={`hours-time ${hours.toLowerCase() === 'closed' ? 'closed-not-available' : ''}`}>

@@ -7,42 +7,27 @@ const Library = () => {
   const [activeTab, setActiveTab] = useState('main-library');
 
   useEffect(() => {
-    // Temporary mock data - will be replaced with API call
-    const mockHours = {
-      'Main Library': {
-        'Monday': '7:30 AM - 2:00 AM',
-        'Tuesday': '7:30 AM - 2:00 AM',
-        'Wednesday': '7:30 AM - 2:00 AM',
-        'Thursday': '7:30 AM - 2:00 AM',
-        'Friday': '7:30 AM - 6:00 PM',
-        'Saturday': '10:00 AM - 6:00 PM',
-        'Sunday': '12:00 PM - 2:00 AM'
-      },
-      'IT Desk': {
-        'Monday': '8:00 AM - 8:00 PM',
-        'Tuesday': '8:00 AM - 8:00 PM',
-        'Wednesday': '8:00 AM - 8:00 PM',
-        'Thursday': '8:00 AM - 8:00 PM',
-        'Friday': '8:00 AM - 5:00 PM',
-        'Saturday': 'Closed',
-        'Sunday': '2:00 PM - 8:00 PM'
-      },
-      'West Texas Collection': {
-        'Monday': '10:00 AM - 5:00 PM',
-        'Tuesday': '10:00 AM - 5:00 PM',
-        'Wednesday': '10:00 AM - 5:00 PM',
-        'Thursday': '10:00 AM - 5:00 PM',
-        'Friday': '10:00 AM - 4:00 PM',
-        'Saturday': 'Closed',
-        'Sunday': 'Closed'
+    const fetchLibraryHours = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:3001/api/facilities/library');
+        if (!response.ok) {
+          throw new Error('Failed to fetch library hours');
+        }
+        const data = await response.json();
+        if (data.success) {
+          setHours(data.data.sections);
+        } else {
+          throw new Error(data.message || 'Failed to load library hours');
+        }
+      } catch (err) {
+        setError(`Error loading library hours: ${err.message}`);
+      } finally {
+        setLoading(false);
       }
     };
 
-    // Simulate API call
-    setTimeout(() => {
-      setHours(mockHours);
-      setLoading(false);
-    }, 1000);
+    fetchLibraryHours();
   }, []);
 
   if (loading) {
