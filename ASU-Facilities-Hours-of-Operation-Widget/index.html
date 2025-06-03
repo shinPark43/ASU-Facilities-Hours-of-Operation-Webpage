@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ASU Facilities Hours</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    body {
+      background: #fafafa;
+      color: #1a1a1a;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    
+    .title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+      letter-spacing: -0.025em;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      color: #6b7280;
+      font-weight: 400;
+    }
+    
+    .cards-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+    
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .card:hover {
+      border-color: #d1d5db;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .card-header {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f3f4f6;
+      text-align: center;
+    }
+    
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0;
+    }
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      color: #6b7280;
+      font-size: 1rem;
+    }
+    
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e5e7eb;
+      border-top: 2px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error {
+      padding: 24px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      color: #dc2626;
+      font-size: 1rem;
+      text-align: center;
+    }
+    
+    .hours-container {
+      min-height: 200px;
+    }
+    
+    .facility-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 8px;
+    }
+    
+    .facility-tab {
+      padding: 8px 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #64748b;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    
+    .facility-tab:hover {
+      background: #f1f5f9;
+      color: #475569;
+    }
+    
+    .facility-tab.active {
+      background: #f59e0b;
+      color: white;
+      border-color: #f59e0b;
+    }
+    
+    .facility-content {
+      display: none;
+    }
+    
+    .facility-content.active {
+      display: block;
+    }
+    
+    .facility-section {
+      margin-bottom: 32px;
+      padding: 24px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .facility-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .facility-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 20px 0;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-radius: 8px;
+      border-left: 4px solid #f59e0b;
+      text-align: center;
+    }
+    
+    .facility-hours {
+      display: grid;
+      gap: 8px;
+    }
+    
+    .hours-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+    
+    .hours-row:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .day-name {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 1rem;
+      min-width: 100px;
+    }
+    
+    .hours-time {
+      color: #475569;
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-align: right;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    }
+    
+    .hours-info {
+      padding: 16px 20px;
+      margin: 8px 0;
+      background: #ffffff;
+      border-radius: 8px;
+      color: #64748b;
+      font-size: 0.95rem;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      font-style: italic;
+    }
+    
+    .website-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 24px;
+      padding: 12px 20px;
+      background: #f8fafc;
+      color: #475569;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: 1px solid #e2e8f0;
+      width: 100%;
+    }
+    
+    .website-link:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    
+    .website-link::after {
+      content: '↗';
+      margin-left: 8px;
+      font-size: 0.8rem;
+    }
+    
+    .footer {
+      text-align: center;
+      padding-top: 40px;
+      border-top: 1px solid #f3f4f6;
+    }
+    
+    .footer-text {
+      color: #9ca3af;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    
+    .footer-note {
+      color: #d1d5db;
+      font-size: 0.8rem;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 24px 16px;
+      }
+      
+      .title {
+        font-size: 2rem;
+      }
+      
+      .card {
+        padding: 24px;
+      }
+      
+      .hours-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 16px;
+      }
+      
+      .day-name {
+        min-width: auto;
+        font-size: 0.95rem;
+      }
+      
+      .hours-time {
+        text-align: left;
+        font-size: 0.9rem;
+      }
+      
+      .facility-name {
+        font-size: 1rem;
+      }
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #0f0f0f;
+        color: #e5e5e5;
+      }
+      
+      .card {
+        background: #1a1a1a;
+        border-color: #2a2a2a;
+      }
+      
+      .card:hover {
+        border-color: #3a3a3a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      
+      .title {
+        color: #ffffff;
+      }
+      
+      .card-title {
+        color: #ffffff;
+      }
+      
+      .facility-section {
+        background: #262626;
+        border-color: #404040;
+      }
+      
+      .facility-name {
+        background: #1a1a1a;
+        color: #e5e5e5;
+        border-left-color: #f59e0b;
+      }
+      
+      .hours-row {
+        background: #1a1a1a;
+        border-color: #404040;
+      }
+      
+      .hours-row:hover {
+        border-color: #525252;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      
+      .day-name {
+        color: #e5e5e5;
+      }
+      
+      .hours-time {
+        color: #d1d5db;
+      }
+      
+      .hours-info {
+        background: #1a1a1a;
+        color: #9ca3af;
+        border-color: #404040;
+      }
+      
+      .website-link {
+        background: #262626;
+        color: #d1d5db;
+        border-color: #404040;
+      }
+      
+      .website-link:hover {
+        background: #2a2a2a;
+        color: #ffffff;
+        border-color: #525252;
+      }
+      
+      .footer {
+        border-color: #2a2a2a;
+      }
+      
+      .facility-tabs {
+        border-color: #404040;
+      }
+      
+      .facility-tab {
+        background: #262626;
+        border-color: #404040;
+        color: #9ca3af;
+      }
+      
+      .facility-tab:hover {
+        background: #2a2a2a;
+        color: #d1d5db;
+      }
+      
+      .facility-tab.active {
+        background: #f59e0b;
+        color: white;
+        border-color: #f59e0b;
+      }
+    }
+    
+    .gym-tabs {
+      border-color: #404040;
+    }
+    
+    .library-tabs {
+      border-color: #404040;
+    }
+    
+    .dining-tabs {
+      border-color: #404040;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">ASU Facilities</h1>
+      <p class="subtitle">Weekly operating hours</p>
+    </div>
+    
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Porter Henderson Library</h2>
+        </div>
+        <div id="library-hours" class="hours-container">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            Loading library hours...
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Recreation Center</h2>
+        </div>
+        <div id="gym-hours" class="hours-container">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            Loading recreation center hours...
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Dine on Campus</h2>
+        </div>
+        <div id="dining-hours" class="hours-container">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            Loading dining hours...
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p class="footer-text">Last updated: <span id="last-updated"></span></p>
+      <p class="footer-note">Hours may vary during holidays and special events</p>
+    </div>
+  </div>
+  
+  <script>
+    // Set the last updated time
+    document.getElementById('last-updated').textContent = new Date().toLocaleString();
+  </script>
+  <script src="src/renderer.js"></script>
+</body>
+</html> 
