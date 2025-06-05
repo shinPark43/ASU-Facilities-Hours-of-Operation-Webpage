@@ -32,7 +32,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
         
@@ -45,8 +45,7 @@ jobs:
       env:
         # Set your backend API URL here
         REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://your-backend-url.onrender.com' }}
-        # For GitHub Pages, we need to set the public URL
-        PUBLIC_URL: /ASU-Facilities-Hours-of-Operation-Widget
+        # PUBLIC_URL will be derived from homepage in package.json
       run: |
         cd frontend
         npm run build
