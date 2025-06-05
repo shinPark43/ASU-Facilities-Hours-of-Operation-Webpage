@@ -1,0 +1,132 @@
+import React, { useState, useEffect } from 'react';
+
+const Dining = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hours, setHours] = useState(null);
+  const [activeTab, setActiveTab] = useState(null);
+
+  useEffect(() => {
+    const fetchDiningHours = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:3001/api/facilities/dining');
+        if (!response.ok) {
+          throw new Error('Failed to fetch dining hours');
+        }
+        const data = await response.json();
+        if (data.success) {
+          setHours(data.data.sections);
+          // Set initial active tab to first facility
+          const facilities = Object.keys(data.data.sections);
+          if (facilities.length > 0) {
+            setActiveTab(facilities[0]);
+          }
+        } else {
+          throw new Error(data.message || 'Failed to load dining hours');
+        }
+      } catch (err) {
+        setError(`Error loading dining hours: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDiningHours();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="loading-spinner"></div>
+        <p>Loading dining hours...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error">
+        {error}
+      </div>
+    );
+  }
+
+  // Generate facility tabs from actual API data
+  const facilityTabs = hours ? Object.keys(hours).map(facilityName => ({
+    id: facilityName,
+    label: facilityName.length > 12 ? facilityName.substring(0, 12) + '...' : facilityName,
+    key: facilityName
+  })) : [];
+
+  return (
+    <div>
+      <h2 className="section-panel-header">Dine on Campus</h2>
+      <p className="section-subtitle">
+        Campus dining options, coffee shops, and food courts
+      </p>
+      
+      <div className="facility-section">
+        <div className="facility-tabs">
+          {facilityTabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`facility-tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        
+        <div className="facility-dropdown-wrapper">
+          <select 
+            className="facility-dropdown"
+            value={activeTab || ''}
+            onChange={(e) => setActiveTab(e.target.value)}
+          >
+            {facilityTabs.map((tab) => (
+              <option key={tab.id} value={tab.id}>
+                {tab.key}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        {facilityTabs.map((tab) => (
+          <div
+            key={tab.id}
+            className={`facility-content ${activeTab === tab.id ? 'active' : ''}`}
+          >
+            <h3 className="facility-name">{tab.key}</h3>
+            <div className="facility-hours">
+              {hours && hours[tab.key] && Object.entries(hours[tab.key]).map(([day, hours]) => (
+                <div key={day} className="hours-row">
+                  <span className="day-name">{day}</span>
+                  <span className={`hours-time ${hours.toLowerCase() === 'closed' ? 'closed-not-available' : ''}`}>
+                    {hours}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="hours-info">
+        Hours may vary during holidays and special events.
+      </div>
+      
+      <a 
+        href="https://dineoncampus.com/Angelo/hours-of-operation" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="website-link"
+      >
+        View on Dining Website
+      </a>
+    </div>
+  );
+};
+
+export default Dining; 

@@ -1,0 +1,37 @@
+{
+  "name": "asu-facilities-backend",
+  "version": "1.0.0",
+  "description": "Backend API for ASU Facilities Hours scraper and database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "init-db": "node scripts/init-db.js",
+    "scrape": "node scripts/scraper.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "node-cron": "^3.0.3",
+    "puppeteer": "^21.7.0",
+    "cheerio": "^1.0.0-rc.12",
+    "axios": "^1.6.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "asu",
+    "facilities",
+    "hours",
+    "scraper",
+    "api"
+  ],
+  "author": "ASU Student",
+  "license": "MIT"
+}

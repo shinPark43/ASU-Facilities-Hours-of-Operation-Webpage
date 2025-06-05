@@ -1,0 +1,68 @@
+name: Scrape Facility Hours
+
+on:
+  # Run daily at 00:01 AM CST (06:01 AM UTC)
+  schedule:
+    - cron: '1 6 * * *'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      facility_type:
+        description: 'Facility type to scrape (optional: library, recreation, dining)'
+        required: false
+        default: ''
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+        
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm ci
+        
+    - name: Run scraper
+      env:
+        # If you need API keys or credentials, add them as secrets
+        NODE_ENV: production
+        API_BASE_URL: ${{ secrets.API_BASE_URL || 'https://your-backend-url.render.com' }}
+      run: |
+        cd backend
+        if [ "${{ github.event.inputs.facility_type }}" != "" ]; then
+          npm run scrape ${{ github.event.inputs.facility_type }}
+        else
+          npm run scrape
+        fi
+        
+    - name: Upload scraping logs (if needed)
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: scraping-logs
+        path: backend/logs/
+        retention-days: 7
+
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "❌ Facility hours scraping failed!"
+        echo "Check the logs above for details."
+        # You can add Slack/Discord notification here if needed
+
+    - name: Success notification
+      if: success()
+      run: |
+        echo "✅ Facility hours scraping completed successfully!"
+        echo "Database has been updated with the latest hours." 

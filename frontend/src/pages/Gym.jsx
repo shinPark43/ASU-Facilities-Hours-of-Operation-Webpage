@@ -1,0 +1,131 @@
+import React, { useState, useEffect } from 'react';
+
+const Gym = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('CHP (Fitness Center)');
+  const [facilities, setFacilities] = useState(null);
+
+  useEffect(() => {
+    const fetchRecreationHours = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:3001/api/facilities/recreation');
+        if (!response.ok) {
+          throw new Error('Failed to fetch recreation hours');
+        }
+        const data = await response.json();
+        if (data.success) {
+          setFacilities(data.data.sections);
+        } else {
+          throw new Error(data.message || 'Failed to load recreation hours');
+        }
+      } catch (err) {
+        setError(`Error loading recreation hours: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecreationHours();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="loading-spinner"></div>
+        <p>Loading recreation center hours...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error">
+        {error}
+      </div>
+    );
+  }
+
+  // Generate facility tabs from actual API data
+  const facilityTabs = facilities ? Object.keys(facilities).map(facilityName => ({
+    id: facilityName,
+    label: facilityName
+  })) : [];
+
+  // Set initial active tab when data loads
+  if (facilities && !facilities[activeTab] && facilityTabs.length > 0) {
+    setActiveTab(facilityTabs[0].id);
+  }
+
+  return (
+    <div>
+      <h2 className="section-panel-header">Recreation Center</h2>
+      <p className="section-subtitle">
+        Fitness facilities, swimming, climbing, and recreational activities
+      </p>
+      
+      <div className="facility-section">
+        <div className="facility-tabs">
+          {facilityTabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`facility-tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        
+        <div className="facility-dropdown-wrapper">
+          <select 
+            className="facility-dropdown"
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+          >
+            {facilityTabs.map((tab) => (
+              <option key={tab.id} value={tab.id}>
+                {tab.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        {facilities && Object.keys(facilities).map((facilityName) => (
+          <div
+            key={facilityName}
+            className={`facility-content ${activeTab === facilityName ? 'active' : ''}`}
+          >
+            <h3 className="facility-name">{facilityName}</h3>
+            <div className="facility-hours">
+              {Object.entries(facilities[facilityName]).map(([day, hours]) => (
+                <div key={day} className="hours-row">
+                  <span className="day-name">{day}</span>
+                  <span className={`hours-time ${hours.toLowerCase() === 'closed' ? 'closed-not-available' : ''}`}>
+                    {hours}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="hours-info">
+        Hours may vary during holidays and special events.
+      </div>
+      
+      <a 
+        href="https://www.angelo.edu/life-on-campus/play/university-recreation/urec-hours-of-operation.php" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="website-link"
+      >
+        View on Recreation Website
+      </a>
+    </div>
+  );
+};
+
+export default Gym;
