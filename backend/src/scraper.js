@@ -151,7 +151,7 @@ async function scrapeLibraryHours() {
               }
               
               // Extract hours for each day
-              for (let cellIndex = 1; cellIndex < cells.length && cellIndex - 1 < headerDays.length; cellIndex++) {
+              for (let cellIndex = 1; cellIndex < cells.length && cellIndex <= headerDays.length; cellIndex++) {
                 const hoursText = cells[cellIndex].innerText.trim();
                 const dayName = headerDays[cellIndex - 1];
                 
