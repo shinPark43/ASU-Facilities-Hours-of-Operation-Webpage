@@ -5,8 +5,8 @@
 
 // Configuration
 const API_CONFIG = {
-  // Use environment variable or fallback to localhost for development
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3001',
+  // Temporarily hardcoded for debugging - TODO: fix GitHub secret
+  baseURL: process.env.REACT_APP_API_URL || 'https://asu-facilities-hours-of-operation-webpage-production.up.railway.app',
   timeout: 10000, // 10 seconds
 };
 
