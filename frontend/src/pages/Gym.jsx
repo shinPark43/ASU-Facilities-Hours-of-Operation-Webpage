@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { facilityAPI } from '../services/api.js';
 
 const Gym = () => {
   const [loading, setLoading] = useState(true);
@@ -10,15 +11,11 @@ const Gym = () => {
     const fetchRecreationHours = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:3001/api/facilities/recreation');
-        if (!response.ok) {
-          throw new Error('Failed to fetch recreation hours');
-        }
-        const data = await response.json();
-        if (data.success) {
-          setFacilities(data.data.sections);
+        const data = await facilityAPI.getRecreationHours();
+        if (data && data.sections) {
+          setFacilities(data.sections);
         } else {
-          throw new Error(data.message || 'Failed to load recreation hours');
+          throw new Error('No recreation hours data available');
         }
       } catch (err) {
         setError(`Error loading recreation hours: ${err.message}`);

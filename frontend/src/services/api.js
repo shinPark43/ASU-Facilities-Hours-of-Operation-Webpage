@@ -5,8 +5,7 @@
 
 // Configuration
 const API_CONFIG = {
-  // Temporarily hardcoded for debugging - TODO: fix GitHub secret
-  baseURL: process.env.REACT_APP_API_URL || 'https://asu-facilities-hours-of-operation-webpage-production.up.railway.app',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3001',
   timeout: 10000, // 10 seconds
 };
 

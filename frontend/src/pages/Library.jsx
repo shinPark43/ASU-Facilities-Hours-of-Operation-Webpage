@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { facilityAPI } from '../services/api.js';
 
 const Library = () => {
   const [loading, setLoading] = useState(true);
@@ -10,15 +11,11 @@ const Library = () => {
     const fetchLibraryHours = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:3001/api/facilities/library');
-        if (!response.ok) {
-          throw new Error('Failed to fetch library hours');
-        }
-        const data = await response.json();
-        if (data.success) {
-          setHours(data.data.sections);
+        const data = await facilityAPI.getLibraryHours();
+        if (data && data.sections) {
+          setHours(data.sections);
         } else {
-          throw new Error(data.message || 'Failed to load library hours');
+          throw new Error('No library hours data available');
         }
       } catch (err) {
         setError(`Error loading library hours: ${err.message}`);

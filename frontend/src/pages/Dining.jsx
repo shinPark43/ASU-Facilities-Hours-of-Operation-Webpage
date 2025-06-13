@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { facilityAPI } from '../services/api.js';
 
 const Dining = () => {
   const [loading, setLoading] = useState(true);
@@ -10,20 +11,16 @@ const Dining = () => {
     const fetchDiningHours = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:3001/api/facilities/dining');
-        if (!response.ok) {
-          throw new Error('Failed to fetch dining hours');
-        }
-        const data = await response.json();
-        if (data.success) {
-          setHours(data.data.sections);
+        const data = await facilityAPI.getDiningHours();
+        if (data && data.sections) {
+          setHours(data.sections);
           // Set initial active tab to first facility
-          const facilities = Object.keys(data.data.sections);
+          const facilities = Object.keys(data.sections);
           if (facilities.length > 0) {
             setActiveTab(facilities[0]);
           }
         } else {
-          throw new Error(data.message || 'Failed to load dining hours');
+          throw new Error('No dining hours data available');
         }
       } catch (err) {
         setError(`Error loading dining hours: ${err.message}`);

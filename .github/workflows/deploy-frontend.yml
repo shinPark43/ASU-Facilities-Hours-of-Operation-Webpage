@@ -47,7 +47,7 @@ jobs:
     - name: Build application
       env:
         # Set your backend API URL here
-        REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://your-backend-url.onrender.com' }}
+        REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
         # PUBLIC_URL will be derived from homepage in package.json
       run: |
         cd frontend
