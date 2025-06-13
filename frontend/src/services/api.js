@@ -10,6 +10,13 @@ const API_CONFIG = {
   timeout: 10000, // 10 seconds
 };
 
+// Debug logging
+console.log('🔧 API Configuration:', {
+  envVar: process.env.REACT_APP_API_URL,
+  finalURL: API_CONFIG.baseURL,
+  timestamp: new Date().toISOString()
+});
+
 /**
  * Generic API request function with error handling
  */
