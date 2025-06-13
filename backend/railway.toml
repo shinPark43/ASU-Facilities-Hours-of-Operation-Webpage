@@ -1,9 +1,9 @@
 [build]
   builder = "nixpacks"
-  buildCommand = "npm install --omit=dev"
+  buildCommand = "npm install --omit=dev && npm run init-db"
 
 [deploy]
-  startCommand = "npm run init-db && npm start"
+  startCommand = "npm start"
   healthcheckPath = "/api/health"
 
 [env]

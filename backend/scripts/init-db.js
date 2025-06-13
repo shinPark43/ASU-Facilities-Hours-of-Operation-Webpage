@@ -21,8 +21,8 @@ async function initializeDatabase() {
   console.log('🚀 Initializing ASU Facilities Database...');
   
   try {
-    // Initialize database
-    db.init();
+    // Initialize database (await the promise)
+    await db.init();
     
     console.log('✅ Database initialized successfully!');
     console.log('📊 Database includes:');
@@ -30,12 +30,17 @@ async function initializeDatabase() {
     console.log('  - Facility hours table for storing operating hours');
     console.log('  - Scrape log table for tracking scraping activities');
     
-    // Get and display current facilities
-    const facilities = db.getAllFacilities();
-    console.log(`📍 Default facilities loaded: ${facilities.length}`);
-    facilities.forEach(facility => {
-      console.log(`  - ${facility.name} (${facility.type})`);
-    });
+    // Get and display current facilities (await the promise)
+    const facilities = await db.getAllFacilities();
+    console.log(`📍 Default facilities loaded: ${facilities ? facilities.length : 0}`);
+    
+    if (facilities && Array.isArray(facilities) && facilities.length > 0) {
+      facilities.forEach(facility => {
+        console.log(`  - ${facility.name} (${facility.type})`);
+      });
+    } else {
+      console.log('  - No facilities found in database');
+    }
     
     console.log('\n🎯 Next steps:');
     console.log('  1. Start the server: npm start');
