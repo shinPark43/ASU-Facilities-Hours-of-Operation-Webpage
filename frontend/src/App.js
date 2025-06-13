@@ -9,7 +9,7 @@ import './styles/Layout.css';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/ASU-Facilities-Hours-of-Operation-Webpage">
       <Layout>
         <Routes>
           <Route path="/library" element={<Library />} />
