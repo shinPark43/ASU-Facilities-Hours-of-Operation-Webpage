@@ -4,17 +4,12 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && npm run init-db
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        fromService:
-          type: web
-          name: asu-facilities-backend
-          property: port
-    disk:
-      name: asu-facilities-data
-      mountPath: /opt/render/project/src/backend/data
-      sizeGB: 1 
+      - key: ALLOWED_ORIGINS
+        value: https://shinpark43.github.io
+      - key: DATABASE_PATH
+        value: /tmp/facilities.db 

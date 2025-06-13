@@ -1,0 +1,11 @@
+[build]
+  builder = "nixpacks"
+
+[deploy]
+  startCommand = "npm start"
+  healthcheckPath = "/api/health"
+
+[env]
+  NODE_ENV = "production"
+  ALLOWED_ORIGINS = "https://shinpark43.github.io"
+  DATABASE_PATH = "/app/data/facilities.db" 
