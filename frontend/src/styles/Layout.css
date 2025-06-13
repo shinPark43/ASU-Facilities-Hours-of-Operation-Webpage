@@ -266,21 +266,23 @@ body {
   display: flex;
   flex: 1;
   overflow: hidden;
-  margin-top: 100px;
+  margin-top: calc(var(--header-height) + (var(--header-padding-desktop) * 2));
 }
 
-/* Sidebar Navigation */
+/* Sidebar Navigation - Fixed positioning and responsive design */
 .sidebar {
-  width: 280px;
+  width: var(--sidebar-width-desktop);
   background: var(--gradient-secondary);
   border-right: 1px solid var(--border-color);
   padding: 40px 0;
   position: fixed;
-  height: calc(100vh - 100px);
-  top: 100px;
+  height: calc(100vh - var(--header-height) - (var(--header-padding-desktop) * 2));
+  top: calc(var(--header-height) + (var(--header-padding-desktop) * 2));
+  left: 0;
   overflow-y: auto;
   box-shadow: 0 0 0 1px var(--shadow-light), 0 4px 16px var(--shadow-medium);
   z-index: 50;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-nav {
@@ -647,6 +649,26 @@ body {
     height: calc(var(--header-height) + (var(--header-padding-tablet) * 2));
   }
   
+  .sidebar {
+    width: var(--sidebar-width-tablet);
+    height: calc(100vh - var(--header-height) - (var(--header-padding-tablet) * 2));
+    top: calc(var(--header-height) + (var(--header-padding-tablet) * 2));
+    padding: 32px 0;
+  }
+  
+  .sidebar-nav {
+    padding: 0 24px;
+  }
+  
+  .sidebar-nav li {
+    margin-bottom: 10px;
+  }
+  
+  .sidebar-nav a {
+    padding: 16px 20px;
+    font-size: 14px;
+  }
+  
   .main-content-wrapper {
     margin-left: var(--sidebar-width-tablet);
     margin-top: calc(var(--header-height) + (var(--header-padding-tablet) * 2) + var(--content-spacing-tablet));
@@ -664,6 +686,24 @@ body {
   .facility-tab {
     padding: 12px 18px;
     font-size: 13px;
+  }
+}
+
+/* Medium screens - prevent sidebar overlap on cramped screens */
+@media (max-width: 900px) and (min-width: 769px) {
+  .sidebar {
+    display: none;
+  }
+  
+  .main-content-wrapper {
+    margin-left: 0;
+    max-width: 100%;
+    padding: var(--content-spacing-tablet) 24px;
+    margin-top: calc(var(--header-height) + (var(--header-padding-tablet) * 2) + var(--content-spacing-tablet));
+  }
+  
+  .main-layout {
+    margin-top: calc(var(--header-height) + (var(--header-padding-tablet) * 2));
   }
 }
 
