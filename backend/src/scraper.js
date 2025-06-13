@@ -3,6 +3,22 @@ const cheerio = require('cheerio');
 const axios = require('axios');
 const db = require('./database');
 
+// Puppeteer configuration for Railway deployment
+const PUPPETEER_CONFIG = {
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-accelerated-2d-canvas',
+    '--no-first-run',
+    '--no-zygote',
+    '--single-process',
+    '--disable-gpu'
+  ],
+  headless: 'new',
+  timeout: 30000
+};
+
 // Configuration for scraping
 const SCRAPER_CONFIG = {
   timeout: 30000,

@@ -1,0 +1,9 @@
+node_modules
+*.log
+.env
+.DS_Store
+README.md
+DEPLOYMENT.md
+DEPLOYMENT_ALTERNATIVES.md
+data/facilities.db-wal
+data/facilities.db-shm 
