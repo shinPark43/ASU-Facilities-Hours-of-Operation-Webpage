@@ -75,8 +75,7 @@ function createTables() {
         notes TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (facility_id) REFERENCES facilities (id),
-        UNIQUE(facility_id, section_name, day_of_week)
+        FOREIGN KEY (facility_id) REFERENCES facilities (id)
       )`,
       
       // Scrape log table - tracks scraping activities
@@ -229,35 +228,32 @@ function getFacilityHours(facilityType) {
   });
 }
 
-// Update facility hours
-function updateFacilityHours(facilityType, hoursData) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const facility = await getFacilityByType(facilityType);
-      if (!facility) {
-        reject(new Error(`Facility type '${facilityType}' not found`));
-        return;
-      }
+// Update facility hours - optimized with batch operations and prepared statements
+async function updateFacilityHours(facilityType, hoursData) {
+  const facility = await getFacilityByType(facilityType);
+  if (!facility) {
+    throw new Error(`Facility type '${facilityType}' not found`);
+  }
 
-      const query = `
-        INSERT OR REPLACE INTO facility_hours 
-        (facility_id, section_name, day_of_week, open_time, close_time, is_closed, notes, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-      `;
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      let stmt;
+      
+      db.run('BEGIN TRANSACTION', (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
 
-      // Start transaction
-      db.serialize(() => {
-        db.run('BEGIN TRANSACTION', (err) => {
+        // Delete existing hours for this facility
+        db.run('DELETE FROM facility_hours WHERE facility_id = ?', [facility.id], (err) => {
           if (err) {
+            db.run('ROLLBACK');
             reject(err);
             return;
           }
 
-          let completed = 0;
-          const total = hoursData.length;
-          let hasError = false;
-
-          if (total === 0) {
+          if (hoursData.length === 0) {
             db.run('COMMIT', (err) => {
               if (err) reject(err);
               else resolve();
@@ -265,39 +261,47 @@ function updateFacilityHours(facilityType, hoursData) {
             return;
           }
 
-          hoursData.forEach(hours => {
-            if (hasError) return;
+          // Prepare statement once for all inserts
+          stmt = db.prepare(`
+            INSERT INTO facility_hours 
+            (facility_id, section_name, day_of_week, open_time, close_time, is_closed, notes, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          `);
 
-            db.run(query, [
-              facility.id,
-              hours.section_name,
-              hours.day_of_week,
-              hours.open_time,
-              hours.close_time,
-              hours.is_closed || false,
-              hours.notes || null
-            ], (err) => {
-              if (err && !hasError) {
-                hasError = true;
+          // Batch insert all hours data
+          try {
+            hoursData.forEach(hours => {
+              stmt.run([
+                facility.id,
+                hours.section_name,
+                hours.day_of_week,
+                hours.open_time,
+                hours.close_time,
+                hours.is_closed || false,
+                hours.notes || null
+              ]);
+            });
+
+            stmt.finalize((err) => {
+              if (err) {
                 db.run('ROLLBACK');
                 reject(err);
                 return;
               }
 
-              completed++;
-              if (completed === total && !hasError) {
-                db.run('COMMIT', (err) => {
-                  if (err) reject(err);
-                  else resolve();
-                });
-              }
+              db.run('COMMIT', (err) => {
+                if (err) reject(err);
+                else resolve();
+              });
             });
-          });
+          } catch (error) {
+            stmt.finalize();
+            db.run('ROLLBACK');
+            reject(error);
+          }
         });
       });
-    } catch (error) {
-      reject(error);
-    }
+    });
   });
 }
 
