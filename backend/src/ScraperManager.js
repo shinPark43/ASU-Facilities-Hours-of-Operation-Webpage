@@ -473,6 +473,20 @@ class ScraperManager {
             cleanLocationName = 'Chick-fil-A';
           } else if (locationName.toLowerCase().includes('starbucks')) {
             cleanLocationName = 'Starbucks';
+          } else if (locationName.toLowerCase().includes('einstein') || locationName.toLowerCase().includes('bagel')) {
+            cleanLocationName = 'Einstein Bros Bagels';
+          } else if (locationName.toLowerCase().includes('roscoe')) {
+            cleanLocationName = "Roscoe's Den";
+          } else if (locationName.toLowerCase().includes('subway')) {
+            cleanLocationName = 'Subway';
+          } else if (locationName.toLowerCase().includes('tu taco') || locationName.toLowerCase().includes('taco')) {
+            cleanLocationName = 'Tu Taco';
+          } else if (locationName.toLowerCase().includes('ranch') || locationName.toLowerCase().includes('smokehouse')) {
+            cleanLocationName = 'Ranch Smokehouse';
+          } else if (locationName.toLowerCase().includes('market')) {
+            cleanLocationName = 'Market';
+          } else if (locationName.toLowerCase().includes('sushi')) {
+            cleanLocationName = 'Sushi';
           }
           
           if (!diningData[cleanLocationName]) {
