@@ -2,7 +2,29 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 
-// Helper function to format hours data for frontend
+// Cache for formatted results
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Helper function to format time range
+function formatTimeRange(hour) {
+  if (hour.is_closed) return 'Closed';
+  if (hour.open_time && hour.close_time) {
+    return `${hour.open_time} - ${hour.close_time}`;
+  }
+  if (hour.open_time) return hour.open_time;
+  return 'Hours not available';
+}
+
+// Helper function to get latest update timestamp
+function getLatestUpdate(current, newUpdate) {
+  if (!current || newUpdate > current) {
+    return newUpdate;
+  }
+  return current;
+}
+
+// Optimized helper function to format hours data for frontend - O(n) complexity
 function formatHoursForFrontend(rawHours) {
   if (!rawHours || rawHours.length === 0) {
     return {};
@@ -17,31 +39,90 @@ function formatHoursForFrontend(rawHours) {
     last_updated: null
   };
 
-  // Group hours by section
+  // Use Map for O(1) lookups instead of nested objects
+  const timeRangesBySection = new Map();
+  
+  // Single pass O(n) processing
   rawHours.forEach(hour => {
     if (!hour.section_name) return;
-
-    if (!facility.sections[hour.section_name]) {
-      facility.sections[hour.section_name] = {};
+    
+    const sectionKey = `${hour.section_name}:${hour.day_of_week}`;
+    if (!timeRangesBySection.has(sectionKey)) {
+      timeRangesBySection.set(sectionKey, []);
     }
+    
+    const timeRange = formatTimeRange(hour);
+    timeRangesBySection.get(sectionKey).push(timeRange);
+    
+    facility.last_updated = getLatestUpdate(facility.last_updated, hour.updated_at);
+  });
 
-    const timeString = hour.is_closed 
-      ? 'Closed'
-      : hour.open_time && hour.close_time  // Dining: separate fields
-        ? `${hour.open_time} - ${hour.close_time}`
-        : hour.open_time  // Library/Recreation: full string in open_time
-          ? hour.open_time
-          : 'Hours not available';
-
-    facility.sections[hour.section_name][hour.day_of_week] = timeString;
-
-    // Track the most recent update
-    if (!facility.last_updated || hour.updated_at > facility.last_updated) {
-      facility.last_updated = hour.updated_at;
+  // Build final sections structure efficiently
+  timeRangesBySection.forEach((timeRanges, sectionKey) => {
+    const [sectionName, dayName] = sectionKey.split(':');
+    
+    if (!facility.sections[sectionName]) {
+      facility.sections[sectionName] = {};
+    }
+    
+    // Remove duplicates and filter invalid entries
+    const uniqueRanges = [...new Set(timeRanges)].filter(range => range && range.trim() !== '');
+    
+    if (uniqueRanges.includes('Closed')) {
+      facility.sections[sectionName][dayName] = 'Closed';
+    } else if (uniqueRanges.length === 0) {
+      facility.sections[sectionName][dayName] = 'Hours not available';
+    } else if (uniqueRanges.length === 1) {
+      facility.sections[sectionName][dayName] = uniqueRanges[0];
+    } else {
+      // Multiple time ranges - join with line breaks for display
+      facility.sections[sectionName][dayName] = uniqueRanges.join('\n');
     }
   });
 
   return facility;
+}
+
+// Generic route handler with caching
+async function getFacilityHoursHandler(req, res, facilityType) {
+  // Create cache key based on facility type and time window
+  const cacheKey = `${facilityType}:${Math.floor(Date.now() / CACHE_TTL)}`;
+  
+  // Check cache first
+  if (cache.has(cacheKey)) {
+    return res.json({
+      success: true,
+      data: cache.get(cacheKey),
+      cached: true
+    });
+  }
+
+  try {
+    const rawHours = await db.getFacilityHours(facilityType);
+    const facility = formatHoursForFrontend(rawHours);
+    
+    // Store in cache
+    cache.set(cacheKey, facility);
+    
+    // Clean up old cache entries to prevent memory leaks
+    if (cache.size > 50) {
+      const oldestKey = cache.keys().next().value;
+      cache.delete(oldestKey);
+    }
+    
+    res.json({
+      success: true,
+      data: facility,
+      cached: false
+    });
+  } catch (error) {
+    console.error(`Error fetching ${facilityType} hours:`, error);
+    res.status(500).json({
+      success: false,
+      error: `Failed to fetch ${facilityType} hours`,
+      message: error.message
+    });
+  }
 }
 
 // GET /api/facilities - Get all facilities
@@ -65,93 +146,33 @@ router.get('/', async (req, res) => {
 
 // GET /api/facilities/library - Get library hours
 router.get('/library', async (req, res) => {
-  try {
-    const rawHours = await db.getFacilityHours('library');
-    const facility = formatHoursForFrontend(rawHours);
-    
-    res.json({
-      success: true,
-      data: facility
-    });
-  } catch (error) {
-    console.error('Error fetching library hours:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch library hours',
-      message: error.message
-    });
-  }
+  await getFacilityHoursHandler(req, res, 'library');
 });
 
 // GET /api/facilities/recreation - Get recreation center hours
 router.get('/recreation', async (req, res) => {
-  try {
-    const rawHours = await db.getFacilityHours('recreation');
-    const facility = formatHoursForFrontend(rawHours);
-    
-    res.json({
-      success: true,
-      data: facility
-    });
-  } catch (error) {
-    console.error('Error fetching recreation hours:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch recreation hours',
-      message: error.message
-    });
-  }
+  await getFacilityHoursHandler(req, res, 'recreation');
 });
 
 // GET /api/facilities/dining - Get dining hours
 router.get('/dining', async (req, res) => {
-  try {
-    const rawHours = await db.getFacilityHours('dining');
-    const facility = formatHoursForFrontend(rawHours);
-    
-    res.json({
-      success: true,
-      data: facility
-    });
-  } catch (error) {
-    console.error('Error fetching dining hours:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch dining hours',
-      message: error.message
-    });
-  }
+  await getFacilityHoursHandler(req, res, 'dining');
 });
 
 // GET /api/facilities/:type - Get hours for any facility type
 router.get('/:type', async (req, res) => {
-  try {
-    const { type } = req.params;
-    const validTypes = ['library', 'recreation', 'dining'];
-    
-    if (!validTypes.includes(type)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid facility type',
-        message: `Valid types are: ${validTypes.join(', ')}`
-      });
-    }
-
-    const rawHours = await db.getFacilityHours(type);
-    const facility = formatHoursForFrontend(rawHours);
-    
-    res.json({
-      success: true,
-      data: facility
-    });
-  } catch (error) {
-    console.error(`Error fetching ${req.params.type} hours:`, error);
-    res.status(500).json({
+  const { type } = req.params;
+  const validTypes = ['library', 'recreation', 'dining'];
+  
+  if (!validTypes.includes(type)) {
+    return res.status(400).json({
       success: false,
-      error: `Failed to fetch ${req.params.type} hours`,
-      message: error.message
+      error: 'Invalid facility type',
+      message: `Valid types are: ${validTypes.join(', ')}`
     });
   }
+
+  await getFacilityHoursHandler(req, res, type);
 });
 
 // POST /api/facilities/:type/hours - Update hours for a facility (for scraper)
