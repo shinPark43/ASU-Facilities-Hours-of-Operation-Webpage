@@ -540,6 +540,14 @@ body {
   letter-spacing: -0.01em;
 }
 
+.hours-time-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  min-width: 140px;
+}
+
 .hours-time {
   color: var(--text-primary);
   font-weight: 600;
@@ -551,6 +559,7 @@ body {
   border-radius: 10px;
   border: 1px solid var(--border-light);
   min-width: 140px;
+  width: 100%;
 }
 
 .hours-time.closed-not-available {
@@ -561,6 +570,96 @@ body {
 }
 
 /* Enhanced contrast for dark mode */
+/* Enhanced Week Context Card Styling */
+.week-context-card {
+  margin: 20px 0 28px 0;
+  padding: 20px 24px;
+  background: var(--gradient-card);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 12px rgba(0, 63, 127, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.week-context-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-accent);
+}
+
+.week-context-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 63, 127, 0.12);
+}
+
+.week-context-header {
+  margin-bottom: 8px;
+}
+
+.week-context-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--asu-blue);
+  text-transform: uppercase;
+}
+
+.week-context-date {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.week-context-status {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.week-context-status::before {
+  content: '🔄';
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .week-context-card {
+  background: var(--gradient-card);
+  border-color: var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .week-context-card::before {
+  background: var(--gradient-primary);
+}
+
+[data-theme="dark"] .week-context-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .week-context-label {
+  color: var(--asu-gold);
+}
+
+[data-theme="dark"] .week-context-date {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .week-context-status {
+  color: var(--text-secondary);
+}
+
 [data-theme="dark"] .hours-time {
   background: var(--bg-secondary);
   color: var(--text-primary);
@@ -1040,7 +1139,42 @@ body {
     font-size: 13px;
   }
   
+  .hours-time-container {
+    align-items: flex-start;
+    min-width: auto;
+    width: 100%;
+    gap: 6px;
+  }
+  
   .hours-time {
+    font-size: 12px;
+    min-width: auto;
+    width: 100%;
+    text-align: left;
+  }
+  
+  .week-context-card {
+    margin: 16px 0 20px 0;
+    padding: 16px 18px;
+    border-radius: 12px;
+  }
+  
+  .week-context-card:hover {
+    transform: translateY(-1px);
+  }
+  
+  
+  .week-context-label {
+    font-size: 11px;
+    letter-spacing: 0.6px;
+  }
+  
+  .week-context-date {
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+  
+  .week-context-status {
     font-size: 12px;
   }
   

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { facilityAPI } from '../services/api.js';
+import { parseMultipleTimeRanges, formatWeekRange, formatDayWithDate, isClosedTime, getRelativeUpdateTime } from '../utils/timeUtils.js';
 
 const Library = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hours, setHours] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const [activeTab, setActiveTab] = useState('main-library');
 
   useEffect(() => {
@@ -14,6 +16,7 @@ const Library = () => {
         const data = await facilityAPI.getLibraryHours();
         if (data && data.sections) {
           setHours(data.sections);
+          setLastUpdated(data.last_updated);
         } else {
           throw new Error('No library hours data available');
         }
@@ -56,6 +59,17 @@ const Library = () => {
       <p className="section-subtitle">
         Academic resources, research support, and study spaces
       </p>
+      <div className="week-context-card">
+        <div className="week-context-header">
+          <span className="week-context-label">CURRENT WEEK</span>
+        </div>
+        <div className="week-context-date">
+          {formatWeekRange()}
+        </div>
+        <div className="week-context-status">
+          Last updated: {getRelativeUpdateTime(lastUpdated)}
+        </div>
+      </div>
       
       <div className="facility-section">
         <div className="facility-tabs">
@@ -91,14 +105,27 @@ const Library = () => {
           >
             <h3 className="facility-name">{tab.key}</h3>
             <div className="facility-hours">
-              {hours && Object.entries(hours[tab.key]).map(([day, hours]) => (
-                <div key={day} className="hours-row">
-                  <span className="day-name">{day}</span>
-                  <span className={`hours-time ${hours.toLowerCase() === 'closed' ? 'closed-not-available' : ''}`}>
-                    {hours}
-                  </span>
-                </div>
-              ))}
+              {hours && Object.entries(hours[tab.key]).map(([day, hours]) => {
+                const timeRanges = parseMultipleTimeRanges(hours);
+                const dayWithDate = formatDayWithDate(day);
+                const isClosed = isClosedTime(hours);
+                
+                return (
+                  <div key={day} className="hours-row">
+                    <span className="day-name">{dayWithDate}</span>
+                    <div className="hours-time-container">
+                      {timeRanges.map((timeRange, index) => (
+                        <span 
+                          key={index} 
+                          className={`hours-time ${isClosed ? 'closed-not-available' : ''}`}
+                        >
+                          {timeRange}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))}
