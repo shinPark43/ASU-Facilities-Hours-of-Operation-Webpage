@@ -421,12 +421,13 @@ body {
 .facility-tabs {
   display: flex;
   gap: 6px;
-  margin-bottom: 36px;
+  margin-bottom: 0;
   padding: 8px;
   background-color: var(--bg-tertiary);
-  border-radius: 16px;
+  border-radius: 16px 16px 0 0;
   flex-wrap: wrap;
   border: 1px solid var(--border-light);
+  border-bottom: none;
 }
 
 .facility-tab {
@@ -474,10 +475,11 @@ body {
 
 .facility-section {
   background: var(--bg-secondary);
-  border-radius: 20px;
+  border-radius: 0 0 20px 20px;
   padding: 36px;
   margin-bottom: 36px;
   border: 1px solid var(--border-light);
+  border-top: none;
   box-shadow: 0 1px 3px var(--shadow-light), 0 4px 12px var(--shadow-medium);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1014,6 +1016,11 @@ body {
   
   [data-theme="dark"] .facility-dropdown-wrapper::after {
     border-top-color: var(--text-secondary);
+  }
+  
+  .facility-section {
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
   }
   
   [data-theme="dark"] .facility-dropdown:focus + .facility-dropdown-wrapper::after,
