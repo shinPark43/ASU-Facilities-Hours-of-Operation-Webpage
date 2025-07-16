@@ -266,7 +266,7 @@ body {
   display: flex;
   flex: 1;
   overflow: hidden;
-  margin-top: calc(var(--header-height) + (var(--header-padding-desktop) * 2) + 16px);
+  margin-top: calc(var(--header-height) + (var(--header-padding-desktop) * 2));
 }
 
 /* Sidebar Navigation - Fixed positioning and responsive design */
@@ -276,8 +276,8 @@ body {
   border-right: 1px solid var(--border-color);
   padding: 40px 0;
   position: fixed;
-  height: calc(100vh - var(--header-height) - (var(--header-padding-desktop) * 2) - 16px);
-  top: calc(var(--header-height) + (var(--header-padding-desktop) * 2) + 16px);
+  height: calc(100vh - var(--header-height) - (var(--header-padding-desktop) * 2));
+  top: calc(var(--header-height) + (var(--header-padding-desktop) * 2));
   left: 0;
   overflow-y: auto;
   box-shadow: 0 0 0 1px var(--shadow-light), 0 4px 16px var(--shadow-medium);
@@ -826,7 +826,7 @@ body {
   
   .header-content {
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     align-items: flex-start;
   }
   
@@ -840,45 +840,87 @@ body {
     margin-bottom: 0;
   }
   
-  /* Mobile-optimized toggle */
+  /* Mobile-optimized toggle - Better positioned and sized */
   .theme-toggle-container {
     align-self: flex-end;
-    margin-top: -8px;
+    margin-top: -12px;
+    gap: 8px;
+    align-items: center;
   }
   
   .theme-label {
-    font-size: 12px;
-    min-width: 40px;
+    font-size: 11px;
+    font-weight: 500;
+    min-width: 35px;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
   }
   
   .toggle-track {
-    width: 60px;
-    height: 30px;
+    width: 48px;
+    height: 28px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .theme-toggle-switch:hover .toggle-track {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: none;
   }
   
   .toggle-thumb {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     top: 2px;
+    border-radius: 11px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
   }
   
   .toggle-thumb.light {
     left: 2px;
+    transform: translateX(0);
   }
   
   .toggle-thumb.dark {
-    left: calc(100% - 26px);
+    left: calc(100% - 24px);
+    transform: translateX(0);
   }
   
   .toggle-icons {
-    padding: 0 6px;
+    padding: 0 3px;
   }
   
   .icon-light,
   .icon-dark {
-    font-size: 12px;
-    width: 16px;
-    height: 16px;
+    font-size: 11px;
+    width: 14px;
+    height: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Smooth icon transitions */
+  .toggle-thumb.light + .toggle-icons .icon-light {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+  
+  .toggle-thumb.light + .toggle-icons .icon-dark {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .toggle-thumb.dark + .toggle-icons .icon-light {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .toggle-thumb.dark + .toggle-icons .icon-dark {
+    opacity: 0.3;
+    transform: scale(0.9);
   }
   
   .main-layout {
@@ -889,22 +931,24 @@ body {
     position: fixed;
     width: 100%;
     height: auto;
-    top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 8px);
+    top: calc(var(--header-height) + (var(--header-padding-mobile) * 2));
     padding: 16px 0;
     box-shadow: 0 2px 8px var(--shadow-medium);
     z-index: 90;
     border-radius: 0;
-    margin: 0 8px;
-    width: calc(100% - 16px);
+    margin: 0;
+    left: 0;
+    right: 0;
   }
   
   .sidebar-nav {
     display: flex;
-    gap: 8px;
-    padding: 0 20px;
+    gap: 12px;
+    padding: 16px 16px 12px 16px;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    background: var(--bg-secondary);
   }
   
   .sidebar-nav::-webkit-scrollbar {
@@ -917,19 +961,57 @@ body {
   }
   
   .sidebar-nav a {
-    padding: 12px 20px;
+    padding: 8px 16px;
     white-space: nowrap;
     font-size: 14px;
-    border-radius: 20px;
+    font-weight: 500;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+  }
+  
+  .sidebar-nav a:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+  }
+  
+  .sidebar-nav a:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+    transform: none; /* Remove transform on mobile to prevent clipping */
+  }
+  
+  .sidebar-nav a.active {
+    background: var(--asu-blue);
+    color: white;
+    border-color: var(--asu-blue);
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 63, 127, 0.2);
+    transform: none; /* Remove transform on mobile to prevent clipping */
+  }
+  
+  .sidebar-nav a.active:hover {
+    transform: none; /* Remove transform on mobile to prevent clipping */
   }
   
   .main-content-wrapper {
     margin-left: 0;
-    /* Professional mobile spacing: header + sidebar + extra breathing room */
-    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 80px + var(--content-spacing-mobile));
+    /* Mobile spacing: header + sidebar (no extra gap) */
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 80px);
     padding: var(--content-spacing-mobile) 16px;
     max-width: 100%;
-    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 80px - var(--content-spacing-mobile));
+    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 80px);
   }
   
   .section-panel-header {
