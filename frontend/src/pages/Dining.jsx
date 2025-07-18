@@ -65,17 +65,6 @@ const Dining = () => {
       <p className="section-subtitle">
         Campus dining options, coffee shops, and food courts
       </p>
-      <div className="week-context-card">
-        <div className="week-context-header">
-          <span className="week-context-label">CURRENT WEEK</span>
-        </div>
-        <div className="week-context-date">
-          {formatWeekRange()}
-        </div>
-        <div className="week-context-status">
-          Last updated: {getRelativeUpdateTime(lastUpdated)}
-        </div>
-      </div>
       
       <div className="facility-section">
         <div className="facility-tabs">
