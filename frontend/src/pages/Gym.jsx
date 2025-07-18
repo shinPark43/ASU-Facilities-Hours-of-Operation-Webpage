@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { facilityAPI } from '../services/api.js';
-import { parseMultipleTimeRanges, formatWeekRange, formatDayWithDate, isClosedTime, getRelativeUpdateTime } from '../utils/timeUtils.js';
+import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime } from '../utils/timeUtils.js';
 
 const Gym = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('CHP (Fitness Center)');
   const [facilities, setFacilities] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     const fetchRecreationHours = async () => {
@@ -16,7 +15,6 @@ const Gym = () => {
         const data = await facilityAPI.getRecreationHours();
         if (data && data.sections) {
           setFacilities(data.sections);
-          setLastUpdated(data.last_updated);
         } else {
           throw new Error('No recreation hours data available');
         }
