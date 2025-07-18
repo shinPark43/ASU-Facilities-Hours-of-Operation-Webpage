@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { facilityAPI } from '../services/api.js';
-import { parseMultipleTimeRanges, formatWeekRange, formatDayWithDate, isClosedTime, getRelativeUpdateTime } from '../utils/timeUtils.js';
+import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime } from '../utils/timeUtils.js';
 
 const Library = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hours, setHours] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(null);
   const [activeTab, setActiveTab] = useState('main-library');
 
   useEffect(() => {
@@ -16,7 +15,6 @@ const Library = () => {
         const data = await facilityAPI.getLibraryHours();
         if (data && data.sections) {
           setHours(data.sections);
-          setLastUpdated(data.last_updated);
         } else {
           throw new Error('No library hours data available');
         }
