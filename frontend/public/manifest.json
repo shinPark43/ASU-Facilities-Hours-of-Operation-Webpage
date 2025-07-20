@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "ASU Sigan",
+  "name": "ASU Sigan - Facilities Hours",
+  "description": "ASU Facilities Hours of Operation - Real-time hours for ASU library, recreation center, and dining facilities",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,9 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#003f7f",
+  "background_color": "#fafafa",
+  "orientation": "portrait-primary",
+  "categories": ["education", "utilities"],
+  "lang": "en-US"
 }
