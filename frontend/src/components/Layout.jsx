@@ -25,7 +25,7 @@ const Layout = ({ children }) => {
       <header className="app-header">
         <div className="header-content">
           <div className="header-text">
-            <h1 className="app-title">ASU Sigan</h1>
+            <h1 className="app-title">ASU Hours</h1>
             <p className="app-subtitle">Weekly Operating Hours</p>
           </div>
           <div className="theme-toggle-container">
