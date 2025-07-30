@@ -131,6 +131,12 @@ function insertDefaultFacilities() {
         type: 'dining',
         description: 'Campus dining options, coffee shops, and food courts',
         website_url: 'https://dineoncampus.com/Angelo/hours-of-operation'
+      },
+      {
+        name: 'Ram tram',
+        type: 'ram_tram',
+        description: 'Campus transportation system',
+        website_url: 'https://www.angelo.edu/life-on-campus/live/parking-and-transportation/ram-tram.php'
       }
     ];
 
