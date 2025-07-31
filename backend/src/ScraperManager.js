@@ -581,7 +581,7 @@ class ScraperManager {
       // Find the table that contains Fall information
       for (const table of tables) {
         const tableText = table.innerText.toLowerCase();
-        if (tableText.includes('fall')) {
+        if (tableText.includes('summer')) {
           scheduleTable = table;
           break;
         }
@@ -609,7 +609,7 @@ class ScraperManager {
         }
         
         // Find Fall row
-        if (rowText.includes('Fall')) {
+        if (rowText.includes('Summer')) {
           fallRow = row;
         }
       }
