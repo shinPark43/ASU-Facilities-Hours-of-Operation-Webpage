@@ -39,6 +39,7 @@ class ScraperManager {
       library: null,
       recreation: null,
       dining: null,
+      ram_tram: null,
       total_records: 0,
       started_at: new Date().toISOString()
     };
@@ -50,21 +51,24 @@ class ScraperManager {
       const scraperPromises = [
         this.scrapeLibrary(browser).catch(error => ({ error: error.message, success: false })),
         this.scrapeRecreation(browser).catch(error => ({ error: error.message, success: false })),
-        this.scrapeDining(browser).catch(error => ({ error: error.message, success: false }))
+        this.scrapeDining(browser).catch(error => ({ error: error.message, success: false })),
+        this.scrapeRamTram(browser).catch(error => ({ error: error.message, success: false }))
       ];
 
-      const [libraryResult, recreationResult, diningResult] = await Promise.allSettled(scraperPromises);
+      const [libraryResult, recreationResult, diningResult, ramTramResult] = await Promise.allSettled(scraperPromises);
 
       // Process results
       results.library = libraryResult.status === 'fulfilled' ? libraryResult.value : { error: libraryResult.reason.message, success: false };
       results.recreation = recreationResult.status === 'fulfilled' ? recreationResult.value : { error: recreationResult.reason.message, success: false };
       results.dining = diningResult.status === 'fulfilled' ? diningResult.value : { error: diningResult.reason.message, success: false };
+      results.ram_tram = ramTramResult.status === 'fulfilled' ? ramTramResult.value : { error: ramTramResult.reason.message, success: false };
 
       // Calculate totals
       results.total_records = 
         (results.library?.count || 0) + 
         (results.recreation?.count || 0) + 
-        (results.dining?.count || 0);
+        (results.dining?.count || 0) +
+        (results.ram_tram?.count || 0);
 
       results.completed_at = new Date().toISOString();
       
@@ -95,6 +99,8 @@ class ScraperManager {
         return await this.scrapeRecreation(browser);
       case 'dining':
         return await this.scrapeDining(browser);
+      case 'ram_tram':
+        return await this.scrapeRamTram(browser);
       default:
         throw new Error(`Unsupported facility type: ${facilityType}`);
     }
@@ -236,6 +242,46 @@ class ScraperManager {
       if (page) await page.close();
     }
   }
+
+  async scrapeRamTram(browser) {
+    console.log('🔍 Scraping Ram Tram schedule.');
+
+    let page;
+    try {
+      db.logScrapeActivity('ram_tram', 'started', 'Beginning Ram Tram scrape');
+
+      page = await browser.newPage();
+      await page.setUserAgent(this.userAgent);
+
+      await page.goto('https://www.angelo.edu/life-on-campus/live/parking-and-transportation/ram-tram.php', {
+        waitUntil: 'networkidle2',
+        timeout: this.config.timeout
+      });
+
+      await delay(3000);
+
+      const ramTramData = await this.extractRamTramHours(page);
+      
+      if (!ramTramData || Object.keys(ramTramData).length === 0) {
+        throw new Error('No Ram Tram hours data found on the page');
+      }
+
+      const tramHours = this.formatRamTramHours(ramTramData);
+      
+      await db.updateFacilityHours('ram_tram', tramHours);
+      db.logScrapeActivity('ram_tram', 'success', `Updated ${tramHours.length} ram tram hour records`);
+      console.log('✅ Ram Tram hours scraped successfully');
+      return { success: true, count: tramHours.length };
+
+    } catch (error) {
+      console.error('❌ Ram tram scraping failed:', error);
+      db.logScrapeActivity('ram_tram', 'error', error.message);
+      throw error;
+    } finally {
+      if (page) await page.close();
+    }
+  }
+
 
   // Helper method to wait for content with multiple fallback selectors
   async waitForContent(page, selectors) {
@@ -526,6 +572,117 @@ class ScraperManager {
     });
   }
 
+  async extractRamTramHours(page) {
+    return await page.evaluate(() => {
+      // Look for the schedule table
+      const tables = document.querySelectorAll('table');
+      let scheduleTable = null;
+      
+      // Find the table that contains Fall information
+      for (const table of tables) {
+        const tableText = table.innerText.toLowerCase();
+        if (tableText.includes('summer')) {
+          scheduleTable = table;
+          break;
+        }
+      }
+      
+      if (!scheduleTable) {
+        console.log('No schedule table found');
+        return null;
+      }
+      
+      const rows = scheduleTable.querySelectorAll('tr');
+      let ramTramData = {};
+      let headerRow = null;
+      let fallRow = null;
+      
+      // Find the header row and the Fall row
+      for (const row of rows) {
+        const rowText = row.innerText;
+        
+        // Find header row (contains day names)
+        const dayPatterns = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        const hasDayName = dayPatterns.some(day => rowText.toLowerCase().includes(day));
+        if (hasDayName) {
+          headerRow = row;
+        }
+        
+        // Find Fall row
+        if (rowText.includes('Summer')) {
+          fallRow = row;
+        }
+      }
+      
+      if (!headerRow || !fallRow) {
+        console.log('Header row or Fall row not found');
+        return null;
+      }
+      
+      // Get header cells to determine which days are available
+      const headerCells = headerRow.querySelectorAll('td, th');
+      const fallCells = fallRow.querySelectorAll('td, th');
+      
+      // Initialize all days as closed
+      const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      allDays.forEach(day => {
+        ramTramData[day] = 'Closed';
+      });
+      
+      // Check each header cell to see which days are available
+      for (let i = 0; i < headerCells.length; i++) {
+        const headerText = headerCells[i].innerText.toLowerCase();
+        const fallText = fallCells[i] ? fallCells[i].innerText.trim() : '';
+        
+        // Determine which day this column represents - check for any day of the week
+        let dayName = null;
+        const dayMappings = {
+          'monday': 'Monday',
+          'tuesday': 'Tuesday', 
+          'wednesday': 'Wednesday',
+          'thursday': 'Thursday',
+          'friday': 'Friday',
+          'saturday': 'Saturday',
+          'sunday': 'Sunday'
+        };
+        
+        // Check if this header contains any day name
+        for (const [dayKey, dayValue] of Object.entries(dayMappings)) {
+          if (headerText.includes(dayKey)) {
+            dayName = dayValue;
+            break;
+          }
+        }
+        
+      // If found a day and there's content in the Fall row, set the hours
+        if (dayName && fallText && fallText !== '') {
+          // Extract route information
+          let routeInfo = '';
+          if (fallText.toLowerCase().includes('gold route')) {
+            routeInfo = 'Gold Route';
+          } else if (fallText.toLowerCase().includes('blue route')) {
+            routeInfo = 'Blue Route';
+          }
+          
+          // Clean up the text (remove route names, keep just the time)
+          let cleanText = fallText;
+          cleanText = cleanText.replace(/gold route|blue route/gi, '').trim();
+          
+          // If the text still has content after cleaning, use it
+          if (cleanText && cleanText !== '') {
+            // Store both time and route info
+            ramTramData[dayName] = {
+              time: cleanText,
+              route: routeInfo
+            };
+          }
+        }
+      }
+      
+      return ramTramData;
+    });
+  }
+
   // Format methods for each facility type
   formatLibraryHours(hoursData) {
     const libraryHours = [];
@@ -608,6 +765,65 @@ class ScraperManager {
       }
     }
     return diningHours;
+  }
+
+  formatRamTramHours(hoursData) {
+    const ramTramHours = [];
+    for (const [dayName, dayData] of Object.entries(hoursData)) {
+      const isClosed = dayData === 'Closed' || (typeof dayData === 'string' && dayData.toLowerCase().includes('closed'));
+      
+      if (isClosed) {
+        ramTramHours.push({
+          section_name: 'Ram Tram',
+          day_of_week: dayName,
+          open_time: null,
+          close_time: null,
+          is_closed: true,
+          route: null
+        });
+      } else {
+        // Handle new data structure with route info
+        let hoursText, routeInfo;
+        
+        if (typeof dayData === 'object' && dayData.time) {
+          hoursText = dayData.time;
+          routeInfo = dayData.route;
+        } else {
+          // Fallback for old string format
+          hoursText = dayData;
+          routeInfo = null;
+        }
+        
+        // Extract time range for Ram Tram
+        const timeRangeRegex = /(\d{1,2}:\d{2}\s*(?:[APap]\.?[Mm]?\.?))\s*-\s*(\d{1,2}:\d{2}\s*(?:[APap]\.?[Mm]?\.?))/gi;
+        const timeMatch = timeRangeRegex.exec(hoursText);
+        
+        if (timeMatch) {
+          const openTime = timeMatch[1].trim();
+          const closeTime = timeMatch[2].trim();
+          
+          ramTramHours.push({
+            section_name: 'Ram Tram',
+            day_of_week: dayName,
+            open_time: openTime,
+            close_time: closeTime,
+            is_closed: false,
+            route: routeInfo
+          });
+        } else {
+          // If no time range found, store the raw text
+          ramTramHours.push({
+            section_name: 'Ram Tram',
+            day_of_week: dayName,
+            open_time: hoursText,
+            close_time: null,
+            is_closed: false,
+            route: routeInfo
+          });
+        }
+      }
+    }
+    return ramTramHours;
   }
 
   async close() {

@@ -9,11 +9,25 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 // Helper function to format time range
 function formatTimeRange(hour) {
   if (hour.is_closed) return 'Closed';
+  
+  let timeString = '';
   if (hour.open_time && hour.close_time) {
-    return `${hour.open_time} - ${hour.close_time}`;
+    timeString = `${hour.open_time} - ${hour.close_time}`;
+  } else if (hour.open_time) {
+    timeString = hour.open_time;
+  } else {
+    timeString = 'Hours not available';
   }
-  if (hour.open_time) return hour.open_time;
-  return 'Hours not available';
+  
+  // Add route information for Ram Tram
+  if (hour.route && hour.route !== '') {
+    return {
+      time: timeString,
+      route: hour.route
+    };
+  }
+  
+  return timeString;
 }
 
 // Helper function to get latest update timestamp
@@ -66,14 +80,20 @@ function formatHoursForFrontend(rawHours) {
     }
     
     // Remove duplicates and filter invalid entries
-    const uniqueRanges = [...new Set(timeRanges)].filter(range => range && range.trim() !== '');
+    const uniqueRanges = [...new Set(timeRanges)].filter(range => range && (typeof range === 'string' ? range.trim() !== '' : true));
     
     if (uniqueRanges.includes('Closed')) {
       facility.sections[sectionName][dayName] = 'Closed';
     } else if (uniqueRanges.length === 0) {
       facility.sections[sectionName][dayName] = 'Hours not available';
     } else if (uniqueRanges.length === 1) {
-      facility.sections[sectionName][dayName] = uniqueRanges[0];
+      const range = uniqueRanges[0];
+      // Check if this is a route object (for Ram Tram)
+      if (typeof range === 'object' && range.time && range.route) {
+        facility.sections[sectionName][dayName] = range;
+      } else {
+        facility.sections[sectionName][dayName] = range;
+      }
     } else {
       // Multiple time ranges - join with line breaks for display
       facility.sections[sectionName][dayName] = uniqueRanges.join('\n');
@@ -159,10 +179,16 @@ router.get('/dining', async (req, res) => {
   await getFacilityHoursHandler(req, res, 'dining');
 });
 
+// GET /api/facilities/ram_tram - Get Ram Tram hours
+router.get('/ram_tram', async (req, res) => {
+  await getFacilityHoursHandler(req, res, 'ram_tram');
+});
+
+
 // GET /api/facilities/:type - Get hours for any facility type
 router.get('/:type', async (req, res) => {
   const { type } = req.params;
-  const validTypes = ['library', 'recreation', 'dining'];
+  const validTypes = ['library', 'recreation', 'dining', 'ram_tram'];
   
   if (!validTypes.includes(type)) {
     return res.status(400).json({

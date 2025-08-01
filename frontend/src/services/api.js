@@ -193,6 +193,23 @@ export const mockData = {
       },
     },
   },
+  ram_tram: {
+    name: 'Ram Tram',
+    type: 'ram_tram',
+    description: 'Campus transportation system',
+    website_url: 'https://www.angelo.edu/life-on-campus/live/parking-and-transportation/ram-tram.php',
+    sections: {
+      'Ram Tram': {
+        'Monday': 'Closed',
+        'Tuesday': { time: '4:30 - 8:30 p.m.', route: 'Gold Route' },
+        'Wednesday': 'Closed',
+        'Thursday': 'Closed',
+        'Friday': { time: '5:30 - 11:30 p.m.', route: 'Blue Route' },
+        'Saturday': { time: '11:30 a.m. - 11:30 p.m.', route: 'Blue Route' },
+        'Sunday': 'Closed',
+      }
+    }
+  },
 };
 
 /**
