@@ -545,7 +545,7 @@ body {
 }
 
 .hours-row.selected {
-  background: var(--gradient-primary);
+  background: var(--asu-blue-light);
   border-color: var(--asu-blue);
   color: white;
   box-shadow: 0 4px 16px rgba(0, 63, 127, 0.25);

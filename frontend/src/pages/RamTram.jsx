@@ -58,7 +58,7 @@ const RamTram = () => {
   return (
     <div className="facility-page">
       <h2 className="section-panel-header">Ram Tram</h2>
-      <p className="section-subtitle">Campus transportation system</p>
+      <p className="section-subtitle">Campus transportation system • Click on available time slots to view stop locations</p>
       <div className="facility-hours">
         {hours && Object.entries(hours)
           .sort(([dayA], [dayB]) => {
