@@ -53,10 +53,24 @@ const Library = () => {
 
   return (
     <div>
-      <h2 className="section-panel-header">Porter Henderson Library</h2>
-      <p className="section-subtitle">
-        Academic resources, research support, and study spaces
-      </p>
+      <div className="page-header-with-square-button">
+        <div className="page-header-content">
+          <h2 className="section-panel-header">Porter Henderson Library</h2>
+          <p className="section-subtitle">
+            Academic resources, research support, and study spaces
+          </p>
+        </div>
+        <div className="square-button-container">
+          <a 
+            href="https://angelo.edu/library/services/group-study-rooms.php"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="square-button"
+          >
+            Reserve a Group Study Room
+          </a>
+        </div>
+      </div>
       
       <div className="facility-section">
         <div className="facility-tabs">

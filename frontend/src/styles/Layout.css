@@ -22,6 +22,9 @@
   --asu-blue: #003f7f;
   --asu-blue-light: #1e5aa8;
   --asu-blue-dark: #002856;
+  --asu-maroon: #8c1d40;
+  --asu-maroon-light: #a64466;
+  --asu-maroon-dark: #6b1530;
   --asu-gold: #ffc425;
   --asu-gold-light: #ffd454;
   --asu-gold-dark: #e6a800;
@@ -72,6 +75,9 @@
   /* ASU Brand Colors (same in dark mode) */
   --asu-blue: #1e5aa8;
   --asu-blue-light: #4a7bc8;
+  --asu-maroon: #a64466;
+  --asu-maroon-light: #c06b8a;
+  --asu-maroon-dark: #8c1d40;
   --asu-blue-dark: #003f7f;
   --asu-gold: #ffc425;
   --asu-gold-light: #ffd454;
@@ -367,6 +373,113 @@ body {
   font-weight: 500;
   margin-bottom: 36px;
   letter-spacing: -0.01em;
+}
+
+.subtitle-container {
+  margin-bottom: 36px;
+}
+
+.instruction-text {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-style: italic;
+  margin-top: -24px;
+  margin-bottom: 0;
+  opacity: 0.8;
+}
+
+/* Page header with square button layout */
+.page-header-with-square-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 0; /* No extra margin to maintain consistency with other pages */
+}
+
+.page-header-content {
+  flex: 1;
+}
+
+.page-header-content .section-subtitle {
+  margin-bottom: 0; /* Remove default margin since we're in flex layout */
+}
+
+.square-button-container {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* Add normal section spacing after the header */
+.page-header-with-square-button + .facility-section {
+  margin-top: 36px; /* Match the normal section-subtitle margin */
+}
+
+/* Big square button design */
+.square-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 80px;
+  background: var(--asu-gold);
+  color: var(--asu-blue-dark);
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  line-height: 1.2;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(255, 196, 37, 0.25);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.square-button:hover {
+  background: var(--asu-gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 196, 37, 0.4);
+}
+
+/* Dark mode support */
+[data-theme="dark"] .square-button {
+  background: var(--asu-gold);
+  color: var(--asu-blue-dark);
+  box-shadow: 0 4px 12px rgba(255, 196, 37, 0.25);
+}
+
+[data-theme="dark"] .square-button:hover {
+  background: var(--asu-gold-light);
+  box-shadow: 0 6px 20px rgba(255, 196, 37, 0.4);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .instruction-text {
+    margin-top: -12px; /* Less negative margin on mobile for better spacing */
+  }
+  
+  .page-header-with-square-button {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    margin-bottom: 0;
+  }
+  
+  .page-header-with-square-button + .facility-section {
+    margin-top: 24px; /* Match mobile section-subtitle margin */
+  }
+  
+  .square-button-container {
+    align-self: stretch;
+  }
+  
+  .square-button {
+    width: 100%;
+    height: 60px;
+    font-size: 15px;
+  }
 }
 
 /* Loading states */

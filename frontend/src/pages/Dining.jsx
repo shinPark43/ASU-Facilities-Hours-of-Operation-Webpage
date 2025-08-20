@@ -59,10 +59,24 @@ const Dining = () => {
 
   return (
     <div>
-      <h2 className="section-panel-header">Dine on Campus</h2>
-      <p className="section-subtitle">
-        Campus dining options, coffee shops, and food courts
-      </p>
+      <div className="page-header-with-square-button">
+        <div className="page-header-content">
+          <h2 className="section-panel-header">Dine on Campus</h2>
+          <p className="section-subtitle">
+            Campus dining options, coffee shops, and food courts
+          </p>
+        </div>
+        <div className="square-button-container">
+          <a 
+            href="https://dineoncampus.com/Angelo/whats-on-the-menu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="square-button"
+          >
+            What's CAF Menu
+          </a>
+        </div>
+      </div>
       
       <div className="facility-section">
         <div className="facility-tabs">
