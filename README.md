@@ -4,23 +4,36 @@ A web application providing real-time operating hours for ASU facilities includi
 
 **Live Application**: [https://shinpark43.github.io/ASU-Facilities-Hours-of-Operation-Webpage/](https://shinpark43.github.io/ASU-Facilities-Hours-of-Operation-Webpage/)
 
-## Screenshots
+## Mobile View
 
-### Dining Locations
-![Dining Page](images/screenshots/dining-page.png)
-*Campus dining options with multiple time ranges support*
-
-### Ram Tram Transportation
-![Ram Tram Page](images/screenshots/ramtram-page.png)
-*Campus transportation schedule with interactive time slots*
-
-### Library Hours
-![Library Page](images/screenshots/library-page.png)
-*Porter Henderson Library hours and sections*
-
-### Recreation Center
-![Recreation Page](images/screenshots/recreation-page.png)
-*Fitness facilities and recreational activities*
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="images/screenshots/library-page.png" width="300" alt="Library Page"/>
+        <br/>
+        <em>Porter Henderson Library</em>
+      </td>
+      <td align="center">
+        <img src="images/screenshots/recreation-page.png" width="300" alt="Recreation Page"/>
+        <br/>
+        <em>Recreation Center</em>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="images/screenshots/dining-page.png" width="300" alt="Dining Page"/>
+        <br/>
+        <em>Dining Locations</em>
+      </td>
+      <td align="center">
+        <img src="images/screenshots/ramtram-page.png" width="300" alt="Ram Tram Page"/>
+        <br/>
+        <em>Ram Tram Transportation</em>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ## Architecture
 
