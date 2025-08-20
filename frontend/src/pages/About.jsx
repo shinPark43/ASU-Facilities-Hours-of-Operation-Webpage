@@ -65,6 +65,19 @@ const About = () => {
               }}>•</span>
               <strong>Dining Locations</strong> - Campus restaurants, cafes, and food courts
             </li>
+            <li style={{ 
+              marginBottom: '12px',
+              position: 'relative',
+              paddingLeft: '20px'
+            }}>
+              <span style={{ 
+                position: 'absolute',
+                left: '0',
+                color: 'var(--asu-gold)',
+                fontWeight: 'bold'
+              }}>•</span>
+              <strong>Ram Tram</strong> - Campus transportation schedule and stop locations
+            </li>
           </ul>
         </div>
       </div>
