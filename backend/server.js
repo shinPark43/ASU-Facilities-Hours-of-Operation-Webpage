@@ -104,8 +104,8 @@ async function startServer() {
     console.log('📊 Initializing database...');
     await db.init();
     
-    // Schedule scraper to run daily at 11:20 AM
-    cron.schedule('20 11 * * *', () => {
+    // Schedule scraper to run daily at 11:50 AM
+    cron.schedule('50 11 * * *', () => {
       console.log('🕐 Running scheduled scraper...');
       scraper.scrapeAllFacilities()
         .then(() => {
