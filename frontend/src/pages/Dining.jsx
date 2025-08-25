@@ -68,7 +68,7 @@ const Dining = () => {
         </div>
         <div className="square-button-container">
           <a 
-            href="https://dineoncampus.com/Angelo/whats-on-the-menu"
+            href="https://new.dineoncampus.com/Angelo/whats-on-the-menu/the-caf/"
             target="_blank"
             rel="noopener noreferrer"
             className="square-button"
@@ -143,7 +143,7 @@ const Dining = () => {
       </div>
       
       <a 
-        href="https://dineoncampus.com/Angelo/hours-of-operation" 
+        href="https://new.dineoncampus.com/Angelo/hours-of-operation" 
         target="_blank" 
         rel="noopener noreferrer"
         className="website-link"
