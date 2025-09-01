@@ -652,8 +652,9 @@ class ScraperManager {
             // Main table: "Mon8/257:30a - 9:00p7:30a - 9:00p" (duplicated)
             // Additional table: "Mon8/2511:00a - 2:00p7:00p - 11:00p11:00a - 2:00p7:00p - 11:00p" (separated hours)
             
-            // First, remove date information (like "Mon8/25", "Tue8/26", etc.)
-            hoursText = hoursText.replace(/^[A-Za-z]{3}\d{1,2}\/\d{1,2}/, '');
+            // First, remove date information (like "Mon8/25", "Tue8/26", etc.)  
+            // Fixed regex to prevent consuming hour digits - handles both single and double digit hours
+            hoursText = hoursText.replace(/^[A-Za-z]{3}\d{1,2}\/\d{1,2}?(?=\d{1,2}:)/, '');
             
             // Extract all time range patterns
             const timePattern = /(\d{1,2}:\d{2}[ap])\s*-\s*(\d{1,2}:\d{2}[ap])/gi;
