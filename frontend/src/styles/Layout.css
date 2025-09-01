@@ -423,7 +423,7 @@ body {
   width: 200px;
   height: 80px;
   background: var(--asu-gold);
-  color: var(--asu-blue-dark);
+  color: black;
   text-decoration: none;
   border-radius: 12px;
   font-weight: 600;
@@ -445,7 +445,7 @@ body {
 /* Dark mode support */
 [data-theme="dark"] .square-button {
   background: var(--asu-gold);
-  color: var(--asu-blue-dark);
+  color: black;
   box-shadow: 0 4px 12px rgba(255, 196, 37, 0.25);
 }
 
@@ -955,7 +955,7 @@ body {
   gap: 8px;
   padding: 18px 28px;
   background: var(--asu-gold);
-  color: var(--asu-blue-dark);
+  color: black;
   text-decoration: none;
   border-radius: 12px;
   font-weight: 600;
@@ -1747,7 +1747,7 @@ body {
   gap: 8px;
   padding: 18px 28px;
   background: var(--asu-gold);
-  color: var(--asu-blue-dark);
+  color: black;
   text-decoration: none;
   border-radius: 12px;
   font-weight: 600;

@@ -4,6 +4,27 @@ const db = require('./database');
 // Helper function to wait for a specified time
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Retry utility function with exponential backoff
+const retryWithBackoff = async (operation, operationName, maxRetries = 2, baseDelay = 1000) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      const isLastAttempt = attempt === maxRetries;
+      
+      if (isLastAttempt) {
+        console.error(`❌ ${operationName} failed after ${maxRetries} attempts:`, error.message);
+        throw error;
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt - 1); // 1s, 2s, 4s...
+      console.warn(`⚠️ ${operationName} failed (attempt ${attempt}/${maxRetries}), retrying in ${delay/1000}s...`);
+      console.warn(`   Error: ${error.message}`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+};
+
 class ScraperManager {
   constructor() {
     this.browser = null;
@@ -33,7 +54,7 @@ class ScraperManager {
   }
 
   async scrapeAllFacilities() {
-    console.log('🚀 Starting parallel facility hours scraping...');
+    console.log('🚀 Starting serial facility hours scraping...');
     
     const results = {
       library: null,
@@ -47,21 +68,46 @@ class ScraperManager {
     try {
       const browser = await this.getBrowser();
       
-      // Run all scrapers in parallel for better performance
-      const scraperPromises = [
-        this.scrapeLibrary(browser).catch(error => ({ error: error.message, success: false })),
-        this.scrapeRecreation(browser).catch(error => ({ error: error.message, success: false })),
-        this.scrapeDining(browser).catch(error => ({ error: error.message, success: false })),
-        this.scrapeRamTram(browser).catch(error => ({ error: error.message, success: false }))
-      ];
+      // Run all scrapers in serial with retry logic to avoid database transaction conflicts
+      console.log('📚 Scraping library...');
+      try {
+        results.library = await retryWithBackoff(
+          () => this.scrapeLibrary(browser),
+          'Library scraping'
+        );
+      } catch (error) {
+        results.library = { error: error.message, success: false };
+      }
 
-      const [libraryResult, recreationResult, diningResult, ramTramResult] = await Promise.allSettled(scraperPromises);
+      console.log('🏃 Scraping recreation center...');
+      try {
+        results.recreation = await retryWithBackoff(
+          () => this.scrapeRecreation(browser),
+          'Recreation scraping'
+        );
+      } catch (error) {
+        results.recreation = { error: error.message, success: false };
+      }
 
-      // Process results
-      results.library = libraryResult.status === 'fulfilled' ? libraryResult.value : { error: libraryResult.reason.message, success: false };
-      results.recreation = recreationResult.status === 'fulfilled' ? recreationResult.value : { error: recreationResult.reason.message, success: false };
-      results.dining = diningResult.status === 'fulfilled' ? diningResult.value : { error: diningResult.reason.message, success: false };
-      results.ram_tram = ramTramResult.status === 'fulfilled' ? ramTramResult.value : { error: ramTramResult.reason.message, success: false };
+      console.log('🍽️ Scraping dining facilities...');
+      try {
+        results.dining = await retryWithBackoff(
+          () => this.scrapeDining(browser),
+          'Dining scraping'
+        );
+      } catch (error) {
+        results.dining = { error: error.message, success: false };
+      }
+
+      console.log('🚌 Scraping Ram Tram schedule...');
+      try {
+        results.ram_tram = await retryWithBackoff(
+          () => this.scrapeRamTram(browser),
+          'Ram Tram scraping'
+        );
+      } catch (error) {
+        results.ram_tram = { error: error.message, success: false };
+      }
 
       // Calculate totals
       results.total_records = 
