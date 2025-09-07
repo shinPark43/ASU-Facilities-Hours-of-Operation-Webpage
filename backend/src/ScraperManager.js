@@ -267,6 +267,10 @@ class ScraperManager {
       
       await delay(3000);
       
+      // Sunday-specific navigation: If today is Sunday, click next week arrow
+      // This ensures we get the week that contains today's Sunday data
+      await this.handleSundayWeekNavigation(page);
+      
       const hoursData = await this.extractDiningHours(page);
       
       if (!hoursData || Object.keys(hoursData).length === 0) {
@@ -1004,6 +1008,45 @@ class ScraperManager {
       }
     }
     return ramTramHours;
+  }
+
+  async handleSundayWeekNavigation(page) {
+    const today = new Date();
+    const isSunday = today.getDay() === 0; // 0 = Sunday
+    
+    if (!isSunday) {
+      console.log('📅 Not Sunday, using default week display');
+      return;
+    }
+    
+    console.log('📅 Today is Sunday - navigating to current week that contains today');
+    
+    try {
+      // Use the exact selector from the screenshot: button.btn-next
+      const clicked = await page.evaluate(() => {
+        const nextButton = document.querySelector('button.btn-next');
+        
+        if (nextButton && nextButton.offsetParent !== null && !nextButton.disabled) {
+          console.log('Found and clicking button.btn-next');
+          nextButton.click();
+          return true;
+        }
+        
+        console.log('button.btn-next not found or not clickable');
+        return false;
+      });
+      
+      if (clicked) {
+        console.log('✅ Successfully clicked next week arrow (button.btn-next)');
+        await delay(3000); // Wait for page to update
+      } else {
+        console.log('⚠️ Could not find or click button.btn-next - continuing with default week');
+      }
+      
+    } catch (error) {
+      console.log('⚠️ Error during Sunday navigation:', error.message);
+      // Continue with default week if navigation fails
+    }
   }
 
   async close() {
