@@ -197,6 +197,24 @@ export function isClosedTime(timeString) {
 }
 
 /**
+ * Get the current day name
+ * @returns {string} Current day name like "Monday", "Tuesday", etc.
+ */
+export function getCurrentDayName() {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return days[new Date().getDay()];
+}
+
+/**
+ * Check if a given day name is today
+ * @param {string} dayName - Day name like "Monday", "Tuesday", etc.
+ * @returns {boolean} True if the day is today
+ */
+export function isToday(dayName) {
+  return dayName === getCurrentDayName();
+}
+
+/**
  * Normalize time format to match library/recreation style
  * Converts "7:00 AM - 9:00 AM" to "7 a.m. - 9 a.m."
  * @param {string} timeString - The time string to normalize

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { facilityAPI } from '../services/api.js';
-import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, normalizeTimeFormat } from '../utils/timeUtils.js';
+import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, normalizeTimeFormat, isToday } from '../utils/timeUtils.js';
 
 const Dining = () => {
   const [loading, setLoading] = useState(true);
@@ -118,7 +118,7 @@ const Dining = () => {
                 const isClosed = isClosedTime(hours);
                 
                 return (
-                  <div key={day} className="hours-row">
+                  <div key={day} className={`hours-row ${isToday(day) ? 'current-day' : ''}`}>
                     <span className="day-name">{dayWithDate}</span>
                     <div className="hours-time-container">
                       {timeRanges.map((timeRange, index) => (
