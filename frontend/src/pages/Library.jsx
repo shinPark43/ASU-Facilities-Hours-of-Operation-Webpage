@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { facilityAPI } from '../services/api.js';
-import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime } from '../utils/timeUtils.js';
+import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, isToday } from '../utils/timeUtils.js';
 
 const Library = () => {
   const [loading, setLoading] = useState(true);
@@ -62,7 +62,7 @@ const Library = () => {
         </div>
         <div className="square-button-container">
           <a 
-            href="https://angelo.edu/library/services/group-study-rooms.php"
+            href="https://myonecard.angelo.edu/patron/roomres/room_res.php"
             target="_blank"
             rel="noopener noreferrer"
             className="square-button"
@@ -112,7 +112,7 @@ const Library = () => {
                 const isClosed = isClosedTime(hours);
                 
                 return (
-                  <div key={day} className="hours-row">
+                  <div key={day} className={`hours-row ${isToday(day) ? 'current-day' : ''}`}>
                     <span className="day-name">{dayWithDate}</span>
                     <div className="hours-time-container">
                       {timeRanges.map((timeRange, index) => (
