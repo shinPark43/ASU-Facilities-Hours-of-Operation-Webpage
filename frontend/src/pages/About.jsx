@@ -155,6 +155,28 @@ const About = () => {
           </p>
         </div>
       </div>
+
+      <div className="facility-section">
+        <h3 className="facility-name">Privacy</h3>
+        <div style={{ lineHeight: '1.8', fontSize: '16px', color: 'var(--text-secondary)' }}>
+          <p style={{ marginBottom: '24px' }}>
+            This website uses Google Analytics to collect anonymous usage data (page visits, user interactions) 
+            to help us improve the site. No personal information is collected.
+          </p>
+          
+          <p style={{ marginBottom: '0' }}>
+            Learn more at{' '}
+            <a 
+              href="https://policies.google.com/privacy" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ color: 'var(--asu-blue)', textDecoration: 'underline' }}
+            >
+              Google Privacy Policy
+            </a>.
+          </p>
+        </div>
+      </div>
       
       <div className="hours-info">
         This website is maintained by ASU students to help our campus community 
