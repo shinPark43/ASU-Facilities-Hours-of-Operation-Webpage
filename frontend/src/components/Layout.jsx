@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
+import ScrollToTop from './ScrollToTop';
 import '../styles/Layout.css';
 
 const Layout = ({ children }) => {
@@ -46,6 +47,7 @@ const Layout = ({ children }) => {
       <main className="main-content-wrapper">
         {children}
       </main>
+      <ScrollToTop />
     </div>
   );
 };
