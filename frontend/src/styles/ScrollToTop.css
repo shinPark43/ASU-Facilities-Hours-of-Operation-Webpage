@@ -1,0 +1,108 @@
+/* Scroll to Top Button Styles */
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}
+
+.scroll-to-top-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--asu-blue, #003f7f);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 63, 127, 0.3);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.scroll-to-top-button:hover {
+  background: var(--asu-blue-light, #1e5aa8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 63, 127, 0.4);
+}
+
+.scroll-to-top-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 63, 127, 0.3);
+}
+
+.scroll-to-top-button svg {
+  transition: transform 0.2s ease;
+}
+
+.scroll-to-top-button:hover svg {
+  transform: translateY(-1px);
+}
+
+/* Animation for button appearance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark theme support */
+[data-theme="dark"] .scroll-to-top-button {
+  background: var(--asu-gold, #FFC627);
+  color: var(--asu-blue, #003f7f);
+  box-shadow: 0 4px 12px rgba(255, 198, 39, 0.3);
+}
+
+[data-theme="dark"] .scroll-to-top-button:hover {
+  background: var(--asu-gold-light, #FFD700);
+  box-shadow: 0 6px 16px rgba(255, 198, 39, 0.4);
+}
+
+[data-theme="dark"] .scroll-to-top-button:active {
+  box-shadow: 0 2px 8px rgba(255, 198, 39, 0.3);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .scroll-to-top {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+  
+  .scroll-to-top-button {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .scroll-to-top-button svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-to-top-button {
+    animation: none;
+    transition: none;
+  }
+  
+  .scroll-to-top-button:hover {
+    transform: none;
+  }
+  
+  .scroll-to-top-button svg {
+    transition: none;
+  }
+  
+  .scroll-to-top-button:hover svg {
+    transform: none;
+  }
+}
