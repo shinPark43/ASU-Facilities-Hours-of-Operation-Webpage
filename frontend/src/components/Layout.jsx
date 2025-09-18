@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import ScrollToTop from './ScrollToTop';
+import HamburgerMenu from './HamburgerMenu';
 import '../styles/Layout.css';
 
 const Layout = ({ children }) => {
@@ -29,17 +30,20 @@ const Layout = ({ children }) => {
             <h1 className="app-title">ASU Hours</h1>
             <p className="app-subtitle">Weekly Operating Hours</p>
           </div>
-          <div className="theme-toggle-container">
-            <span className="theme-label">{theme.toUpperCase()}</span>
-            <div className="theme-toggle-switch" onClick={toggleTheme}>
-              <div className="toggle-track">
-                <div className={`toggle-thumb ${theme === 'dark' ? 'dark' : 'light'}`}></div>
-                <div className="toggle-icons">
-                  <span className="icon-light">☀️</span>
-                  <span className="icon-dark">🌙</span>
+          <div className="header-controls">
+            <div className="theme-toggle-container">
+              <span className="theme-label">{theme.toUpperCase()}</span>
+              <div className="theme-toggle-switch" onClick={toggleTheme}>
+                <div className="toggle-track">
+                  <div className={`toggle-thumb ${theme === 'dark' ? 'dark' : 'light'}`}></div>
+                  <div className="toggle-icons">
+                    <span className="icon-light">☀️</span>
+                    <span className="icon-dark">🌙</span>
+                  </div>
                 </div>
               </div>
             </div>
+            <HamburgerMenu />
           </div>
         </div>
       </header>

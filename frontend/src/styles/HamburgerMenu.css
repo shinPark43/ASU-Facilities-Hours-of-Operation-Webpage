@@ -1,0 +1,269 @@
+/* Hamburger Menu Styles */
+.hamburger-menu {
+  position: relative;
+  display: none; /* Hidden by default, shown only on mobile */
+  z-index: 1000;
+}
+
+/* Hamburger Button - Minimal Design like Medium */
+.hamburger-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.hamburger-button:hover {
+  opacity: 0.7;
+}
+
+.hamburger-button:active {
+  opacity: 0.5;
+}
+
+/* Menu Backdrop */
+.menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Menu Dropdown - Minimal Design */
+.menu-dropdown {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100vh;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-light);
+  transform: translateX(100%);
+  transition: transform 0.2s ease;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.1);
+}
+
+.menu-dropdown.open {
+  transform: translateX(0);
+}
+
+/* Menu Header - Same background as main title */
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 18px 20px;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--gradient-primary);
+}
+
+.menu-header h3 {
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+  text-transform: none;
+  letter-spacing: -0.015em;
+}
+
+/* Close button inside menu */
+.menu-close-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  color: white;
+}
+
+.menu-close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Menu Navigation - Medium-style clean list */
+.menu-nav {
+  flex: 1;
+  padding: 16px 0;
+  overflow-y: auto;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-radius: 0;
+  position: relative;
+}
+
+.menu-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.menu-item.active {
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Menu Item Elements - Simplified */
+.menu-icon {
+  font-size: 20px;
+  margin-right: 16px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  opacity: 0.8;
+}
+
+.menu-label {
+  flex: 1;
+}
+
+.active-indicator {
+  display: none; /* Remove for cleaner look */
+}
+
+/* Menu Footer - Minimal */
+.menu-footer {
+  padding: 16px 20px 20px 20px;
+  border-top: 1px solid var(--border-light);
+  background: transparent;
+}
+
+.footer-info p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.footer-subtitle {
+  color: var(--text-muted) !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  margin-top: 2px !important;
+}
+
+/* Dark Theme Support - Minimal */
+[data-theme="dark"] .hamburger-button {
+  background: transparent;
+}
+
+[data-theme="dark"] .hamburger-button:hover {
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .menu-dropdown {
+  background: var(--bg-secondary);
+  border-left-color: var(--border-color);
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .menu-item.active {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .menu-footer {
+  border-top-color: var(--border-color);
+  background: transparent;
+}
+
+[data-theme="dark"] .menu-header {
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .menu-close-button:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Mobile-Only Display */
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: block;
+  }
+}
+
+/* Ultra-mobile optimization */
+@media (max-width: 480px) {
+  .menu-dropdown {
+    width: 100%;
+    right: 0;
+  }
+  
+  .hamburger-button {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+  }
+  
+  .menu-item {
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+  
+  .menu-icon {
+    font-size: 18px;
+    margin-right: 14px;
+    min-width: 22px;
+  }
+}
+
+/* Removed complex animations for minimal design */
+
+/* Smooth scrollbar for menu nav */
+.menu-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.menu-nav::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+.menu-nav::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+.menu-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
