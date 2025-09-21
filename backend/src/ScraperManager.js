@@ -4,6 +4,40 @@ const db = require('./database');
 // Helper function to wait for a specified time
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+/**
+ * Helper function to validate a time range
+ * @param {string} startTime - e.g., "1:00 p.m."
+ * @param {string} endTime - e.g., "8:00 p.m."
+ * @returns {boolean} - true if the range is valid (start < end)
+ */
+const isValidTimeRange = (startTime, endTime) => {
+  const toMinutes = (timeStr) => {
+    if (!timeStr) return 0;
+    const lower = timeStr.toLowerCase();
+    const isPM = lower.includes('p');
+    
+    // Normalize time format before parsing
+    let [hours, minutes] = lower
+      .replace(/\s*(a\.?m\.?|p\.?m\.?)/, '')
+      .trim()
+      .split(':')
+      .map(n => parseInt(n, 10));
+
+    if (isNaN(hours) || isNaN(minutes)) return 0;
+
+    // Convert to 24-hour format
+    if (isPM && hours < 12) {
+      hours += 12;
+    }
+    if (!isPM && hours === 12) { // Handle 12 a.m. (midnight)
+      hours = 0;
+    }
+    return hours * 60 + minutes;
+  };
+
+  return toMinutes(startTime) < toMinutes(endTime);
+};
+
 // Retry utility function with exponential backoff
 const retryWithBackoff = async (operation, operationName, maxRetries = 2, baseDelay = 1000) => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -928,13 +962,16 @@ class ScraperManager {
               const openTime = match[1].trim();
               const closeTime = match[2].trim();
               
-              diningHours.push({
-                section_name: locationName,
-                day_of_week: dayName,
-                open_time: openTime,
-                close_time: closeTime,
-                is_closed: false
-              });
+              // Validate the time range before adding it
+              if (isValidTimeRange(openTime, closeTime)) {
+                diningHours.push({
+                  section_name: locationName,
+                  day_of_week: dayName,
+                  open_time: openTime,
+                  close_time: closeTime,
+                  is_closed: false
+                });
+              }
             });
           } else {
             diningHours.push({
