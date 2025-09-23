@@ -1,0 +1,234 @@
+/* How to Install Page Styles */
+
+.install-section {
+  padding: 1rem 0;
+}
+
+.install-intro {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.install-platforms {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.platform-section {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.platform-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.platform-title {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.install-steps {
+  list-style: none;
+  counter-reset: step-counter;
+  padding-left: 0;
+  margin: 0;
+}
+
+.install-steps li {
+  counter-increment: step-counter;
+  margin-bottom: 1rem;
+  padding-left: 3rem;
+  position: relative;
+  line-height: 1.6;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.install-steps li::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--asu-blue);
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.install-steps li strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.install-benefits {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.install-benefits h4 {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.5rem;
+}
+
+.benefits-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* QR Code Styles */
+.qr-code-container {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.qr-code-wrapper {
+  display: inline-block;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  border: 2px solid var(--border-color);
+}
+
+.qr-code-image {
+  max-width: 200px;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.qr-code-instructions {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.qr-share-section {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+.qr-share-section h4 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.qr-share-section p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Desktop Features */
+.desktop-features {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+.desktop-features h4 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .install-platforms {
+    flex-direction: row;
+    gap: 2rem;
+  }
+  
+  .platform-section {
+    flex: 1;
+  }
+  
+  .qr-code-image {
+    max-width: 250px;
+  }
+  
+  .benefits-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .qr-code-image {
+    max-width: 300px;
+  }
+  
+  .benefits-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Dark mode support */
+[data-theme="dark"] .qr-code-wrapper {
+  background: var(--card-background);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .platform-section:hover {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+/* Animation for tab icons */
+.facility-tab svg {
+  transition: transform 0.2s ease;
+}
+
+.facility-tab:hover svg {
+  transform: scale(1.1);
+}
+
+.facility-tab.active svg {
+  transform: scale(1.05);
+}

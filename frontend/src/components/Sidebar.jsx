@@ -33,6 +33,11 @@ const Sidebar = () => {
             </Link>
           </li>
           <li>
+            <Link to="/install" className={isActive('/install')}>
+              How to Install
+            </Link>
+          </li>
+          <li>
             <Link to="/about" className={isActive('/about')}>
               About
             </Link>

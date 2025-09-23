@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { HiOutlineMenu, HiOutlineX, HiOutlineHome, HiOutlineInformationCircle } from 'react-icons/hi';
+import { HiOutlineMenu, HiOutlineX, HiOutlineHome, HiOutlineInformationCircle, HiOutlineDownload } from 'react-icons/hi';
 import { TbBus } from 'react-icons/tb';
 import '../styles/HamburgerMenu.css';
 
@@ -13,6 +13,7 @@ const HamburgerMenu = () => {
   const menuItems = [
     { path: '/library', label: 'Home', icon: HiOutlineHome },
     { path: '/ramtram', label: 'Ram Tram', icon: TbBus },
+    { path: '/install', label: 'How to Install', icon: HiOutlineDownload },
     { path: '/about', label: 'About', icon: HiOutlineInformationCircle }
   ];
 

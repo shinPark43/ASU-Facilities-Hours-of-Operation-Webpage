@@ -6,6 +6,7 @@ import Library from './pages/Library';
 import Dining from './pages/Dining';
 import RamTram from './pages/RamTram';
 import About from './pages/About';
+import HowToInstall from './pages/HowToInstall';
 import './styles/Layout.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/dining" element={<Dining />} />
           <Route path="/ramtram" element={<RamTram />} />
           <Route path="/about" element={<About />} />
+          <Route path="/install" element={<HowToInstall />} />
           <Route path="/" element={<Navigate to="/library" replace />} />
         </Routes>
       </Layout>
