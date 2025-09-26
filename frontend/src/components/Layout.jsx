@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import MobileTabBar from './MobileTabBar';
 import ScrollToTop from './ScrollToTop';
 import HamburgerMenu from './HamburgerMenu';
 import '../styles/Layout.css';
 
 const Layout = ({ children }) => {
   const [theme, setTheme] = useState('light');
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const location = useLocation();
+  
+  // Check if current page should show tab bar
+  const facilityPages = ['/library', '/gym', '/dining'];
+  const shouldShowTabBar = facilityPages.includes(location.pathname);
 
   // Load theme from localStorage on component mount
   useEffect(() => {
@@ -13,6 +22,47 @@ const Layout = ({ children }) => {
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
+
+  // Scroll detection for header visibility
+  useEffect(() => {
+    const controlHeaderVisibility = () => {
+      const currentScrollY = window.scrollY;
+      const scrollThreshold = 10; // Minimum scroll distance to trigger
+      
+      if (Math.abs(currentScrollY - lastScrollY) < scrollThreshold) {
+        return;
+      }
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down & past threshold - hide header
+        setIsHeaderVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show header
+        setIsHeaderVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    const throttledControl = throttle(controlHeaderVisibility, 16); // ~60fps
+    window.addEventListener('scroll', throttledControl);
+    
+    return () => window.removeEventListener('scroll', throttledControl);
+  }, [lastScrollY]);
+
+  // Throttle function for performance
+  const throttle = (func, limit) => {
+    let inThrottle;
+    return function() {
+      const args = arguments;
+      const context = this;
+      if (!inThrottle) {
+        func.apply(context, args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    }
+  };
 
   // Toggle between light and dark themes
   const toggleTheme = () => {
@@ -24,7 +74,7 @@ const Layout = ({ children }) => {
 
   return (
     <div className="app-container">
-      <header className="app-header">
+      <header className={`app-header ${isHeaderVisible ? 'visible' : 'hidden'}`}>
         <div className="header-content">
           <div className="header-text">
             <h1 className="app-title">ASU Hours</h1>
@@ -48,7 +98,8 @@ const Layout = ({ children }) => {
         </div>
       </header>
       <Sidebar />
-      <main className="main-content-wrapper">
+      <MobileTabBar isHeaderVisible={isHeaderVisible} />
+      <main className={`main-content-wrapper ${shouldShowTabBar ? 'with-tab-bar' : ''}`}>
         {children}
       </main>
       <ScrollToTop />
