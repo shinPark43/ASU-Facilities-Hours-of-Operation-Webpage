@@ -144,6 +144,16 @@ body {
   z-index: 100;
   backdrop-filter: blur(10px);
   height: calc(var(--header-height) + (var(--header-padding-desktop) * 2));
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+
+.app-header.hidden {
+  transform: translateY(-100%);
+}
+
+.app-header.visible {
+  transform: translateY(0);
 }
 
 .header-content {
@@ -1352,90 +1362,29 @@ body {
   }
   
   .sidebar {
-    position: fixed;
-    width: 100%;
-    height: auto;
-    top: calc(var(--header-height) + (var(--header-padding-mobile) * 2));
-    padding: 16px 0;
-    box-shadow: 0 2px 8px var(--shadow-medium);
-    z-index: 90;
-    border-radius: 0;
-    margin: 0;
-    left: 0;
-    right: 0;
+    display: none; /* Hide sidebar on mobile - replaced by mobile tab bar */
   }
   
-  .sidebar-nav {
-    display: flex;
-    gap: 12px;
-    padding: 16px 16px 12px 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    background: var(--bg-secondary);
-  }
-  
-  .sidebar-nav::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .sidebar-nav li {
-    margin-bottom: 0;
-    flex-shrink: 0;
-  }
-  
-  .sidebar-nav a {
-    padding: 8px 16px;
-    white-space: nowrap;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 32px;
-    transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-                color 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-                border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    background: var(--bg-tertiary);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-light);
-  }
-  
-  .sidebar-nav a:hover {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-  }
-  
-  .sidebar-nav a:hover {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-    transform: none; /* Remove transform on mobile to prevent clipping */
-  }
-  
-  .sidebar-nav a.active {
-    background: var(--asu-blue);
-    color: white;
-    border-color: var(--asu-blue);
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0, 63, 127, 0.2);
-    transform: none; /* Remove transform on mobile to prevent clipping */
-  }
-  
-  .sidebar-nav a.active:hover {
-    transform: none; /* Remove transform on mobile to prevent clipping */
-  }
+  /* Mobile sidebar navigation removed - replaced by MobileTabBar component */
   
   .main-content-wrapper {
     margin-left: 0;
-    /* Mobile spacing: header + sidebar (no extra gap) */
-    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 80px);
     padding: var(--content-spacing-mobile) 16px;
     max-width: 100%;
-    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 80px);
+  }
+  
+  /* Default spacing without tab bar */
+  .main-content-wrapper:not(.with-tab-bar) {
+    /* Mobile spacing: header only */
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 20px);
+    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 20px);
+  }
+  
+  /* Additional spacing when tab bar is present */
+  .main-content-wrapper.with-tab-bar {
+    /* Mobile spacing: header + tab bar */
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 72px);
+    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 72px);
   }
   
   .section-panel-header {
@@ -1650,6 +1599,18 @@ body {
     padding: var(--content-spacing-mobile) 12px;
   }
   
+  /* Default spacing without tab bar on ultra-mobile */
+  .main-content-wrapper:not(.with-tab-bar) {
+    /* Ultra-mobile spacing: header only */
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 16px);
+  }
+  
+  /* Additional spacing when tab bar is present on ultra-mobile */
+  .main-content-wrapper.with-tab-bar {
+    /* Ultra-mobile spacing: header + tab bar */
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 68px);
+  }
+  
   .facility-section {
     padding: 16px 12px;
     margin-bottom: 16px;
@@ -1759,15 +1720,7 @@ body {
     margin-top: 6px;
   }
   
-  .sidebar-nav {
-    padding: 0 12px;
-    gap: 6px;
-  }
-  
-  .sidebar-nav a {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
+  /* Ultra-mobile sidebar styles removed - using MobileTabBar component instead */
 }
 
 /* Professional content width constraint and spacing improvements */

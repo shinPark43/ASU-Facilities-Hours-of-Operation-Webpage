@@ -1,0 +1,191 @@
+/* Mobile Tab Bar - Attached to Header */
+.mobile-tab-bar {
+  display: none; /* Hidden by default, shown only on mobile */
+  position: fixed;
+  top: calc(var(--header-height) + (var(--header-padding-mobile) * 2));
+  left: 0;
+  right: 0;
+  height: 72px;
+  z-index: 90;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+
+.mobile-tab-bar.hidden {
+  transform: translateY(calc(-100% - var(--header-height) - (var(--header-padding-mobile) * 2)));
+}
+
+.mobile-tab-bar.visible {
+  transform: translateY(0);
+}
+
+.tab-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 8px 20px;
+  height: 100%;
+  max-width: 100%;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+  font-size: 13px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  position: relative;
+  flex: 1;
+  text-align: center;
+  max-width: 90px;
+  letter-spacing: -0.01em;
+}
+
+.tab-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.8);
+  transform: translateY(-1px);
+}
+
+.tab-item.active {
+  background: transparent;
+  color: var(--asu-blue);
+  position: relative;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: var(--asu-blue);
+  border-radius: 2px;
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+.tab-item.active .tab-icon {
+  color: var(--asu-blue);
+  opacity: 1;
+}
+
+.tab-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tab-item.active .tab-label {
+  font-weight: 600;
+  color: var(--asu-blue);
+}
+
+/* Dark theme support - Matching design system */
+[data-theme="dark"] .mobile-tab-bar {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="dark"] .tab-item {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .tab-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+[data-theme="dark"] .tab-item.active {
+  background: transparent;
+  color: var(--asu-blue-light);
+  position: relative;
+}
+
+[data-theme="dark"] .tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: var(--asu-blue-light);
+  border-radius: 2px;
+}
+
+[data-theme="dark"] .tab-item.active .tab-icon {
+  color: var(--asu-blue-light);
+}
+
+[data-theme="dark"] .tab-item.active .tab-label {
+  color: var(--asu-blue-light);
+}
+
+/* Show only on mobile */
+@media (max-width: 768px) {
+  .mobile-tab-bar {
+    display: block;
+  }
+}
+
+/* Ultra-mobile optimization */
+@media (max-width: 480px) {
+  .mobile-tab-bar {
+    left: 0;
+    right: 0;
+    height: 68px;
+  }
+  
+  .mobile-tab-bar.hidden {
+    transform: translateY(calc(-100% - var(--header-height) - (var(--header-padding-mobile) * 2)));
+  }
+  
+  .mobile-tab-bar.visible {
+    transform: translateY(0);
+  }
+  
+  .tab-container {
+    padding: 6px 16px;
+  }
+  
+  .tab-item {
+    padding: 10px 12px;
+    max-width: 75px;
+    border-radius: 10px;
+  }
+  
+  .tab-label {
+    font-size: 11px;
+  }
+}
