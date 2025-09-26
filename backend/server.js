@@ -5,6 +5,14 @@ const cron = require('node-cron');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// added for the login system
+const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
+
+//router for the auth system
+const authRouter = require('./src/routes/authRouter');
+
 const db = require('./src/database');
 const facilityRoutes = require('./src/routes/facilities');
 const scraper = require('./src/scraper');
@@ -29,8 +37,14 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Add request size limit
 app.use('/api/', limiter); // Apply rate limiting to API routes only
 
+//for the auth system
+app.use(helmet());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+
 // Routes
 app.use('/api/facilities', facilityRoutes);
+app.use('/api/auth', authRouter);
 
 // Enhanced health check endpoint
 app.get('/api/health', async (req, res) => {
@@ -126,6 +140,13 @@ async function startServer() {
           console.error('❌ Initial scrape failed:', error);
         });
     }
+
+    //connect to the MongoDB database
+    mongoose.connect(process.env.MONGO_URI).then(() => {
+        console.log("Connected to MongoDB");
+    }).catch((err) => {
+        console.log(err);
+    });
 
     // Start the server
     server = app.listen(PORT, () => {
