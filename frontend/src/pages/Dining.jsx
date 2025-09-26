@@ -15,10 +15,13 @@ const Dining = () => {
         const data = await facilityAPI.getDiningHours();
         if (data && data.sections) {
           setHours(data.sections);
-          // Set initial active tab to first facility
+          // Set initial active tab to The CAF if available, otherwise first facility
           const facilities = Object.keys(data.sections);
           if (facilities.length > 0) {
-            setActiveTab(facilities[0]);
+            const cafFacility = facilities.find(name => 
+              name.toLowerCase().includes('caf') || name.toLowerCase().includes('the caf')
+            );
+            setActiveTab(cafFacility || facilities[0]);
           }
         } else {
           throw new Error('No dining hours data available');
