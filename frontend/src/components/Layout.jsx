@@ -27,12 +27,33 @@ const Layout = ({ children }) => {
   useEffect(() => {
     const controlHeaderVisibility = () => {
       const currentScrollY = window.scrollY;
+      const documentHeight = document.documentElement.scrollHeight;
+      const windowHeight = window.innerHeight;
       const scrollThreshold = 10; // Minimum scroll distance to trigger
       
+      // Prevent bounce scrolling issues by checking boundaries
+      const isAtTop = currentScrollY <= 0;
+      const isAtBottom = currentScrollY + windowHeight >= documentHeight - 5;
+      
+      // Don't process if scroll difference is too small
       if (Math.abs(currentScrollY - lastScrollY) < scrollThreshold) {
         return;
       }
 
+      // Always show header at the top
+      if (isAtTop) {
+        setIsHeaderVisible(true);
+        setLastScrollY(currentScrollY);
+        return;
+      }
+
+      // Don't hide header when bouncing at the bottom
+      if (isAtBottom && currentScrollY < lastScrollY) {
+        // User is bouncing back from bottom - keep header state
+        return;
+      }
+
+      // Normal scroll behavior
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         // Scrolling down & past threshold - hide header
         setIsHeaderVisible(false);
@@ -45,7 +66,7 @@ const Layout = ({ children }) => {
     };
 
     const throttledControl = throttle(controlHeaderVisibility, 16); // ~60fps
-    window.addEventListener('scroll', throttledControl);
+    window.addEventListener('scroll', throttledControl, { passive: true });
     
     return () => window.removeEventListener('scroll', throttledControl);
   }, [lastScrollY]);
