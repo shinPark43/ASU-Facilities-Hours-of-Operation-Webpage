@@ -6,7 +6,7 @@ const Library = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hours, setHours] = useState(null);
-  const [activeTab, setActiveTab] = useState('main-library');
+  const [activeTab, setActiveTab] = useState('library');
 
   useEffect(() => {
     const fetchLibraryHours = async () => {
@@ -46,8 +46,8 @@ const Library = () => {
   }
 
   const facilityTabs = [
-    { id: 'main-library', label: 'Main Library', key: 'Main Library' },
-    { id: 'it-desk', label: 'IT Desk', key: 'IT Desk' },
+    { id: 'library', label: 'Library', key: 'Library' },
+    { id: 'research-desk', label: 'Research Assistance', key: 'Research Assistance Desk' },
     { id: 'west-texas', label: 'West Texas', key: 'West Texas Collection' }
   ];
 
@@ -106,7 +106,7 @@ const Library = () => {
           >
             <h3 className="facility-name">{tab.key}</h3>
             <div className="facility-hours">
-              {hours && Object.entries(hours[tab.key]).map(([day, hours]) => {
+              {hours && hours[tab.key] && Object.entries(hours[tab.key]).map(([day, hours]) => {
                 const timeRanges = parseMultipleTimeRanges(hours);
                 const dayWithDate = formatDayWithDate(day);
                 const isClosed = isClosedTime(hours);
