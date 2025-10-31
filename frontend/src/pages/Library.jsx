@@ -6,7 +6,7 @@ const Library = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hours, setHours] = useState(null);
-  const [activeTab, setActiveTab] = useState('library');
+  const [activeTab, setActiveTab] = useState('main-library');
 
   useEffect(() => {
     const fetchLibraryHours = async () => {
@@ -46,7 +46,7 @@ const Library = () => {
   }
 
   const facilityTabs = [
-    { id: 'library', label: 'Library', key: 'Library' },
+    { id: 'main-library', label: 'Main Library', key: 'Main Library' },
     { id: 'research-desk', label: 'Research Assistance', key: 'Research Assistance Desk' },
     { id: 'west-texas', label: 'West Texas', key: 'West Texas Collection' }
   ];
