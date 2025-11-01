@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { facilityAPI } from '../services/api.js';
 import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, isToday } from '../utils/timeUtils.js';
+import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
 
 const Library = () => {
   const [loading, setLoading] = useState(true);
@@ -53,6 +54,8 @@ const Library = () => {
 
   return (
     <div>
+      <AnnouncementBanner items={["11/13 K-Pop Concert - CJ Davidson Hall"]} />
+
       <div className="page-header-with-square-button">
         <div className="page-header-content">
           <h2 className="section-panel-header">Porter Henderson Library</h2>
@@ -61,7 +64,7 @@ const Library = () => {
           </p>
         </div>
         <div className="square-button-container">
-          <a 
+          <a
             href="https://myonecard.angelo.edu/patron/roomres/room_res.php"
             target="_blank"
             rel="noopener noreferrer"
@@ -71,7 +74,7 @@ const Library = () => {
           </a>
         </div>
       </div>
-      
+
       <div className="facility-section">
         <div className="facility-tabs">
           {facilityTabs.map((tab) => (
