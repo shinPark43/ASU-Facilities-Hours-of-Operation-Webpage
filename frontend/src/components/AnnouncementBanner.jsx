@@ -52,8 +52,8 @@ export function AnnouncementBanner({
         .announcement-banner {
           position: relative;
           width: 100%;
-          background: #ffffff;
-          border: 1px solid #003f7f;
+          background: var(--bg-secondary, #ffffff);
+          border: 1px solid var(--asu-blue, #003f7f);
           border-radius: 4px;
           overflow: hidden;
           user-select: none;
@@ -80,13 +80,22 @@ export function AnnouncementBanner({
           font-size: 18px;
           font-weight: normal;
           letter-spacing: 1.5px;
-          color: #003f7f;
+          color: var(--asu-blue, #003f7f);
           text-transform: uppercase;
           white-space: nowrap;
           text-rendering: optimizeSpeed;
           image-rendering: pixelated;
           -webkit-font-smoothing: none;
           -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Dark mode overrides */
+        [data-theme="dark"] .announcement-banner {
+          border-color: #3f3f3f;
+        }
+
+        [data-theme="dark"] .announcement-banner .item {
+          color: #ffffff;
         }
 
         @keyframes scroll {
