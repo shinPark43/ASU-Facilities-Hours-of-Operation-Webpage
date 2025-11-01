@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { facilityAPI } from '../services/api.js';
 import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, isToday } from '../utils/timeUtils.js';
+import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
 
 const Gym = () => {
   const [loading, setLoading] = useState(true);
@@ -58,11 +59,13 @@ const Gym = () => {
 
   return (
     <div>
+      <AnnouncementBanner items={["11/13 K-Pop Concert - CJ Davidson Hall"]} />
+
       <h2 className="section-panel-header">Recreation Center</h2>
       <p className="section-subtitle">
         Fitness facilities, swimming, climbing, and recreational activities
       </p>
-      
+
       <div className="facility-section">
         <div className="facility-tabs">
           {facilityTabs.map((tab) => (

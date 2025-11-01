@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { facilityAPI } from '../services/api.js';
 import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, normalizeTimeFormat, isToday } from '../utils/timeUtils.js';
+import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
 
 const Dining = () => {
   const [loading, setLoading] = useState(true);
@@ -62,6 +63,8 @@ const Dining = () => {
 
   return (
     <div>
+      <AnnouncementBanner items={["11/13 K-Pop Concert - CJ Davidson Hall"]} />
+
       <div className="page-header-with-square-button">
         <div className="page-header-content">
           <h2 className="section-panel-header">Dine on Campus</h2>
@@ -70,7 +73,7 @@ const Dining = () => {
           </p>
         </div>
         <div className="square-button-container">
-          <a 
+          <a
             href="https://new.dineoncampus.com/Angelo/whats-on-the-menu/the-caf/"
             target="_blank"
             rel="noopener noreferrer"
@@ -80,7 +83,7 @@ const Dining = () => {
           </a>
         </div>
       </div>
-      
+
       <div className="facility-section">
         <div className="facility-tabs">
           {facilityTabs.map((tab) => (
