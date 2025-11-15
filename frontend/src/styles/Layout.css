@@ -745,6 +745,98 @@ body {
   color: var(--text-primary);
 }
 
+/* Today's Hours Card - Vertical Status Card Layout */
+.today-card {
+  background: linear-gradient(135deg, rgba(255, 196, 37, 0.12) 0%, rgba(255, 196, 37, 0.08) 100%);
+  border: 2px solid var(--asu-gold);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 16px rgba(255, 196, 37, 0.15), 0 2px 8px rgba(255, 196, 37, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.today-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 196, 37, 0.2), 0 3px 10px rgba(255, 196, 37, 0.15);
+}
+
+.today-card-header {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--asu-gold-dark);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.today-card-date {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.today-card-times {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.today-card-time {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--asu-gold);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  letter-spacing: -0.01em;
+}
+
+.today-card-time.closed-not-available {
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--bg-tertiary);
+  font-weight: 500;
+  border-color: var(--border-color);
+}
+
+/* Dark theme today card styles */
+[data-theme="dark"] .today-card {
+  background: linear-gradient(135deg, rgba(255, 212, 84, 0.1) 0%, rgba(255, 212, 84, 0.06) 100%);
+  border-color: var(--asu-gold-light);
+  box-shadow: 0 4px 16px rgba(255, 212, 84, 0.12), 0 2px 8px rgba(255, 212, 84, 0.08);
+}
+
+[data-theme="dark"] .today-card:hover {
+  box-shadow: 0 6px 20px rgba(255, 212, 84, 0.18), 0 3px 10px rgba(255, 212, 84, 0.12);
+}
+
+[data-theme="dark"] .today-card-header {
+  color: var(--asu-gold-light);
+}
+
+[data-theme="dark"] .today-card-date {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .today-card-time {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--asu-gold-light);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .today-card-time.closed-not-available {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
 /* Dark theme current day styles */
 [data-theme="dark"] .hours-row.current-day {
   background: rgba(255, 196, 37, 0.05);
@@ -757,6 +849,31 @@ body {
 
 [data-theme="dark"] .hours-row.current-day .hours-time {
   color: var(--text-primary);
+}
+
+/* Mobile responsive styles for Today's Hours Card */
+@media (max-width: 768px) {
+  .today-card {
+    padding: 20px 22px;
+    margin-bottom: 24px;
+    border-radius: 14px;
+  }
+  
+  .today-card-header {
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    margin-bottom: 10px;
+  }
+  
+  .today-card-date {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  
+  .today-card-time {
+    font-size: 13px;
+    padding: 12px 16px;
+  }
 }
 
 /* Mobile-friendly current day highlighting - Modern design with full compatibility */

@@ -59,7 +59,7 @@ const Gym = () => {
 
   return (
     <div>
-      <AnnouncementBanner items={["11/13 K-Pop Concert - CJ Davidson Hall"]} />
+      <AnnouncementBanner items={["Thanksgiving Break: Nov 26-28", "Final Exams for Fall 2025: Dec 8-12"]} />
 
       <h2 className="section-panel-header">Recreation Center</h2>
       <p className="section-subtitle">
@@ -100,27 +100,59 @@ const Gym = () => {
           >
             <h3 className="facility-name">{facilityName}</h3>
             <div className="facility-hours">
-              {Object.entries(facilities[facilityName]).map(([day, hours]) => {
-                const timeRanges = parseMultipleTimeRanges(hours);
-                const dayWithDate = formatDayWithDate(day);
-                const isClosed = isClosedTime(hours);
+              {(() => {
+                const todayEntry = Object.entries(facilities[facilityName]).find(([day]) => isToday(day));
                 
                 return (
-                  <div key={day} className={`hours-row ${isToday(day) ? 'current-day' : ''}`}>
-                    <span className="day-name">{dayWithDate}</span>
-                    <div className="hours-time-container">
-                      {timeRanges.map((timeRange, index) => (
-                        <span 
-                          key={index} 
-                          className={`hours-time ${isClosed ? 'closed-not-available' : ''}`}
-                        >
-                          {timeRange}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  <>
+                    {todayEntry && (() => {
+                      const [day, hoursValue] = todayEntry;
+                      const timeRanges = parseMultipleTimeRanges(hoursValue);
+                      const dayWithDate = formatDayWithDate(day);
+                      const isClosed = isClosedTime(hoursValue);
+                      
+                      return (
+                        <div key={`today-${day}`} className="today-card">
+                          <div className="today-card-header">Today's Hours</div>
+                          <div className="today-card-date">{dayWithDate}</div>
+                          <div className="today-card-times">
+                            {timeRanges.map((timeRange, index) => (
+                              <div 
+                                key={index} 
+                                className={`today-card-time ${isClosed ? 'closed-not-available' : ''}`}
+                              >
+                                {timeRange}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                    
+                    {Object.entries(facilities[facilityName]).map(([day, hours]) => {
+                      const timeRanges = parseMultipleTimeRanges(hours);
+                      const dayWithDate = formatDayWithDate(day);
+                      const isClosed = isClosedTime(hours);
+                      
+                      return (
+                        <div key={day} className="hours-row">
+                          <span className="day-name">{dayWithDate}</span>
+                          <div className="hours-time-container">
+                            {timeRanges.map((timeRange, index) => (
+                              <span 
+                                key={index} 
+                                className={`hours-time ${isClosed ? 'closed-not-available' : ''}`}
+                              >
+                                {timeRange}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
                 );
-              })}
+              })()}
             </div>
           </div>
         ))}
