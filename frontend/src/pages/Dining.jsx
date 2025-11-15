@@ -118,27 +118,59 @@ const Dining = () => {
           >
             <h3 className="facility-name">{tab.key}</h3>
             <div className="facility-hours">
-              {hours && hours[tab.key] && Object.entries(hours[tab.key]).map(([day, hours]) => {
-                const timeRanges = parseMultipleTimeRanges(hours);
-                const dayWithDate = formatDayWithDate(day);
-                const isClosed = isClosedTime(hours);
+              {hours && hours[tab.key] && (() => {
+                const todayEntry = Object.entries(hours[tab.key]).find(([day]) => isToday(day));
                 
                 return (
-                  <div key={day} className={`hours-row ${isToday(day) ? 'current-day' : ''}`}>
-                    <span className="day-name">{dayWithDate}</span>
-                    <div className="hours-time-container">
-                      {timeRanges.map((timeRange, index) => (
-                        <span 
-                          key={index} 
-                          className={`hours-time ${isClosed ? 'closed-not-available' : ''}`}
-                        >
-                          {normalizeTimeFormat(timeRange)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  <>
+                    {todayEntry && (() => {
+                      const [day, hoursValue] = todayEntry;
+                      const timeRanges = parseMultipleTimeRanges(hoursValue);
+                      const dayWithDate = formatDayWithDate(day);
+                      const isClosed = isClosedTime(hoursValue);
+                      
+                      return (
+                        <div key={`today-${day}`} className="today-card">
+                          <div className="today-card-header">Today's Hours</div>
+                          <div className="today-card-date">{dayWithDate}</div>
+                          <div className="today-card-times">
+                            {timeRanges.map((timeRange, index) => (
+                              <div 
+                                key={index} 
+                                className={`today-card-time ${isClosed ? 'closed-not-available' : ''}`}
+                              >
+                                {normalizeTimeFormat(timeRange)}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                    
+                    {Object.entries(hours[tab.key]).map(([day, hours]) => {
+                      const timeRanges = parseMultipleTimeRanges(hours);
+                      const dayWithDate = formatDayWithDate(day);
+                      const isClosed = isClosedTime(hours);
+                      
+                      return (
+                        <div key={day} className="hours-row">
+                          <span className="day-name">{dayWithDate}</span>
+                          <div className="hours-time-container">
+                            {timeRanges.map((timeRange, index) => (
+                              <span 
+                                key={index} 
+                                className={`hours-time ${isClosed ? 'closed-not-available' : ''}`}
+                              >
+                                {normalizeTimeFormat(timeRange)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
                 );
-              })}
+              })()}
             </div>
           </div>
         ))}
