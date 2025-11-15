@@ -63,7 +63,7 @@ const Dining = () => {
 
   return (
     <div>
-      <AnnouncementBanner items={["11/13 K-Pop Concert - CJ Davidson Hall"]} />
+      <AnnouncementBanner items={["Thanksgiving Break: Nov 26-28", "Final Exams for Fall 2025: Dec 8-12"]} />
 
       <div className="page-header-with-square-button">
         <div className="page-header-content">

@@ -59,7 +59,7 @@ const Gym = () => {
 
   return (
     <div>
-      <AnnouncementBanner items={["11/13 K-Pop Concert - CJ Davidson Hall"]} />
+      <AnnouncementBanner items={["Thanksgiving Break: Nov 26-28", "Final Exams for Fall 2025: Dec 8-12"]} />
 
       <h2 className="section-panel-header">Recreation Center</h2>
       <p className="section-subtitle">
