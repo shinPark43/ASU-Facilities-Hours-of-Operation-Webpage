@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../styles/Landing.css';
 
 // Local image assets
@@ -24,7 +24,7 @@ const Landing = () => {
   const totalSections = 7;
 
   // Scroll to specific section
-  const scrollToSection = (sectionIndex) => {
+  const scrollToSection = useCallback((sectionIndex) => {
     if (isScrolling) return;
     
     setIsScrolling(true);
@@ -32,13 +32,21 @@ const Landing = () => {
     
     const section = document.querySelector(`[data-section="${sectionIndex}"]`);
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Use direct scrollTop for smoother, snap-friendly scrolling
+      const container = containerRef.current;
+      if (container) {
+        container.scrollTo({
+          top: section.offsetTop,
+          behavior: 'smooth'
+        });
+      }
     }
     
+    // Longer timeout to ensure scroll completes
     setTimeout(() => {
       setIsScrolling(false);
-    }, 1000);
-  };
+    }, 1200);
+  }, [isScrolling]);
 
   // Handle wheel scroll
   useEffect(() => {
@@ -67,7 +75,7 @@ const Landing = () => {
         container.removeEventListener('wheel', handleWheel);
       }
     };
-  }, [currentSection, isScrolling]);
+  }, [currentSection, isScrolling, scrollToSection]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -83,7 +91,7 @@ const Landing = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSection, isScrolling]);
+  }, [currentSection, isScrolling, scrollToSection]);
 
   // Navigate to next section
   const goToNextSection = () => {
