@@ -15,6 +15,9 @@ const Layout = ({ children }) => {
   // Check if current page should show tab bar
   const facilityPages = ['/library', '/gym', '/dining'];
   const shouldShowTabBar = facilityPages.includes(location.pathname);
+  
+  // Check if current page is landing page
+  const isLandingPage = location.pathname === '/landing';
 
   // Load theme from localStorage on component mount
   useEffect(() => {
@@ -95,35 +98,37 @@ const Layout = ({ children }) => {
 
   return (
     <div className="app-container">
-      <header className={`app-header ${isHeaderVisible ? 'visible' : 'hidden'}`}>
-        <div className="header-content">
-          <div className="header-text">
-            <h1 className="app-title">ASU Hours</h1>
-            <p className="app-subtitle">Weekly Operating Hours</p>
-          </div>
-          <div className="header-controls">
-            <div className="theme-toggle-container">
-              <span className="theme-label">{theme.toUpperCase()}</span>
-              <div className="theme-toggle-switch" onClick={toggleTheme}>
-                <div className="toggle-track">
-                  <div className={`toggle-thumb ${theme === 'dark' ? 'dark' : 'light'}`}></div>
-                  <div className="toggle-icons">
-                    <span className="icon-light">☀️</span>
-                    <span className="icon-dark">🌙</span>
+      {!isLandingPage && (
+        <header className={`app-header ${isHeaderVisible ? 'visible' : 'hidden'}`}>
+          <div className="header-content">
+            <div className="header-text">
+              <h1 className="app-title">ASU Hours</h1>
+              <p className="app-subtitle">Weekly Operating Hours</p>
+            </div>
+            <div className="header-controls">
+              <div className="theme-toggle-container">
+                <span className="theme-label">{theme.toUpperCase()}</span>
+                <div className="theme-toggle-switch" onClick={toggleTheme}>
+                  <div className="toggle-track">
+                    <div className={`toggle-thumb ${theme === 'dark' ? 'dark' : 'light'}`}></div>
+                    <div className="toggle-icons">
+                      <span className="icon-light">☀️</span>
+                      <span className="icon-dark">🌙</span>
+                    </div>
                   </div>
                 </div>
               </div>
+              <HamburgerMenu />
             </div>
-            <HamburgerMenu />
           </div>
-        </div>
-      </header>
-      <Sidebar />
-      <MobileTabBar isHeaderVisible={isHeaderVisible} />
-      <main className={`main-content-wrapper ${shouldShowTabBar ? 'with-tab-bar' : ''}`}>
+        </header>
+      )}
+      {!isLandingPage && <Sidebar />}
+      {!isLandingPage && <MobileTabBar isHeaderVisible={isHeaderVisible} />}
+      <main className={`main-content-wrapper ${shouldShowTabBar ? 'with-tab-bar' : ''} ${isLandingPage ? 'landing-page' : ''}`}>
         {children}
       </main>
-      <ScrollToTop />
+      {!isLandingPage && <ScrollToTop />}
     </div>
   );
 };
