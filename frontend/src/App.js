@@ -7,6 +7,7 @@ import Dining from './pages/Dining';
 import RamTram from './pages/RamTram';
 import About from './pages/About';
 import HowToInstall from './pages/HowToInstall';
+import Landing from './pages/Landing';
 import './styles/Layout.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
     <Router basename="/ASU-Facilities-Hours-of-Operation-Webpage">
       <Layout>
         <Routes>
+          <Route path="/landing" element={<Landing />} />
           <Route path="/library" element={<Library />} />
           <Route path="/gym" element={<Gym />} />
           <Route path="/dining" element={<Dining />} />

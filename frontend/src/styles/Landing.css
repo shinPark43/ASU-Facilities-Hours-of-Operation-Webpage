@@ -1,0 +1,806 @@
+/* Override Layout constraints for landing page */
+.main-content-wrapper.landing-page {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  min-height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  width: 100% !important;
+  scroll-behavior: smooth;
+}
+
+/* Disable all hover effects on landing page */
+.landing-page * {
+  transition: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.landing-page *:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.landing-container {
+  width: 100%;
+  max-width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: white;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.landing-section {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  position: relative;
+  background: white;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.landing-section * {
+  border-radius: 0;
+  outline: none;
+}
+
+/* Fixed Navigation Indicator */
+.fixed-scroll-indicator {
+  position: fixed;
+  right: 10%;
+  top: 40%;
+  z-index: 1000;
+  pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.fixed-scroll-dot {
+  display: block;
+  width: 15px;
+  height: 4.5px;
+  background: #909090;
+  border: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+  cursor: pointer;
+}
+
+.fixed-scroll-dot:last-child {
+  margin-bottom: 0;
+}
+
+.fixed-scroll-dot.active {
+  background: #383535;
+  width: 25px;
+}
+
+/* Fixed Down Arrow Button - Original Design with Float Animation */
+.fixed-down-arrow {
+  position: fixed;
+  bottom: 5%;
+  left: 47.7%;
+  z-index: 1000;
+  width: 80px;
+  height: 30px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: none;
+  pointer-events: all;
+  padding: 0;
+  animation: float 2s ease-in-out infinite;
+}
+
+.fixed-down-arrow:hover {
+  background: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.fixed-down-arrow img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: none;
+}
+
+/* White arrow for first section */
+.fixed-down-arrow.white-arrow img {
+  filter: brightness(0) invert(1);
+}
+
+/* Gray arrow for other sections */
+.fixed-down-arrow.gray-arrow img {
+  filter: none;
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Team Section (Page 7) */
+.team-section {
+  background: #000000;
+}
+
+.section-title.main-hero-title {
+  color: #ffffff;
+}
+
+.section-title.team-title {
+  color: #ffffff;
+}
+
+.team-heading {
+  width: 68.6%;
+  max-width: 1186px;
+  height: auto;
+  left: 3.7%;
+  right: 3.7%;
+  top: 25% !important;
+  position: absolute;
+  color: #ffffff !important;
+  font-size: clamp(50px, 4.34vw, 75px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  word-wrap: break-word;
+  line-height: 1.3;
+  letter-spacing: -2.25px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.team-section .section-subtitle {
+  width: 76.8%;
+  max-width: 1327px;
+  height: auto;
+  left: 3.7%;
+  right: 3.7%;
+  top: 35%;
+  position: absolute;
+  color: #ada6a6;
+  font-size: clamp(28px, 2.31vw, 40px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+  line-height: 1.3;
+  letter-spacing: -1.2px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.team-info {
+  width: 33.2%;
+  max-width: 573px;
+  height: auto;
+  left: 6.9%;
+  top: 58%;
+  position: absolute;
+  font-size: 0;
+  letter-spacing: -0.96px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.team-member-name {
+  color: #ffffff;
+  font-size: clamp(24px, 1.85vw, 32px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  word-wrap: break-word;
+  display: block;
+  margin: 0;
+  margin-bottom: 3px;
+  line-height: 1;
+}
+
+.team-member-email {
+  color: #ffffff;
+  font-size: clamp(18px, 1.39vw, 24px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  word-wrap: break-word;
+  display: block;
+  margin: 0;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.social-icon {
+  position: absolute;
+  display: block;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.social-icon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.instagram-icon {
+  width: 35px;
+  height: 35px;
+  left: 12%;
+  top: 45%;
+  position: absolute;
+}
+
+.instagram-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.youtube-icon {
+  width: 38px;
+  height: 38px;
+  left: 8%;
+  top: 45%;
+  position: absolute;
+}
+
+.youtube-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.email-icon {
+  width: 35px;
+  height: 35px;
+  left: 4%;
+  top: 45%;
+  position: absolute;
+}
+
+.email-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* .social-link {
+  position: absolute;
+  color: #f3ebeb;
+  font-size: clamp(16px, 1.16vw, 20px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-position: from-font;
+  text-decoration-style: solid;
+  word-wrap: break-word;
+  line-height: normal;
+  letter-spacing: -0.6px;
+  cursor: pointer;
+  top: 93.5%;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.instagram-link {
+  left: 82.5%;
+  width: auto;
+  max-width: 200px;
+}
+
+.email-link {
+  left: 43.5%;
+  width: auto;
+  max-width: 198px;
+} */
+
+.youtube-link {
+  left: 64.7% !important;
+  width: auto;
+  max-width: 188px;
+}
+
+.scroll-chevron {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 15px;
+  left: 61.8%;
+  top: 93.1%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.chevron-inner {
+  transform: rotate(90deg);
+  width: 15px;
+  height: 19px;
+  position: relative;
+}
+
+.chevron-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Common Section Styles for Pages 2-6 */
+.section-gradient {
+  width: 105%;
+  height: 100%;
+  left: -2.5%;
+  top: 0;
+  position: absolute;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #DEDFE0 78.846%);
+}
+
+.hero-gradient {
+  background: linear-gradient(180deg, #E0E0E0 25%, rgba(255, 255, 255, 0) 100%);
+}
+
+.section-title {
+  left: 3.7%;
+  top: 6%;
+  position: fixed;
+  color: #000000;
+  font-size: clamp(32px, 2.78vw, 48px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  word-wrap: break-word;
+  line-height: normal;
+  letter-spacing: -1.44px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  z-index: 1000;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.section-heading {
+  width: 68.6%;
+  max-width: 1186px;
+  height: auto;
+  left: 3.7%;
+  right: 3.7%;
+  top: 30%;
+  position: absolute;
+  color: #000000;
+  font-size: clamp(50px, 4.34vw, 75px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  word-wrap: break-word;
+  line-height: normal;
+  letter-spacing: -2.25px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.section-description {
+  width: 76.8%;
+  max-width: 1327px;
+  height: auto;
+  left: 3.7%;
+  right: 3.7%;
+  top: 45.2%;
+  position: absolute;
+  color: #6D6D6D;
+  font-size: clamp(38px, 3.18vw, 55px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  word-wrap: break-word;
+  line-height: normal;
+  letter-spacing: -1.65px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.section-description p {
+  margin: 0;
+}
+
+/* Hero Section Specific */
+.hero-section .section-heading {
+  top: 26.9%;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.hero-section .section-description {
+  top: 49.9%;
+  color: #000000;
+}
+
+.hero-heading {
+  width: 68.6%;
+  max-width: 1186px;
+  height: auto;
+  left: 3.7%;
+  right: 3.7%;
+  top: 26.9%;
+  position: absolute;
+  color: #000000;
+  font-size: clamp(50px, 4.34vw, 75px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  word-wrap: break-word;
+  line-height: normal;
+  letter-spacing: -2.25px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.hero-heading p {
+  margin: 0;
+}
+
+.hero-description {
+  width: 76.8%;
+  max-width: 1327px;
+  height: auto;
+  left: 3.7%;
+  right: 3.7%;
+  top: 49.9%;
+  position: absolute;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: clamp(38px, 3.18vw, 55px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  word-wrap: break-word;
+  line-height: normal;
+  letter-spacing: -1.65px;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.hero-description p {
+  margin: 0;
+}
+
+/* Decorative Icons (Pages 2-6) - Now clickable social links */
+.decorative-icons {
+  position: absolute;
+  left: 3.7%;
+  top: 86.3%;
+  bottom: 8.27%;
+  right: 92.79%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-link {
+  display: block;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 50%;
+}
+
+.icon-link:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.icon-phone-1 {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  left: 0;
+  top: 0;
+}
+
+.icon-phone-1 img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.icon-phone-2 {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  left: 55px;
+  top: 0.45px;
+}
+
+.icon-phone-2 img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Old scroll indicators - hidden (using fixed version now) */
+.scroll-indicator,
+.scroll-dot,
+.chevron-button,
+.scroll-chevron,
+.chevron-inner {
+  display: none !important;
+}
+
+/* Main Hero Section (Page 1) */
+.hero-background-image {
+  width: 100%;
+  height: 95%;
+  left: 0;
+  top: 0;
+  position: absolute;
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+}
+
+.hero-overlay {
+  width: 100%;
+  height: 91.4%;
+  left: 0;
+  top: 8.6%;
+  position: absolute;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 71.635%);
+}
+
+.main-hero-title {
+  color: white;
+  line-height: normal;
+  letter-spacing: -1.44px;
+  margin: 0;
+  left: 3.7%;
+  top: 6%;
+}
+
+.main-hero-heading {
+  left: 3.7%;
+  right: 3.7%;
+  top: 23.5%;
+  position: absolute;
+  color: rgb(255, 255, 255);
+  font-size: clamp(64px, 5.56vw, 96px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  word-wrap: break-word;
+  line-height: normal;
+  letter-spacing: -2.88px;
+  white-space: nowrap;
+  margin: 0;
+  width: auto;
+}
+
+.main-hero-heading p {
+  margin: 0;
+}
+
+.hero-icon {
+  width: 8cm;
+  max-width: 216px;
+  min-width: 120px;
+  height: 8vw;
+  max-height: 216px;
+  min-height: 120px;
+  left: 0.8%;
+  top: 75%;
+  position: absolute;
+  object-fit: contain;
+  object-position: center center;
+  pointer-events: none;
+}
+
+.hero-feature-text {
+  left: 14%;
+  top: 83%;
+  position: absolute;
+  color: white;
+  font-size: clamp(24px, 1.85vw, 32px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  word-wrap: break-word;
+  line-height: normal;
+  letter-spacing: -0.96px;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.hero-feature-text p {
+  margin: 0;
+}
+
+.hero-image-1 {
+  width: 25vw;
+  max-width: 484px;
+  min-width: 250px;
+  height: auto;
+  max-height: 82vh;
+  left: 46.5% !important;
+  top: 7%;
+  position: absolute;
+  object-fit: contain;
+  object-position: center center;
+  pointer-events: none;
+}
+
+.hero-image-2 {
+  width: 25vw;
+  max-width: 484px;
+  min-width: 250px;
+  height: auto;
+  max-height: 82vh;
+  left: 71.1%;
+  top: 7%;
+  position: absolute;
+  object-fit: contain;
+  object-position: center center;
+  pointer-events: none;
+}
+
+
+/* Responsive adjustments for all screen sizes */
+@media (max-width: 1920px) {
+  .team-heading,
+  .section-heading,
+  .hero-heading {
+    left: 3.7%;
+    width: auto;
+    max-width: 68.6%;
+  }
+  
+  .team-section .section-subtitle,
+  .section-description,
+  .hero-description {
+    left: 3.7%;
+    width: auto;
+    max-width: 76.8%;
+  }
+  
+  .team-info {
+    left: 6.9%;
+    width: auto;
+    max-width: 33.2%;
+  }
+  
+  .main-hero-heading {
+    left: 3.7%;
+  }
+  
+  .instagram-link {
+    left: 82.4%;
+  }
+  
+  .email-link {
+    left: 43.4%;
+  }
+  
+  .youtube-link {
+    left: 63.9%;
+  }
+}
+
+@media (max-width: 1440px) {
+  .hero-image-1 {
+    left: 42%;
+  }
+  
+  .hero-image-2 {
+    left: 67%;
+  }
+}
+
+@media (max-width: 1366px) {
+  .hero-image-1 {
+    left: 40%;
+  }
+  
+  .hero-image-2 {
+    left: 65%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .landing-section {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .section-title {
+    left: 5%;
+  }
+  
+  .section-heading,
+  .team-heading,
+  .hero-heading {
+    width: 90%;
+    max-width: 90%;
+    left: 5%;
+  }
+  
+  .section-description,
+  .team-section .section-subtitle,
+  .hero-description {
+    width: 90%;
+    max-width: 90%;
+    left: 5%;
+  }
+  
+  .team-info {
+    left: 7%;
+    width: 90%;
+    max-width: 90%;
+  }
+  
+  .main-hero-heading {
+    left: 5%;
+    width: 90%;
+  }
+  
+  .hero-feature-text {
+    left: 5%;
+    width: 90%;
+  }
+  
+  .hero-background-image {
+    width: 100%;
+    height: 95%;
+  }
+  
+  .hero-image-1,
+  .hero-image-2 {
+    width: 35vw;
+    min-width: 250px;
+    height: auto;
+    max-height: 70vh;
+  }
+  
+  .hero-image-1 {
+    left: 10%;
+  }
+  
+  .hero-image-2 {
+    left: 55%;
+  }
+  
+  .instagram-icon,
+  .email-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .youtube-icon {
+    width: 30px;
+    height: 30px;
+  }
+}
