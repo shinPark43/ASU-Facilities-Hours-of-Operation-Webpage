@@ -23,6 +23,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/install" element={<HowToInstall />} />
           <Route path="/" element={<Navigate to="/library" replace />} />
+          {/* Catch all undefined routes and redirect to library */}
+          <Route path="*" element={<Navigate to="/library" replace />} />
         </Routes>
       </Layout>
     </Router>
