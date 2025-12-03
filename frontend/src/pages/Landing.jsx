@@ -9,13 +9,8 @@ import apllicationImage2 from '../assets/images/phone_view2.png';
 import instagram_icon_team_page from '../assets/images/instagram_icon_team_page.svg';
 import youtube_icon_team_page from '../assets/images/youtube_icon_team_page.svg';
 import envelope_icon_team_page from '../assets/images/email_icon_team_page.svg';
-
-// Image assets from Figma (Updated)
-
-const white_arrow_icon = "https://www.figma.com/api/mcp/asset/58946e94-5dfb-4207-a711-c48121944086";
-// const youtube_icon = "https://www.figma.com/api/mcp/asset/cc96215d-1ccc-4d46-be86-d155305e5950";
-// const instagram_icon = "https://www.figma.com/api/mcp/asset/8d46e32d-bd23-4ec4-a0e2-db15776e9d47";
-const gray_arrow_icon = "https://www.figma.com/api/mcp/asset/c9a1bfdf-6922-4ef2-82e1-45292c794760";
+import white_arrow_icon from '../assets/images/white_arrow_icon.svg';
+import gray_arrow_icon from '../assets/images/gray_arrow_icon.svg';
 
 const Landing = () => {
   const [currentSection, setCurrentSection] = useState(0);
