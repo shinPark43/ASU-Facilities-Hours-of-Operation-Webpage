@@ -590,191 +590,119 @@ class ScraperManager {
         return {};
       }
       
-      // Find all dining tables by looking for tables with restaurant/dining content
-      let diningTables = [];
+      // Day name mappings (header format: "Sun14", "Mon15" -> "Sunday", "Monday")
+      const dayMappings = {
+        'sun': 'Sunday', 'mon': 'Monday', 'tue': 'Tuesday', 
+        'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday'
+      };
       
-      for (const table of tables) {
-        const tableText = table.textContent || '';
+      // Skip these non-restaurant entries (header row, navigation buttons)
+      const skipNames = ['location', 'go to'];
+      
+      // Process each table
+      tables.forEach((table, tableIndex) => {
         const rows = table.querySelectorAll('tr');
+        if (rows.length < 2) return; // Skip tables with insufficient rows
         
-        // Look for any table containing dining hours (more generic approach)
-        const hasDiningContent = tableText.includes('Closed') && 
-                                (tableText.includes(':') || tableText.includes('AM') || tableText.includes('PM')) &&
-                                rows.length > 3;
+        // Find header row with day columns
+        let headerRow = null;
+        let dayColumns = {};
         
-        if (hasDiningContent) {
-          diningTables.push({ table: table, rows: rows.length });
-          console.log('Found dining table with', rows.length, 'rows');
-        }
-      }
-      
-      if (diningTables.length === 0) {
-        console.log('Could not find any dining hours tables');
-        return {};
-      }
-      
-      console.log('Processing', diningTables.length, 'dining tables');
-      
-      // Process each dining table
-      diningTables.forEach((tableInfo, tableIndex) => {
-        const { table: diningTable, rows: rowCount } = tableInfo;
-        console.log('Processing table', tableIndex + 1, 'with', rowCount, 'rows');
-        
-        const rows = diningTable.querySelectorAll('tr');
-      
-      // Find header row with day names
-      let headerRow = null;
-      let dayColumns = {};
-      
-      for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        const cells = row.querySelectorAll('td, th');
-        
-        // Check if this row contains day abbreviations
-        let foundDays = 0;
-        cells.forEach((cell, cellIndex) => {
-          const cellText = cell.textContent?.trim().toLowerCase() || '';
-          const dayMappings = {
-            'sun': 'Sunday', 'mon': 'Monday', 'tue': 'Tuesday', 
-            'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday'
-          };
+        for (let i = 0; i < Math.min(rows.length, 3); i++) {
+          const row = rows[i];
+          const cells = row.querySelectorAll('td, th');
+          let foundDays = 0;
           
-          for (const [abbrev, fullDay] of Object.entries(dayMappings)) {
-            if (cellText.includes(abbrev)) {
-              dayColumns[cellIndex] = fullDay;
-              foundDays++;
-              break;
+          cells.forEach((cell, cellIndex) => {
+            const cellText = cell.textContent?.trim().toLowerCase() || '';
+            for (const [abbrev, fullDay] of Object.entries(dayMappings)) {
+              if (cellText.startsWith(abbrev)) {
+                dayColumns[cellIndex] = fullDay;
+                foundDays++;
+                break;
+              }
             }
-          }
-        });
-        
-        if (foundDays >= 3) { // Found at least 3 days, likely the header row
-          headerRow = row;
-          console.log('Found header row with day columns:', dayColumns);
-          break;
-        }
-      }
-      
-      if (!headerRow || Object.keys(dayColumns).length === 0) {
-        console.log('Could not find header row with day columns');
-        return {};
-      }
-      
-      // Process each data row
-      for (let i = 0; i < rows.length; i++) {
-        if (rows[i] === headerRow) continue; // Skip header
-        
-        const row = rows[i];
-        const cells = row.querySelectorAll('td, th');
-        
-        if (cells.length === 0) continue;
-        
-        // Extract location name from first cell
-        const locationName = cells[0]?.textContent?.trim() || '';
-        if (!locationName) continue;
-        
-        // Check if this is a restaurant row
-        const restaurantPatterns = /^(Just Baked|Bella|Starbucks|Chick-fil-A|Subway|Einstein|TEA Co|The CAF|Roscoe|Tu Taco|Ranch|Market|Sushi)/i;
-        if (!restaurantPatterns.test(locationName)) {
-          console.log('Skipping non-restaurant row:', locationName);
-          continue;
-        }
-        
-        console.log('Processing restaurant:', locationName);
-        
-        // Clean and standardize location name
-        let cleanLocationName = locationName;
-        if (locationName.toLowerCase().includes('just baked') || locationName.toLowerCase().includes('bistro')) {
-          cleanLocationName = 'Just Baked Smart Bistro';
-        } else if (locationName.toLowerCase().includes('bella')) {
-          cleanLocationName = "Bella's Blends";
-        } else if (locationName.toLowerCase().includes('tea co')) {
-          cleanLocationName = 'TEA Co';
-        } else if (locationName.toLowerCase().includes('caf')) {
-          cleanLocationName = 'The CAF';
-        } else if (locationName.toLowerCase().includes('chick-fil-a')) {
-          cleanLocationName = 'Chick-fil-A';
-        } else if (locationName.toLowerCase().includes('starbucks')) {
-          cleanLocationName = 'Starbucks';
-        } else if (locationName.toLowerCase().includes('einstein') || locationName.toLowerCase().includes('bagel')) {
-          cleanLocationName = 'Einstein Bros Bagels';
-        } else if (locationName.toLowerCase().includes('roscoe')) {
-          cleanLocationName = "Roscoe's Den";
-        } else if (locationName.toLowerCase().includes('subway')) {
-          cleanLocationName = 'Subway';
-        } else if (locationName.toLowerCase().includes('tu taco') || locationName.toLowerCase().includes('taco')) {
-          cleanLocationName = 'Tu Taco';
-        } else if (locationName.toLowerCase().includes('ranch') || locationName.toLowerCase().includes('smokehouse')) {
-          cleanLocationName = 'Ranch Smokehouse';
-        } else if (locationName.toLowerCase().includes('market')) {
-          cleanLocationName = 'Market';
-        } else if (locationName.toLowerCase().includes('sushi')) {
-          cleanLocationName = 'Sushi';
-        }
-        
-        // Initialize location data
-        diningData[cleanLocationName] = {};
-        
-        // Extract hours for each day
-        Object.entries(dayColumns).forEach(([columnIndex, dayName]) => {
-          const cellIndex = parseInt(columnIndex);
-          const cell = cells[cellIndex];
+          });
           
-          if (!cell) {
-            diningData[cleanLocationName][dayName] = 'Not available';
-            return;
+          if (foundDays >= 5) {
+            headerRow = row;
+            console.log('Table', tableIndex, '- Found header with', foundDays, 'days');
+            break;
+          }
+        }
+        
+        if (!headerRow || Object.keys(dayColumns).length === 0) {
+          return; // Skip this table
+        }
+        
+        // Process data rows - look for rows with 8 cells (name + 7 days)
+        for (let i = 0; i < rows.length; i++) {
+          if (rows[i] === headerRow) continue;
+          
+          const row = rows[i];
+          const cells = row.querySelectorAll('td, th');
+          
+          // We need rows with 8 cells: location name + 7 days of hours
+          if (cells.length < 8) continue;
+          
+          const locationName = cells[0]?.textContent?.trim() || '';
+          if (!locationName) continue;
+          
+          // Skip non-restaurant entries
+          const lowerName = locationName.toLowerCase();
+          if (skipNames.some(skip => lowerName.startsWith(skip))) {
+            continue;
           }
           
-          let hoursText = cell.textContent?.trim() || '';
-          console.log(`Raw hours for ${cleanLocationName} ${dayName}:`, JSON.stringify(hoursText));
+          console.log('Processing:', locationName);
           
-          // Clean up the hours text
-          if (!hoursText || hoursText === '' || hoursText === '-' || hoursText.toLowerCase().includes('closed')) {
-            hoursText = 'Closed';
-          } else {
-            // Handle different cell formats:
-            // Main table: "Mon8/257:30a - 9:00p7:30a - 9:00p" (duplicated)
-            // Additional table: "Mon8/2511:00a - 2:00p7:00p - 11:00p11:00a - 2:00p7:00p - 11:00p" (separated hours)
+          // Initialize location data if not exists
+          if (!diningData[locationName]) {
+            diningData[locationName] = {};
+          }
+          
+          // Extract hours for each day
+          Object.entries(dayColumns).forEach(([columnIndex, dayName]) => {
+            const cellIndex = parseInt(columnIndex);
+            const cell = cells[cellIndex];
             
-            // First, remove date information (like "Mon8/25", "Tue8/26", etc.)  
-            // Smart regex that recognizes valid 12-hour format boundaries (1-12 hours only)
-            hoursText = hoursText.replace(/^[A-Za-z]{3}\d{1,2}\/\d{1,2}?(?=[1-9]:|1[0-2]:)/, '');
+            if (!cell) {
+              diningData[locationName][dayName] = 'Not available';
+              return;
+            }
             
-            // Extract all time range patterns
-            const timePattern = /(\d{1,2}:\d{2}[ap])\s*-\s*(\d{1,2}:\d{2}[ap])/gi;
-            const timeMatches = Array.from(hoursText.matchAll(timePattern));
+            let hoursText = cell.textContent?.trim() || '';
             
-            if (timeMatches.length > 0) {
-              // Convert each time range to proper format
-              const timeRanges = timeMatches.map(match => {
-                const startTime = match[1].replace('a', ' AM').replace('p', ' PM');
-                const endTime = match[2].replace('a', ' AM').replace('p', ' PM');
-                return startTime + ' - ' + endTime;
-              });
-              
-              // For locations like Roscoe's Den with separated hours (lunch + dinner)
-              // Remove duplicates and join unique ranges
-              const uniqueRanges = [...new Set(timeRanges)];
-              hoursText = uniqueRanges.join(', ');
-              
+            // Clean up the hours text
+            if (!hoursText || hoursText === '' || hoursText === '-' || hoursText.toLowerCase() === 'closed') {
+              hoursText = 'Closed';
             } else {
-              // If no time pattern found, check if it contains "Closed"
-              if (hoursText.toLowerCase().includes('closed')) {
+              // Extract time ranges (format: "10:00a - 2:00p" or "10:00a - 2:00p\n5:00p - 7:00p")
+              // Match valid 12-hour times: 1:00-12:59
+              const timePattern = /(1[0-2]:\d{2}[ap]|[1-9]:\d{2}[ap])\s*-\s*(1[0-2]:\d{2}[ap]|[1-9]:\d{2}[ap])/gi;
+              const timeMatches = Array.from(hoursText.matchAll(timePattern));
+              
+              if (timeMatches.length > 0) {
+                const timeRanges = timeMatches.map(match => {
+                  const startTime = match[1].replace('a', ' AM').replace('p', ' PM');
+                  const endTime = match[2].replace('a', ' AM').replace('p', ' PM');
+                  return startTime + ' - ' + endTime;
+                });
+                
+                // Remove duplicates and join
+                const uniqueRanges = [...new Set(timeRanges)];
+                hoursText = uniqueRanges.join('\n');
+              } else if (hoursText.toLowerCase().includes('closed')) {
                 hoursText = 'Closed';
               } else {
                 hoursText = 'Not available';
               }
             }
-          }
-          
-          diningData[cleanLocationName][dayName] = hoursText;
-        });
-        
-      }
-      
-      }); // End of diningTables.forEach
-      
-      // Processing complete - all tables (main + additional) have been processed
+            
+            diningData[locationName][dayName] = hoursText;
+          });
+        }
+      });
       
       console.log('Extraction complete. Found locations:', Object.keys(diningData));
       return diningData;
