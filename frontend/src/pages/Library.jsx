@@ -54,7 +54,7 @@ const Library = () => {
 
   return (
     <div>
-      <AnnouncementBanner items={["Final Exams for Fall 2025: Dec 8-12", "Fall 2025 Commencement: Dec 13"]} />
+      <AnnouncementBanner items={["Dec. 22 - Jan 2, 2026: Closed in Observance of Winter Holidays"]} />
 
       <div className="page-header-with-square-button">
         <div className="page-header-content">
