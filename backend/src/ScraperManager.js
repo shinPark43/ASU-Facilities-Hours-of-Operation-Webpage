@@ -579,128 +579,160 @@ class ScraperManager {
     return await page.evaluate(() => {
       let diningData = {};
       
-      console.log('Extracting dining hours from new website structure...');
+      console.log('Extracting dining hours from unified-hours-table structure...');
       
-      // Look for the main dining hours table
-      const tables = document.querySelectorAll('table');
-      console.log('Found tables:', tables.length);
+      // Look for ALL tables with unified-hours-table class (there are multiple!)
+      const tables = document.querySelectorAll('table.unified-hours-table');
       
       if (tables.length === 0) {
-        console.log('No tables found - website structure may have changed');
+        console.log('No unified-hours-table found - website structure may have changed');
         return {};
       }
       
-      // Day name mappings (header format: "Sun14", "Mon15" -> "Sunday", "Monday")
+      console.log('Found', tables.length, 'unified-hours-table tables');
+      
+      // Day name mappings
       const dayMappings = {
         'sun': 'Sunday', 'mon': 'Monday', 'tue': 'Tuesday', 
         'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday'
       };
       
-      // Skip these non-restaurant entries (header row, navigation buttons)
-      const skipNames = ['location', 'go to'];
-      
       // Process each table
       tables.forEach((table, tableIndex) => {
-        const rows = table.querySelectorAll('tr');
-        if (rows.length < 2) return; // Skip tables with insufficient rows
+        console.log('Processing table', tableIndex);
         
-        // Find header row with day columns
-        let headerRow = null;
+        // Find header row to map day columns
+        const thead = table.querySelector('thead');
         let dayColumns = {};
         
-        for (let i = 0; i < Math.min(rows.length, 3); i++) {
-          const row = rows[i];
-          const cells = row.querySelectorAll('td, th');
-          let foundDays = 0;
-          
-          cells.forEach((cell, cellIndex) => {
+        if (thead) {
+          const headerCells = thead.querySelectorAll('th, td');
+          headerCells.forEach((cell, index) => {
             const cellText = cell.textContent?.trim().toLowerCase() || '';
             for (const [abbrev, fullDay] of Object.entries(dayMappings)) {
-              if (cellText.startsWith(abbrev)) {
-                dayColumns[cellIndex] = fullDay;
-                foundDays++;
+              if (cellText.includes(abbrev)) {
+                dayColumns[index] = fullDay;
                 break;
               }
             }
           });
-          
-          if (foundDays >= 5) {
-            headerRow = row;
-            console.log('Table', tableIndex, '- Found header with', foundDays, 'days');
-            break;
-          }
         }
         
-        if (!headerRow || Object.keys(dayColumns).length === 0) {
-          return; // Skip this table
+        // Process tbody - new structure has pairs of rows: location-name-row + hours-row
+        const tbody = table.querySelector('tbody');
+        if (!tbody) {
+          console.log('No tbody found in table', tableIndex);
+          return;
         }
         
-        // Process data rows - look for rows with 8 cells (name + 7 days)
+        const rows = tbody.querySelectorAll('tr');
+        console.log('Table', tableIndex, '- Found rows:', rows.length);
+        
+        let currentLocation = null;
+        
         for (let i = 0; i < rows.length; i++) {
-          if (rows[i] === headerRow) continue;
-          
           const row = rows[i];
-          const cells = row.querySelectorAll('td, th');
           
-          // We need rows with 8 cells: location name + 7 days of hours
-          if (cells.length < 8) continue;
-          
-          const locationName = cells[0]?.textContent?.trim() || '';
-          if (!locationName) continue;
-          
-          // Skip non-restaurant entries
-          const lowerName = locationName.toLowerCase();
-          if (skipNames.some(skip => lowerName.startsWith(skip))) {
-            continue;
-          }
-          
-          console.log('Processing:', locationName);
-          
-          // Initialize location data if not exists
-          if (!diningData[locationName]) {
-            diningData[locationName] = {};
-          }
-          
-          // Extract hours for each day
-          Object.entries(dayColumns).forEach(([columnIndex, dayName]) => {
-            const cellIndex = parseInt(columnIndex);
-            const cell = cells[cellIndex];
+          // Check if this is a location-name-row
+          if (row.classList.contains('location-name-row')) {
+            // Extract location name from the link or h3
+            const locationLink = row.querySelector('a');
+            const locationH3 = row.querySelector('h3');
             
-            if (!cell) {
-              diningData[locationName][dayName] = 'Not available';
+            if (locationLink) {
+              currentLocation = locationLink.textContent?.trim() || '';
+            } else if (locationH3) {
+              currentLocation = locationH3.textContent?.trim() || '';
+            }
+            
+            if (currentLocation) {
+              console.log('Found location:', currentLocation);
+              if (!diningData[currentLocation]) {
+                diningData[currentLocation] = {};
+              }
+            }
+          }
+          // Check if this is a hours-row
+          else if (row.classList.contains('hours-row') && currentLocation) {
+            console.log('Processing hours for:', currentLocation);
+            
+            // Get all cells in the hours row
+            const cells = row.querySelectorAll('td');
+            
+          cells.forEach((cell, cellIndex) => {
+            // Skip the first cell (usually the row header/scope)
+            if (cellIndex === 0) return;
+            
+            const dayName = dayColumns[cellIndex];
+            if (!dayName) return;
+            
+            // Check if location is closed - look for "Closed" text or ban icon
+            const closedSpan = cell.querySelector('span[aria-label*="Closed"]');
+            const banIcon = cell.querySelector('svg[data-icon="ban"]');
+            
+            if (closedSpan || banIcon) {
+              diningData[currentLocation][dayName] = 'Closed';
               return;
             }
             
-            let hoursText = cell.textContent?.trim() || '';
+            // Try to get hours from aria-label first (most reliable)
+            const ariaLabelSpans = cell.querySelectorAll('span[aria-label]');
+            let hoursFound = false;
             
-            // Clean up the hours text
-            if (!hoursText || hoursText === '' || hoursText === '-' || hoursText.toLowerCase() === 'closed') {
-              hoursText = 'Closed';
-            } else {
-              // Extract time ranges (format: "10:00a - 2:00p" or "10:00a - 2:00p\n5:00p - 7:00p")
-              // Match valid 12-hour times: 1:00-12:59
-              const timePattern = /(1[0-2]:\d{2}[ap]|[1-9]:\d{2}[ap])\s*-\s*(1[0-2]:\d{2}[ap]|[1-9]:\d{2}[ap])/gi;
-              const timeMatches = Array.from(hoursText.matchAll(timePattern));
+            for (const span of ariaLabelSpans) {
+              const ariaLabel = span.getAttribute('aria-label') || '';
+              if (ariaLabel.toLowerCase().includes('closed')) {
+                diningData[currentLocation][dayName] = 'Closed';
+                hoursFound = true;
+                break;
+              }
               
-              if (timeMatches.length > 0) {
-                const timeRanges = timeMatches.map(match => {
-                  const startTime = match[1].replace('a', ' AM').replace('p', ' PM');
-                  const endTime = match[2].replace('a', ' AM').replace('p', ' PM');
-                  return startTime + ' - ' + endTime;
-                });
+              // Extract time from aria-label (format: "Location Day: 11:00a - 1:00p")
+              const colonSpaceIndex = ariaLabel.indexOf(': ');
+              if (colonSpaceIndex > 0) {
+                let timeText = ariaLabel.substring(colonSpaceIndex + 2).trim();
                 
-                // Remove duplicates and join
-                const uniqueRanges = [...new Set(timeRanges)];
-                hoursText = uniqueRanges.join('\n');
-              } else if (hoursText.toLowerCase().includes('closed')) {
-                hoursText = 'Closed';
-              } else {
-                hoursText = 'Not available';
+                // Look for time patterns
+                const timePattern = /(\d{1,2}:\d{2})\s*([APap]\.?[Mm]?\.?)\s*-\s*(\d{1,2}:\d{2})\s*([APap]\.?[Mm]?\.?)/gi;
+                const timeMatches = Array.from(timeText.matchAll(timePattern));
+                
+                if (timeMatches.length > 0) {
+                  const uniqueRanges = new Set();
+                  
+                  timeMatches.forEach(match => {
+                    const startHour = match[1];
+                    const startPeriod = match[2].toLowerCase();
+                    const endHour = match[3];
+                    const endPeriod = match[4].toLowerCase();
+                    
+                    const startAMPM = startPeriod.startsWith('a') ? 'AM' : 'PM';
+                    const endAMPM = endPeriod.startsWith('a') ? 'AM' : 'PM';
+                    
+                    const timeRange = `${startHour} ${startAMPM} - ${endHour} ${endAMPM}`;
+                    uniqueRanges.add(timeRange);
+                  });
+                  
+                  if (uniqueRanges.size > 0) {
+                    diningData[currentLocation][dayName] = Array.from(uniqueRanges).join('\n');
+                    hoursFound = true;
+                    break;
+                  }
+                }
               }
             }
             
-            diningData[locationName][dayName] = hoursText;
+            // Fallback: if no aria-label hours found, try cell text
+            if (!hoursFound) {
+              const cellText = cell.textContent?.trim() || '';
+              
+              if (cellText.toLowerCase().includes('closed') || !cellText) {
+                diningData[currentLocation][dayName] = 'Closed';
+              } else {
+                diningData[currentLocation][dayName] = 'Not available';
+              }
+            }
           });
+          }
         }
       });
       
