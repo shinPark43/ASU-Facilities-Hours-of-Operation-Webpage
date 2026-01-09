@@ -35,16 +35,12 @@ export function AnnouncementBanner({
       {/* Two groups with identical content create the continuous loop */}
       <div className="belt" aria-hidden="true">
         {repeated.map((msg, i) => (
-          <span key={`g1-${i}`} className="item">
-            {msg}
-          </span>
+          <span key={`g1-${i}`} className="item" dangerouslySetInnerHTML={{ __html: msg }} />
         ))}
       </div>
       <div className="belt" aria-hidden="true">
         {repeated.map((msg, i) => (
-          <span key={`g2-${i}`} className="item">
-            {msg}
-          </span>
+          <span key={`g2-${i}`} className="item" dangerouslySetInnerHTML={{ __html: msg }} />
         ))}
       </div>
 
@@ -87,6 +83,10 @@ export function AnnouncementBanner({
           image-rendering: pixelated;
           -webkit-font-smoothing: none;
           -moz-osx-font-smoothing: grayscale;
+        }
+
+        .announcement-banner .item strong {
+          font-weight: bold;
         }
 
         /* Dark mode overrides */

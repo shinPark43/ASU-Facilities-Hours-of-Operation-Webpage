@@ -59,7 +59,14 @@ const Gym = () => {
 
   return (
     <div>
-      <AnnouncementBanner items={["Final Exams for Fall 2025: Dec 8-12", "Fall 2025 Commencement: Dec 13"]} />
+      <AnnouncementBanner 
+        items={[
+          "<strong>Jan. 16 until January 23</strong> - Late Registration Period, Spring 2026", 
+          "<strong>Jan. 19</strong> - University Closed in Observance of Martin Luther King, Jr. Day", 
+          "<strong>Jan. 20</strong> - First Class Day of Regular Term and 1st 8-Week Session, Spring 2026"
+        ]} 
+        speedSec={280}
+      />
 
       <h2 className="section-panel-header">Recreation Center</h2>
       <p className="section-subtitle">
