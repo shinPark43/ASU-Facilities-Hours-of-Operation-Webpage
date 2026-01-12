@@ -113,8 +113,8 @@ export function AnnouncementBanner({
           to   { transform: translateX(calc(-100% - var(--gap))); }
         }
 
-        /* Pause on hover */
-        .announcement-banner:hover .belt { animation-play-state: paused; }
+        /* Pause on hover only if not clickable */
+        .announcement-banner:not(.clickable):hover .belt { animation-play-state: paused; }
 
         /* Clickable banner styles */
         .announcement-banner.clickable {
@@ -130,6 +130,9 @@ export function AnnouncementBanner({
           transform: translateY(0);
           box-shadow: 0 2px 6px rgba(0, 63, 127, 0.1);
         }
+
+        /* Keep animation running for clickable banners */
+        .announcement-banner.clickable .belt { animation-play-state: running; }
 
         /* Respect reduced motion */
         @media (prefers-reduced-motion: reduce) {
