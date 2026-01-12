@@ -8,6 +8,7 @@ import React from "react";
  *  - speedSec?: number             // how long one full pass takes (default 14s)
  *  - height?: number               // banner height in px (default 48)
  *  - gapPx?: number                // gap between repeats in px (default 48)
+ *  - link?: string                 // optional URL to open when banner is clicked
  *
  * Accessibility:
  *  - Animation pauses on hover and for users with reduced motion.
@@ -17,19 +18,28 @@ export function AnnouncementBanner({
   speedSec = 140,
   height = 56,
   gapPx = 48,
+  link = null,
 }) {
   // Duplicate content so it can loop seamlessly
   const repeated = Array.from({ length: 8 }, () => items).flat();
 
+  const handleClick = () => {
+    if (link) {
+      window.open(link, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div
-      className="announcement-banner"
+      className={`announcement-banner ${link ? 'clickable' : ''}`}
       role="img"
       aria-label={items.join(" • ")}
+      onClick={handleClick}
       style={{
         "--duration": `${speedSec}s`,
         "--gap": `${gapPx}px`,
         height: `${height}px`,
+        cursor: link ? 'pointer' : 'default',
       }}
     >
       {/* Two groups with identical content create the continuous loop */}
@@ -106,9 +116,27 @@ export function AnnouncementBanner({
         /* Pause on hover */
         .announcement-banner:hover .belt { animation-play-state: paused; }
 
+        /* Clickable banner styles */
+        .announcement-banner.clickable {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .announcement-banner.clickable:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 63, 127, 0.15);
+        }
+
+        .announcement-banner.clickable:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 6px rgba(0, 63, 127, 0.1);
+        }
+
         /* Respect reduced motion */
         @media (prefers-reduced-motion: reduce) {
           .announcement-banner .belt { animation-play-state: paused; }
+          .announcement-banner.clickable {
+            transform: none !important;
+          }
         }
 
         /* Responsive adjustments */

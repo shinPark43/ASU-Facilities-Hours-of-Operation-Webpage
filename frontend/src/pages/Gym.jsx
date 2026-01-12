@@ -66,6 +66,7 @@ const Gym = () => {
           "<strong>Jan. 20</strong> - First Class Day of Regular Term and 1st 8-Week Session, Spring 2026"
         ]} 
         speedSec={280}
+        link="https://www.angelo.edu/current-students/registrar/academic_calendar.php"
       />
 
       <h2 className="section-panel-header">Recreation Center</h2>
