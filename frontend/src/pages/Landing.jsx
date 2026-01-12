@@ -144,6 +144,17 @@ const Landing = () => {
       <div className="landing-section main-hero-section" data-section="0">
         <img className="hero-background-image" src={backgroundImage} alt="ASU Campus" />
         <div className="hero-overlay"></div>
+        
+        {/* How to Install Dropdown Menu */}
+        <div className="install-dropdown">
+          <span className="install-dropdown-title">How to Install</span>
+          <div className="install-dropdown-menu">
+            <button onClick={() => scrollToSection(4)}>Safari</button>
+            <button onClick={() => scrollToSection(5)}>Chrome</button>
+            <button onClick={() => scrollToSection(6)}>Samsung Internet</button>
+          </div>
+        </div>
+        
         <div className="main-hero-heading">
           <p>Real-Time</p>
           <p>Operating Hours</p>
