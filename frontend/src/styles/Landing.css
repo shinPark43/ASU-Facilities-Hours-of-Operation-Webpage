@@ -491,6 +491,77 @@
   margin: 0;
 }
 
+.install-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 15vh;
+  padding-left: 3.7%;
+  padding-right: 3.7%;
+  box-sizing: border-box;
+}
+
+.install-guide-title {
+  color: #000000;
+  font-size: 30px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;  
+  letter-spacing: -1px;
+  margin: 0;
+  z-index: 10;
+  position: absolute;
+  top: 18%;
+  left: 3.7%;
+}
+
+.install-guide-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  z-index: 10;
+  width: 92%;
+  max-width: 92%;
+  position: absolute;
+  top: 27%;
+  left: 4%;
+}
+
+.install-guide-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.install-guide-img {
+  height: 55vh;
+  width: auto;
+  max-height: 550px;
+  object-fit: contain;
+  border-radius: 12px !important;
+}
+
+.install-guide-label {
+  margin-top: 10px;
+  font-size: clamp(14px, 1.2vw, 18px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: #333333;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.install-guide-arrow {
+  font-size: clamp(28px, 3vw, 48px);
+  color: #888888;
+  margin: 0 20px;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+
 /* Decorative Icons (Pages 2-6) - Now clickable social links */
 .decorative-icons {
   position: absolute;
