@@ -563,7 +563,7 @@
 }
 
 /* How to Install Dropdown Menu */
-.install-dropdown {
+/* .install-dropdown {
   position: absolute;
   top: 6%;
   right: 5%;
@@ -622,7 +622,7 @@
 
 .install-dropdown-menu button:hover {
   background: rgba(255, 255, 255, 0.1);
-}
+} */
 
 /* Decorative Icons (Pages 2-6) - Now clickable social links */
 .decorative-icons {
@@ -772,13 +772,13 @@
 }
 
 .hero-image-1 {
-  width: 25vw;
+  width: 20vw;
   max-width: 484px;
   min-width: 250px;
   height: auto;
   max-height: 82vh;
-  left: 46.5% !important;
-  top: 7%;
+  left: 49% !important;
+  top: 10%;
   position: absolute;
   object-fit: contain;
   object-position: center center;
@@ -786,13 +786,13 @@
 }
 
 .hero-image-2 {
-  width: 25vw;
+  width: 20vw;
   max-width: 484px;
   min-width: 250px;
   height: auto;
   max-height: 82vh;
-  left: 71.1%;
-  top: 7%;
+  left: 70% !important;
+  top: 10%;
   position: absolute;
   object-fit: contain;
   object-position: center center;

@@ -146,14 +146,14 @@ const Landing = () => {
         <div className="hero-overlay"></div>
         
         {/* How to Install Dropdown Menu */}
-        <div className="install-dropdown">
+        {/* <div className="install-dropdown">
           <span className="install-dropdown-title">How to Install</span>
           <div className="install-dropdown-menu">
             <button onClick={() => scrollToSection(4)}>Safari</button>
             <button onClick={() => scrollToSection(5)}>Chrome</button>
             <button onClick={() => scrollToSection(6)}>Samsung Internet</button>
           </div>
-        </div>
+        </div> */}
         
         <div className="main-hero-heading">
           <p>Real-Time</p>
