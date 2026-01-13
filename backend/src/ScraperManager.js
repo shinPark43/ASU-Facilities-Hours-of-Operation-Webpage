@@ -660,10 +660,9 @@ class ScraperManager {
             const cells = row.querySelectorAll('td');
             
           cells.forEach((cell, cellIndex) => {
-            // Skip the first cell (usually the row header/scope)
-            if (cellIndex === 0) return;
-            
-            const dayName = dayColumns[cellIndex];
+            // Map data cell index to header index (header has "Location" at index 0, data doesn't)
+            const headerIndex = cellIndex + 1;
+            const dayName = dayColumns[headerIndex];
             if (!dayName) return;
             
             // Check if location is closed - look for "Closed" text or ban icon
