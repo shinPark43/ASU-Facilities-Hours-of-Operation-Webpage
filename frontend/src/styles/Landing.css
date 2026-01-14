@@ -491,6 +491,139 @@
   margin: 0;
 }
 
+.install-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 15vh;
+  padding-left: 3.7%;
+  padding-right: 3.7%;
+  box-sizing: border-box;
+}
+
+.install-guide-title {
+  color: #000000;
+  font-size: 30px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;  
+  letter-spacing: -1px;
+  margin: 0;
+  z-index: 10;
+  position: absolute;
+  top: 18%;
+  left: 3.7%;
+}
+
+.install-guide-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  z-index: 10;
+  width: 92%;
+  max-width: 92%;
+  position: absolute;
+  top: 27%;
+  left: 4%;
+}
+
+.install-guide-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.install-guide-img {
+  height: 55vh;
+  width: auto;
+  max-height: 550px;
+  object-fit: contain;
+  border-radius: 12px !important;
+}
+
+.install-guide-label {
+  margin-top: 10px;
+  font-size: clamp(14px, 1.2vw, 18px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: #333333;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.install-guide-arrow {
+  font-size: clamp(28px, 3vw, 48px);
+  color: #888888;
+  margin: 0 20px;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+
+/* How to Install Dropdown Menu */
+/* .install-dropdown {
+  position: absolute;
+  top: 6%;
+  right: 5%;
+  z-index: 100;
+}
+
+.install-dropdown-title {
+  color: #ffffff;
+  font-size: clamp(16px, 1.5vw, 22px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: opacity 0.3s ease !important;
+}
+
+.install-dropdown-title:hover {
+  opacity: 0.8;
+}
+
+.install-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(0, 0, 0, 0.9);
+  border-radius: 8px;
+  padding: 8px 0;
+  width: 100%;
+  min-width: fit-content;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease !important;
+}
+
+.install-dropdown:hover .install-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.install-dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: clamp(14px, 1.2vw, 18px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease !important;
+}
+
+.install-dropdown-menu button:hover {
+  background: rgba(255, 255, 255, 0.1);
+} */
+
 /* Decorative Icons (Pages 2-6) - Now clickable social links */
 .decorative-icons {
   position: absolute;
@@ -639,13 +772,13 @@
 }
 
 .hero-image-1 {
-  width: 25vw;
+  width: 20vw;
   max-width: 484px;
   min-width: 250px;
   height: auto;
   max-height: 82vh;
-  left: 46.5% !important;
-  top: 7%;
+  left: 49% !important;
+  top: 10%;
   position: absolute;
   object-fit: contain;
   object-position: center center;
@@ -653,13 +786,13 @@
 }
 
 .hero-image-2 {
-  width: 25vw;
+  width: 20vw;
   max-width: 484px;
   min-width: 250px;
   height: auto;
   max-height: 82vh;
-  left: 71.1%;
-  top: 7%;
+  left: 70% !important;
+  top: 10%;
   position: absolute;
   object-fit: contain;
   object-position: center center;

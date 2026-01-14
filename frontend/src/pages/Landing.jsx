@@ -12,11 +12,24 @@ import envelope_icon_team_page from '../assets/images/email_icon_team_page.svg';
 import white_arrow_icon from '../assets/images/white_arrow_icon.svg';
 import gray_arrow_icon from '../assets/images/gray_arrow_icon.svg';
 
+//How to Install guide images
+import chrome1 from '../assets/images/Chrome1.png';
+import chrome2 from '../assets/images/Chrome2.png';
+import chrome3 from '../assets/images/Chrome3.png';
+import chrome4 from '../assets/images/Chrome4.png';
+import si1 from '../assets/images/SI1.png';
+import si2 from '../assets/images/SI2.png';
+import si3 from '../assets/images/SI3.png';
+import si4 from '../assets/images/SI4.png';
+import safari1 from '../assets/images/safari1.png';
+import safari2 from '../assets/images/safari2.png';
+import safari3 from '../assets/images/safari3.png';
+
 const Landing = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const containerRef = useRef(null);
-  const totalSections = 7;
+  const totalSections = 8;
 
   // Scroll to specific section
   const scrollToSection = useCallback((sectionIndex) => {
@@ -97,7 +110,7 @@ const Landing = () => {
 
   return (
     <div className="landing-container" ref={containerRef}>
-      {/* Fixed Navigation Indicators - Hidden on first section */}
+      {/* Navigation Indicators - Hidden on first section */}
       {currentSection !== 0 && (
         <div className="fixed-scroll-indicator">
           {[...Array(totalSections)].map((_, i) => (
@@ -111,7 +124,7 @@ const Landing = () => {
         </div>
       )}
 
-      {/* Fixed Down Arrow Button */}
+      {/* Down Arrow Button */}
       {currentSection < totalSections - 1 && (
         <button 
           className={`fixed-down-arrow ${currentSection === 0 ? 'white-arrow' : 'gray-arrow'}`}
@@ -122,15 +135,26 @@ const Landing = () => {
         </button>
       )}
 
-      {/* Fixed ASU Hours Title */}
-      <p className={`section-title ${currentSection === 0 ? 'main-hero-title' : ''} ${currentSection === 6 ? 'team-title' : ''}`}>
+      {/* ASU Hours Title */}
+      <p className={`section-title ${currentSection === 0 ? 'main-hero-title' : ''} ${currentSection === 7 ? 'team-title' : ''}`}>
         ASU Hours
       </p>
 
-      {/* Main Hero Section with Image - Section 0 (First) */}
+      {/* First page (Main)- Section 0 (First) */}
       <div className="landing-section main-hero-section" data-section="0">
         <img className="hero-background-image" src={backgroundImage} alt="ASU Campus" />
         <div className="hero-overlay"></div>
+        
+        {/* How to Install Dropdown Menu */}
+        {/* <div className="install-dropdown">
+          <span className="install-dropdown-title">How to Install</span>
+          <div className="install-dropdown-menu">
+            <button onClick={() => scrollToSection(4)}>Safari</button>
+            <button onClick={() => scrollToSection(5)}>Chrome</button>
+            <button onClick={() => scrollToSection(6)}>Samsung Internet</button>
+          </div>
+        </div> */}
+        
         <div className="main-hero-heading">
           <p>Real-Time</p>
           <p>Operating Hours</p>
@@ -145,7 +169,7 @@ const Landing = () => {
         <img className="hero-image-2" src={apllicationImage2} alt="Mobile App Screenshot 2" />
             </div>
 
-      {/* Hero Section - Section 1 */}
+      {/* Second page (Information1) - Section 1 */}
       <div className="landing-section hero-section" data-section="1">
         <div className="section-gradient hero-gradient"></div>
         <div className="hero-heading">
@@ -157,37 +181,10 @@ const Landing = () => {
           <p>for the inconvenience of checking</p>
           <p>facility operating hours</p>
             </div>
-        {/* <div className="decorative-icons">
-          <a href="https://www.instagram.com/asuhours/?next=%2F" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-1">
-            <img src={youtube_icon} alt="Phone icon" />
-          </a>
-          <a href="https://www.youtube.com/channel/UCi5WsmDEHtfI6_BeSipnKrg" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-2">
-            <img src={instagram_icon} alt="Phone icon" />
-          </a>
-        </div> */}
     </div>
 
-      {/* Centralized Platform Section - Section 2 */}
-      <div className="landing-section platform-section" data-section="2">
-        <div className="section-gradient"></div>
-        <p className="section-heading">Centralized Platform</p>
-        <div className="section-description">
-          <p>Combines</p>
-          <p>the most frequently used<br aria-hidden="true" />campus facilities and services</p>
-          <p>into a single, easy-to-use application.</p>
-        </div>
-        {/* <div className="decorative-icons">
-          <a href="https://www.instagram.com/asuhours/?next=%2F" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-1">
-            <img src={youtube_icon} alt="Phone icon" />
-          </a>
-          <a href="https://www.youtube.com/channel/UCi5WsmDEHtfI6_BeSipnKrg" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-2">
-            <img src={instagram_icon} alt="Phone icon" />
-          </a>
-        </div> */}
-      </div>
-
-      {/* Quick Mobile Access Section - Section 3 */}
-      <div className="landing-section mobile-section" data-section="3">
+      {/* Third page (Information2) - Section 2 */}
+      <div className="landing-section" data-section="2">
         <div className="section-gradient"></div>
         <p className="section-heading">Quick Mobile Access</p>
         <div className="section-description">
@@ -196,18 +193,10 @@ const Landing = () => {
           <p>from their phones</p>
           <p>without repeating searches.</p>
         </div>
-        {/* <div className="decorative-icons">
-          <a href="https://www.instagram.com/asuhours/?next=%2F" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-1">
-            <img src={youtube_icon} alt="Phone icon" />
-          </a>
-          <a href="https://www.youtube.com/channel/UCi5WsmDEHtfI6_BeSipnKrg" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-2">
-            <img src={instagram_icon} alt="Phone icon" />
-          </a>
-        </div> */}
       </div>
 
-      {/* Up-to-Date Information Section - Section 4 */}
-      <div className="landing-section info-section" data-section="4">
+      {/* Fourth page (Information3) - Section 3 */}
+      <div className="landing-section" data-section="3">
         <div className="section-gradient"></div>
         <p className="section-heading">Up-to-Date Information</p>
         <div className="section-description">
@@ -215,37 +204,86 @@ const Landing = () => {
           <p>are automatically updated every day,</p>
           <p>ensuring accuracy without manual checks.</p>
         </div>
-        {/* <div className="decorative-icons">
-          <a href="https://www.instagram.com/asuhours/?next=%2F" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-1">
-            <img src={youtube_icon} alt="Phone icon" />
-          </a>
-          <a href="https://www.youtube.com/channel/UCi5WsmDEHtfI6_BeSipnKrg" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-2">
-            <img src={instagram_icon} alt="Phone icon" />
-          </a>
-        </div> */}
-    </div>
-
-      {/* Comprehensive Services Section - Section 5 */}
-      <div className="landing-section services-section" data-section="5">
-        <div className="section-gradient"></div>
-        <p className="section-heading">Comprehensive Services</p>
-        <div className="section-description">
-          <p>Includes library hours, recreation facilities</p>
-          <p>(gym, pool, climbing wall, Lake House),</p>
-          <p>dining options (CAF, Chick-fil-A, Subway, Starbucks, etc.), and Ram Tram schedules.</p>
-        </div>
-        {/* <div className="decorative-icons">
-          <a href="https://www.instagram.com/asuhours/?next=%2F" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-1">
-            <img src={youtube_icon} alt="Phone icon" />
-          </a>
-          <a href="https://www.youtube.com/channel/UCi5WsmDEHtfI6_BeSipnKrg" target="_blank" rel="noopener noreferrer" className="icon-link icon-phone-2">
-            <img src={instagram_icon} alt="Phone icon" />
-          </a>
-        </div> */}
       </div>
 
-      {/* Team Section - Section 6 (Last) */}
-      <div className="landing-section team-section" data-section="6">
+      {/* Fifth page (How to Install1)- Section 4 */}
+      <div className="landing-section install-section" data-section="4">
+        <div className="section-gradient hero-gradient"></div>
+        <p className="install-guide-title">How to install - Safari</p>
+        <div className="install-guide-row chrome-row">
+          <div className="install-guide-item">
+            <img src={safari1} alt="Safari Step 1" className="install-guide-img" />
+            <p className="install-guide-label">Tap share icon</p>
+          </div>
+          <span className="install-guide-arrow">→</span>
+          <div className="install-guide-item">
+            <img src={safari2} alt="Safari Step 2" className="install-guide-img" />
+            <p className="install-guide-label">Add to Home screen</p>
+          </div>
+          <span className="install-guide-arrow">→</span>
+          <div className="install-guide-item">
+            <img src={safari3} alt="Safari Step 3" className="install-guide-img" />
+            <p className="install-guide-label">Tap Add</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Sixth page (How to Install2)- Section 5 */}
+      <div className="landing-section install-section" data-section="5">
+        <div className="section-gradient"></div>
+        <p className="install-guide-title">How to install - Chrome</p>
+        <div className="install-guide-row chrome-row">
+          <div className="install-guide-item">
+            <img src={chrome1} alt="Chrome Step 1" className="install-guide-img" />
+            <p className="install-guide-label">Tap menu icon</p>
+          </div>
+          <span className="install-guide-arrow">→</span>
+          <div className="install-guide-item">
+            <img src={chrome2} alt="Chrome Step 2" className="install-guide-img" />
+            <p className="install-guide-label">Add to Home screen</p>
+          </div>
+          <span className="install-guide-arrow">→</span>
+          <div className="install-guide-item">
+            <img src={chrome3} alt="Chrome Step 3" className="install-guide-img" />
+            <p className="install-guide-label">Tap Install</p>
+          </div>
+          <span className="install-guide-arrow">→</span>
+          <div className="install-guide-item">
+            <img src={chrome4} alt="Chrome Step 4" className="install-guide-img" />
+            <p className="install-guide-label">Confirm Install</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Seventh page (How to Install3)- Section 6 */}
+      <div className="landing-section install-section" data-section="6">
+        <div className="section-gradient"></div>
+        <p className="install-guide-title">How to install - Samsung Internet</p>
+        <div className="install-guide-row samsung-internet-row">
+          <div className="install-guide-item">
+            <img src={si1} alt="Samsung Internet Step 1" className="install-guide-img" />
+            <p className="install-guide-label">Open menu</p>
+          </div>
+          <span className="install-guide-arrow">→</span>
+          <div className="install-guide-item">
+            <img src={si2} alt="Samsung Internet Step 2" className="install-guide-img" />
+            <p className="install-guide-label">Tap Add to</p>
+          </div>
+          <span className="install-guide-arrow">→</span>
+          <div className="install-guide-item">
+            <img src={si3} alt="Samsung Internet Step 3" className="install-guide-img" />
+            <p className="install-guide-label">Install as web app</p>
+          </div>
+          <span className="install-guide-arrow">→</span>
+          <div className="install-guide-item">
+            <img src={si4} alt="Samsung Internet Step 4" className="install-guide-img" />
+            <p className="install-guide-label">Confirm Add</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Last page (Team) - Section 7 */}
+      <div className="landing-section team-section" data-section="7">
         <p className="section-heading team-heading">ASU Student Dev Team</p>
         <p className="section-subtitle">We create a better campus experience together</p>
         <div className="team-info">
