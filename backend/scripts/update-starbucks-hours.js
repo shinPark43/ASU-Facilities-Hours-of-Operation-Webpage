@@ -25,7 +25,7 @@ async function updateStarbucksHours() {
       { section_name: "Starbucks", day_of_week: "Thursday", open_time: "8:00 AM", close_time: "5:00 PM", is_closed: false },
       { section_name: "Starbucks", day_of_week: "Friday", open_time: "7:30 AM", close_time: "9:00 PM", is_closed: false },
       { section_name: "Starbucks", day_of_week: "Saturday", open_time: "1:00 PM", close_time: "8:00 PM", is_closed: false },
-      { section_name: "Starbucks", day_of_week: "Sunday", open_time: "1:00 PM", close_time: "8:00 PM", is_closed: false }
+      { section_name: "Starbucks", day_of_week: "Sunday", open_time: "1:00 PM", close_time: "8:00 PM", is_closed: true }
     ];
     
     // Combine: other dining locations + new Starbucks hours
