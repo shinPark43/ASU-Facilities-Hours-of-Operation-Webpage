@@ -8,6 +8,29 @@ const Dining = () => {
   const [error, setError] = useState(null);
   const [hours, setHours] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
+  const [showNotice, setShowNotice] = useState(() => {
+    // Notice only applies to Jan 24-25, 2026
+    const today = new Date();
+    const startDate = new Date('2026-01-24');
+    const endDate = new Date('2026-01-25');
+    
+    // Set times to compare just the dates (ignore time portion)
+    today.setHours(0, 0, 0, 0);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+    
+    // Only show if within date bounds
+    if (today < startDate || today > endDate) {
+      return false;
+    }
+    
+    // Check if already dismissed today
+    const lastDismissed = localStorage.getItem('hhuc-notice-dismissed-date');
+    if (!lastDismissed) return true; // Never dismissed, show it
+    
+    const todayString = today.toDateString();
+    return lastDismissed !== todayString; // Show if dismissed on a different day
+  });
 
   useEffect(() => {
     const fetchDiningHours = async () => {
@@ -61,8 +84,39 @@ const Dining = () => {
     key: facilityName
   })) : [];
 
+  const handleDismissNotice = () => {
+    localStorage.setItem('hhuc-notice-dismissed-date', new Date().toDateString());
+    setShowNotice(false);
+  };
+
   return (
     <div>
+      {/* Notice Popup Modal */}
+      {showNotice && (
+        <div className="notice-popup-overlay" onClick={handleDismissNotice}>
+          <div className="notice-popup" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="notice-popup-close" 
+              onClick={handleDismissNotice}
+              aria-label="Close notice"
+            >
+              ×
+            </button>
+            <h3 className="notice-popup-title">Building Access Notice</h3>
+            <div className="notice-popup-date">
+              <span className="notice-popup-date-label">Effective Dates</span>
+              <span className="notice-popup-date-value">Jan 24 (Sat) – 25 (Sun)</span>
+            </div>
+            <p className="notice-popup-message">
+              The Houston Harte University Center will be accessible from the Starbucks entrance facing the Carr Education-Fine Arts Building.
+            </p>
+            <button className="notice-popup-button" onClick={handleDismissNotice}>
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
       <AnnouncementBanner 
         items={[
           "<strong>Jan. 16 until January 23</strong> - Late Registration Period, Spring 2026", 
