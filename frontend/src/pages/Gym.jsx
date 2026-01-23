@@ -61,9 +61,8 @@ const Gym = () => {
     <div>
       <AnnouncementBanner 
         items={[
-          "<strong>Jan. 16 until January 23</strong> - Late Registration Period, Spring 2026", 
-          "<strong>Jan. 19</strong> - University Closed in Observance of Martin Luther King, Jr. Day", 
-          "<strong>Jan. 20</strong> - First Class Day of Regular Term and 1st 8-Week Session, Spring 2026"
+          "<strong>Jan. 23</strong> - Last Day to Register or Make Schedule Changes for the Regular Spring 2026 Semester", 
+          "<strong>Feb. 12</strong> - Late Registration Final Payment Deadline, Spring 2026"
         ]} 
         speedSec={280}
         link="https://www.angelo.edu/current-students/registrar/academic_calendar.php"
