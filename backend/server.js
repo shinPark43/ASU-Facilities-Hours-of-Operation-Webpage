@@ -110,27 +110,56 @@ async function startServer() {
     await db.init();
     await tutoringDb.init();
     
-    // Schedule scraper to run daily at 6:10 PM Texas time
-    cron.schedule('0 0 * * *', () => {
-      console.log('🕐 Running scheduled scraper...');
-      scraper.scrapeAllFacilities()
-        .then(() => {
-          console.log('✅ Scheduled scrape completed successfully');
-        })
-        .catch((error) => {
-          console.error('❌ Scheduled scrape failed:', error);
-        });
+    // Daily scraper for facilities (library, recreation, dining, ram_tram)
+    // Runs at midnight CST every day
+    cron.schedule('0 0 * * *', async () => {
+      console.log('🕐 Running daily facility scraper...');
+      const facilities = ['library', 'recreation', 'dining', 'ram_tram'];
+      
+      for (const facility of facilities) {
+        try {
+          console.log(`📊 Scraping ${facility}...`);
+          await scraper.scrapeSpecificFacility(facility);
+          console.log(`✅ ${facility} scrape completed`);
+        } catch (error) {
+          console.error(`❌ ${facility} scrape failed:`, error);
+        }
+      }
+      console.log('✅ Daily facility scrape completed');
+    }, {
+      timezone: "America/Chicago" // CST/CDT for Texas
+    });
+
+    // Weekly scraper for tutoring (runs every Sunday at midnight CST)
+    // Tutoring schedules don't change frequently, so weekly is sufficient
+    cron.schedule('0 0 * * 0', async () => {
+      console.log('🕐 Running weekly tutoring scraper...');
+      try {
+        await scraper.scrapeSpecificFacility('tutoring');
+        console.log('✅ Weekly tutoring scrape completed successfully');
+      } catch (error) {
+        console.error('❌ Weekly tutoring scrape failed:', error);
+      }
     }, {
       timezone: "America/Chicago" // CST/CDT for Texas
     });
 
     // Run scraper on startup (optional - for testing)
+    // Only scrapes daily facilities, not tutoring (to save time during dev)
     if (process.env.NODE_ENV !== 'production') {
-      console.log('🚀 Running initial scrape...');
-      scraper.scrapeAllFacilities()
-        .catch((error) => {
-          console.error('❌ Initial scrape failed:', error);
-        });
+      console.log('🚀 Running initial scrape (daily facilities only)...');
+      const facilities = ['library', 'recreation', 'dining', 'ram_tram'];
+      (async () => {
+        for (const facility of facilities) {
+          try {
+            console.log(`📊 Scraping ${facility}...`);
+            await scraper.scrapeSpecificFacility(facility);
+          } catch (error) {
+            console.error(`❌ ${facility} scrape failed:`, error);
+          }
+        }
+        console.log('✅ Initial scrape completed');
+      })();
     }
 
     // Start the server

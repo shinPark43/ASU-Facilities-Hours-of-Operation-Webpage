@@ -2529,7 +2529,7 @@ body {
   gap: 12px;
 }
 
-/* Tutoring Course Card */
+/* Tutoring Course Card - Matches facility cards */
 .tutoring-course-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-light);
@@ -2568,9 +2568,10 @@ body {
 
 .tutoring-course-info {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 12px;
   flex: 1;
+  flex-wrap: wrap;
 }
 
 .tutoring-course-name {
@@ -2589,7 +2590,6 @@ body {
   font-size: 11px;
   font-weight: 600;
   border-radius: 20px;
-  width: fit-content;
 }
 
 [data-theme="dark"] .tutoring-online-badge {
@@ -2610,7 +2610,7 @@ body {
 
 /* Course Sessions */
 .tutoring-course-sessions {
-  padding: 16px 20px;
+  padding: 0;
   background: var(--bg-primary);
   animation: slideDown 0.2s ease-out;
 }
@@ -2618,116 +2618,122 @@ body {
 .tutoring-sessions-table {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .tutoring-sessions-header {
-  display: grid;
-  grid-template-columns: 70px 1fr;
-  gap: 12px;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid var(--border-light);
+  display: none;
 }
 
+/* Session rows */
 .tutoring-session-row {
-  display: grid;
-  grid-template-columns: 70px 1fr;
-  gap: 12px;
-  padding: 12px;
+  display: flex;
+  gap: 16px;
+  padding: 14px 18px;
+  margin: 8px 12px;
   background: var(--bg-secondary);
-  border-radius: 8px;
   border: 1px solid var(--border-light);
-  font-size: 14px;
-  transition: all 0.2s ease;
+  border-radius: 12px;
 }
 
-.tutoring-session-row:hover {
-  background: var(--gradient-hover);
-  border-color: var(--border-color);
+.tutoring-session-row:first-child {
+  margin-top: 12px;
+}
+
+.tutoring-session-row:last-child {
+  margin-bottom: 12px;
 }
 
 .tutoring-session-row.tba {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .tutoring-session-day {
   font-weight: 600;
-  color: var(--text-primary);
-  padding-top: 2px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  min-width: 40px;
+  padding-top: 11px;
 }
 
 .tutoring-session-details {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  flex: 1;
 }
 
 .tutoring-session-entry {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
   background: var(--bg-primary);
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--border-light);
-}
-
-.tutoring-session-entry:only-child {
-  background: transparent;
-  border: none;
-  padding: 0;
 }
 
 /* Online session indicator */
 .tutoring-session-entry.online {
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(76, 175, 80, 0.04) 100%);
-  border: 1px solid rgba(76, 175, 80, 0.3);
-  border-left: 3px solid #4caf50;
+  background: rgba(46, 125, 50, 0.05);
+  border-color: rgba(46, 125, 50, 0.2);
 }
 
-.tutoring-session-entry.online:only-child {
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(76, 175, 80, 0.04) 100%);
-  border: 1px solid rgba(76, 175, 80, 0.3);
-  border-left: 3px solid #4caf50;
-  padding: 8px 10px;
+.tutoring-session-entry.online .tutoring-session-location {
+  color: #2e7d32;
+  font-weight: 500;
 }
 
 [data-theme="dark"] .tutoring-session-entry.online {
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.12) 0%, rgba(76, 175, 80, 0.06) 100%);
-  border-color: rgba(76, 175, 80, 0.4);
+  background: rgba(76, 175, 80, 0.08);
+  border-color: rgba(76, 175, 80, 0.25);
 }
 
-[data-theme="dark"] .tutoring-session-entry.online:only-child {
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.12) 0%, rgba(76, 175, 80, 0.06) 100%);
-  border-color: rgba(76, 175, 80, 0.4);
+[data-theme="dark"] .tutoring-session-entry.online .tutoring-session-location {
+  color: #81c784;
 }
 
 .tutoring-session-time {
   color: var(--text-primary);
-  font-weight: 500;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 110px;
+}
+
+/* Multiple time ranges display */
+.tutoring-session-entry.multi-time .tutoring-session-time {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tutoring-time-range {
+  display: block;
+  white-space: nowrap;
+}
+
+.tutoring-session-entry.multi-time {
+  align-items: center;
 }
 
 .tutoring-session-location {
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 13px;
+  text-align: right;
 }
 
 .online-indicator {
-  color: #4caf50;
+  color: #2e7d32;
   font-weight: 500;
 }
 
 .tutoring-tba {
   color: var(--text-muted);
   font-style: italic;
+  padding: 16px 20px;
   text-align: center;
-  padding: 8px 0;
 }
 
 /* Dark theme support */
@@ -2754,6 +2760,7 @@ body {
   border-color: var(--border-color);
 }
 
+
 /* Mobile responsive styles for tutoring */
 @media (max-width: 768px) {
   .tutoring-search-input {
@@ -2769,6 +2776,12 @@ body {
     padding: 14px 16px;
   }
 
+  .tutoring-course-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
   .tutoring-course-name {
     font-size: 14px;
   }
@@ -2778,81 +2791,239 @@ body {
     padding: 3px 8px;
   }
 
-  .tutoring-course-sessions {
-    padding: 12px 16px;
-  }
-
-  .tutoring-sessions-header {
-    grid-template-columns: 50px 1fr;
-    gap: 8px;
-    font-size: 11px;
-    padding: 6px 8px;
-  }
-
   .tutoring-session-row {
-    grid-template-columns: 50px 1fr;
-    gap: 8px;
-    padding: 10px;
-    font-size: 13px;
+    padding: 12px 14px;
+    gap: 12px;
   }
-  
-  .tutoring-session-entry {
-    padding: 6px 8px;
-  }
-  
-  .tutoring-session-time {
+
+  .tutoring-session-day {
     font-size: 12px;
+    min-width: 36px;
+    padding-top: 9px;
+  }
+
+  .tutoring-session-entry {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .tutoring-session-time {
+    font-size: 13px;
+    min-width: 95px;
   }
   
   .tutoring-session-location {
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 
 @media (max-width: 480px) {
-  .tutoring-sessions-header {
-    display: none;
+  .tutoring-course-header {
+    padding: 12px 14px;
+  }
+
+  .tutoring-course-name {
+    font-size: 13px;
   }
 
   .tutoring-session-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    padding: 12px 14px;
     gap: 8px;
-    padding: 12px;
   }
 
   .tutoring-session-day {
-    font-size: 14px;
-    font-weight: 600;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--border-light);
-    margin-bottom: 4px;
+    font-size: 12px;
+    padding-top: 0;
   }
-  
+
   .tutoring-session-details {
-    gap: 6px;
+    width: 100%;
   }
-  
+
   .tutoring-session-entry {
-    padding: 8px 10px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-light);
-    border-radius: 6px;
-  }
-  
-  .tutoring-session-entry:only-child {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-light);
-    padding: 8px 10px;
+    padding: 10px 12px;
+    gap: 8px;
   }
 
   .tutoring-session-time {
     font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
+    min-width: 90px;
   }
   
   .tutoring-session-location {
     font-size: 12px;
-    color: var(--text-secondary);
+  }
+
+  /* Multi-time mobile adjustments */
+  .tutoring-session-entry.multi-time .tutoring-session-time {
+    gap: 3px;
+  }
+  
+  .tutoring-time-range {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   Memo Popup - Minimal Style
+   ============================================ */
+
+.memo-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: memoFadeIn 0.15s ease-out;
+}
+
+@keyframes memoFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.memo-popup {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  max-width: 380px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: memoSlideIn 0.2s ease-out;
+}
+
+@keyframes memoSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.memo-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.15s ease;
+}
+
+.memo-close:hover {
+  color: var(--text-primary);
+}
+
+.memo-content {
+  padding: 20px 24px;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.memo-section {
+  margin-bottom: 16px;
+}
+
+.memo-section:last-child {
+  margin-bottom: 0;
+}
+
+.memo-label {
+  display: block;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  text-transform: lowercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.memo-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.memo-list li {
+  position: relative;
+  padding-left: 14px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.memo-list li:last-child {
+  margin-bottom: 0;
+}
+
+.memo-list li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: var(--text-tertiary);
+}
+
+.memo-links {
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+
+.memo-link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.memo-link-list a {
+  color: var(--asu-blue);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.memo-link-list a:hover {
+  color: var(--asu-gold);
+}
+
+/* Dark mode */
+[data-theme="dark"] .memo-popup {
+  background: var(--bg-secondary);
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .memo-link-list a {
+  color: var(--asu-gold);
+}
+
+[data-theme="dark"] .memo-link-list a:hover {
+  color: #ffffff;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .memo-overlay {
+    padding: 16px;
+  }
+
+  .memo-popup {
+    max-width: 100%;
+  }
+
+  .memo-content {
+    padding: 16px 20px;
+    font-size: 12px;
   }
 }

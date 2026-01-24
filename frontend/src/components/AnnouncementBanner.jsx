@@ -9,6 +9,7 @@ import React from "react";
  *  - height?: number               // banner height in px (default 48)
  *  - gapPx?: number                // gap between repeats in px (default 48)
  *  - link?: string                 // optional URL to open when banner is clicked
+ *  - onClick?: function            // optional click handler (takes precedence over link)
  *
  * Accessibility:
  *  - Animation pauses on hover and for users with reduced motion.
@@ -19,19 +20,24 @@ export function AnnouncementBanner({
   height = 56,
   gapPx = 48,
   link = null,
+  onClick = null,
 }) {
   // Duplicate content so it can loop seamlessly
   const repeated = Array.from({ length: 8 }, () => items).flat();
 
   const handleClick = () => {
-    if (link) {
+    if (onClick) {
+      onClick();
+    } else if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     }
   };
 
+  const isClickable = onClick || link;
+
   return (
     <div
-      className={`announcement-banner ${link ? 'clickable' : ''}`}
+      className={`announcement-banner ${isClickable ? 'clickable' : ''}`}
       role="img"
       aria-label={items.join(" • ")}
       onClick={handleClick}
@@ -39,7 +45,7 @@ export function AnnouncementBanner({
         "--duration": `${speedSec}s`,
         "--gap": `${gapPx}px`,
         height: `${height}px`,
-        cursor: link ? 'pointer' : 'default',
+        cursor: isClickable ? 'pointer' : 'default',
       }}
     >
       {/* Two groups with identical content create the continuous loop */}

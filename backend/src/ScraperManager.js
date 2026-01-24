@@ -1051,7 +1051,24 @@ class ScraperManager {
         throw new Error('No tutoring hours data found on the page');
       }
 
-      const formattedData = this.formatTutoringHours(tutoringData);
+      // Also scrape Math Lab hours
+      console.log('🔍 Scraping Math Lab hours...');
+      const mathLabData = await this.scrapeMathLab(browser);
+      
+      // Merge Math Lab data with tutoring data
+      const mergedData = { ...tutoringData };
+      if (mathLabData && Object.keys(mathLabData).length > 0) {
+        Object.assign(mergedData, mathLabData);
+        console.log('✅ Math Lab hours merged with tutoring data');
+      }
+
+      // Sort subjects alphabetically
+      const sortedData = {};
+      Object.keys(mergedData).sort((a, b) => a.localeCompare(b)).forEach(key => {
+        sortedData[key] = mergedData[key];
+      });
+
+      const formattedData = this.formatTutoringHours(sortedData);
       
       // Update tutoring database
       const counts = await tutoringDb.updateTutoringData(formattedData);
@@ -1069,6 +1086,108 @@ class ScraperManager {
       console.error('❌ Tutoring scraping failed:', error);
       tutoringDb.logScrapeActivity('error', error.message);
       throw error;
+    } finally {
+      if (page) await page.close();
+    }
+  }
+
+  async scrapeMathLab(browser) {
+    console.log('🔍 Scraping Math Lab hours from dedicated page...');
+    
+    let page;
+    try {
+      page = await browser.newPage();
+      await page.setUserAgent(this.userAgent);
+      
+      await page.goto('https://www.angelo.edu/current-students/freshman-college/math-lab.php', {
+        waitUntil: 'networkidle2',
+        timeout: this.config.timeout
+      });
+      
+      await delay(2000);
+      
+      const mathLabData = await page.evaluate(() => {
+        const data = {};
+        
+        // Find the table with Math Lab hours
+        const tables = document.querySelectorAll('table');
+        let mathLabTable = null;
+        
+        for (const table of tables) {
+          const caption = table.querySelector('caption');
+          const tableText = table.innerText.toLowerCase();
+          if (caption?.innerText.toLowerCase().includes('math lab') || 
+              tableText.includes('math lab') ||
+              tableText.includes('sun') && tableText.includes('mon')) {
+            mathLabTable = table;
+            break;
+          }
+        }
+        
+        if (!mathLabTable) {
+          console.log('Math Lab table not found');
+          return null;
+        }
+        
+        // Parse the table - it has days as columns
+        const rows = mathLabTable.querySelectorAll('tr');
+        if (rows.length < 2) return null;
+        
+        // Get header row (days)
+        const headerCells = rows[0].querySelectorAll('td, th');
+        const days = [];
+        const dayMappings = {
+          'sun': 'Sunday', 'mon': 'Monday', 'tue': 'Tuesday',
+          'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday'
+        };
+        
+        headerCells.forEach(cell => {
+          const text = cell.innerText.toLowerCase().trim();
+          for (const [abbrev, fullDay] of Object.entries(dayMappings)) {
+            if (text.includes(abbrev)) {
+              days.push(fullDay);
+              break;
+            }
+          }
+        });
+        
+        // Get hours row
+        const hoursRow = rows[1];
+        const hoursCells = hoursRow.querySelectorAll('td, th');
+        
+        const sessions = [];
+        hoursCells.forEach((cell, index) => {
+          if (index < days.length) {
+            const hoursText = cell.innerText.trim();
+            const day = days[index];
+            
+            if (hoursText.toLowerCase() === 'closed' || !hoursText) {
+              // Skip closed days
+            } else {
+              sessions.push({
+                day: day,
+                time: hoursText,
+                location: 'Porter Henderson Library, Room 328'
+              });
+            }
+          }
+        });
+        
+        if (sessions.length > 0) {
+          data['Math Lab'] = {
+            'Math Lab (Drop-in Help)': sessions
+          };
+        }
+        
+        return data;
+      });
+      
+      console.log('✅ Math Lab hours extracted');
+      return mathLabData;
+      
+    } catch (error) {
+      console.error('⚠️ Math Lab scraping failed (continuing without it):', error.message);
+      return null;
     } finally {
       if (page) await page.close();
     }

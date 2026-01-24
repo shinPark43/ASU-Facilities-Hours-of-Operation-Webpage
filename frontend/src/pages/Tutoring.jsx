@@ -2,12 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { tutoringAPI } from '../services/api.js';
 import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
 
+// Tutoring notice data - can be moved to backend later
+const TUTORING_MEMO = {
+  notices: [
+    "Free tutoring available to all ASU students",
+    "No appointment necessary for in-person sessions",
+    "Upswing: 2 hrs/week free online tutoring",
+    "ASU tutors are at the top of Upswing list — they do NOT count against your 2 hours"
+  ],
+  hoursChanged: [
+    // Add any temporary hour changes here
+    // "Math tutoring closed Jan 20 for MLK Day"
+  ],
+  links: {
+    main: "https://www.angelo.edu/current-students/freshman-college/academic-tutoring.php",
+    upswing: "https://angelostate.upswing.io/"
+  }
+};
+
 const Tutoring = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tutoringData, setTutoringData] = useState(null);
   const [activeSubject, setActiveSubject] = useState(null);
   const [expandedCourses, setExpandedCourses] = useState({});
+  const [showNoticePopup, setShowNoticePopup] = useState(false);
 
   useEffect(() => {
     const fetchTutoringData = async () => {
@@ -64,6 +83,18 @@ const Tutoring = () => {
   const formatTime = (time) => {
     if (!time || time === 'TBA') return 'TBA';
     return time;
+  };
+
+  // Check if time string has multiple ranges (contains comma)
+  const hasMultipleTimeRanges = (time) => {
+    if (!time || time === 'TBA') return false;
+    return time.includes(',');
+  };
+
+  // Split time string into separate ranges
+  const splitTimeRanges = (time) => {
+    if (!time || time === 'TBA') return ['TBA'];
+    return time.split(',').map(t => t.trim());
   };
 
   // Parse time string to minutes for sorting
@@ -163,11 +194,63 @@ const Tutoring = () => {
       <AnnouncementBanner 
         items={[
           "<strong>Free Tutoring</strong> - Available to all ASU students, no appointment necessary",
-          "<strong>Upswing</strong> - 2 hours/week of free online tutoring available"
+          "<strong>Upswing</strong> - 2 hours/week of free online tutoring available",
+          "<strong>Click for more info</strong>"
         ]} 
         speedSec={280}
-        link="https://www.angelo.edu/current-students/freshman-college/academic-tutoring.php"
+        onClick={() => setShowNoticePopup(true)}
       />
+
+      {/* Notice Popup Modal - Memo Style */}
+      {showNoticePopup && (
+        <div className="memo-overlay" onClick={() => setShowNoticePopup(false)}>
+          <div className="memo-popup" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="memo-close" 
+              onClick={() => setShowNoticePopup(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            
+            <div className="memo-content">
+              {TUTORING_MEMO.notices.length > 0 && (
+                <div className="memo-section">
+                  <span className="memo-label">notices:</span>
+                  <ul className="memo-list">
+                    {TUTORING_MEMO.notices.map((notice, i) => (
+                      <li key={i}>{notice}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {TUTORING_MEMO.hoursChanged.length > 0 && (
+                <div className="memo-section">
+                  <span className="memo-label">hours changed:</span>
+                  <ul className="memo-list">
+                    {TUTORING_MEMO.hoursChanged.map((change, i) => (
+                      <li key={i}>{change}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="memo-section memo-links">
+                <span className="memo-label">links:</span>
+                <div className="memo-link-list">
+                  <a href={TUTORING_MEMO.links.main} target="_blank" rel="noopener noreferrer">
+                    ASU Tutoring →
+                  </a>
+                  <a href={TUTORING_MEMO.links.upswing} target="_blank" rel="noopener noreferrer">
+                    Upswing →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <h2 className="section-panel-header">Academic Support Center</h2>
       <p className="section-subtitle">
@@ -289,11 +372,19 @@ const Tutoring = () => {
                                       {dayGroup.sessions.map((session, sessionIndex) => (
                                         <div 
                                           key={sessionIndex} 
-                                          className={`tutoring-session-entry ${isOnlineSession(session) ? 'online' : ''}`}
+                                          className={`tutoring-session-entry ${isOnlineSession(session) ? 'online' : ''} ${hasMultipleTimeRanges(session.time) ? 'multi-time' : ''}`}
                                         >
-                                          <span className="tutoring-session-time">
-                                            {formatTime(session.time)}
-                                          </span>
+                                          <div className="tutoring-session-time">
+                                            {hasMultipleTimeRanges(session.time) ? (
+                                              splitTimeRanges(session.time).map((timeRange, i) => (
+                                                <span key={i} className="tutoring-time-range">
+                                                  {timeRange}
+                                                </span>
+                                              ))
+                                            ) : (
+                                              formatTime(session.time)
+                                            )}
+                                          </div>
                                           <span className="tutoring-session-location">
                                             {session.location || 'TBA'}
                                           </span>
@@ -317,9 +408,7 @@ const Tutoring = () => {
       </div>
       
       <div className="hours-info">
-        Tutoring is free to all ASU students. No appointment necessary for in-person tutoring.
-        <br />
-        Online tutoring via Upswing: 2 free hours per week.
+        Hours may vary during holidays and special events.
       </div>
       
       <a 
