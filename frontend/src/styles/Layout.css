@@ -2623,7 +2623,7 @@ body {
 
 .tutoring-sessions-header {
   display: grid;
-  grid-template-columns: 80px 1fr 1fr;
+  grid-template-columns: 70px 1fr;
   gap: 12px;
   padding: 8px 12px;
   font-size: 12px;
@@ -2636,7 +2636,7 @@ body {
 
 .tutoring-session-row {
   display: grid;
-  grid-template-columns: 80px 1fr 1fr;
+  grid-template-columns: 70px 1fr;
   gap: 12px;
   padding: 12px;
   background: var(--bg-secondary);
@@ -2655,21 +2655,67 @@ body {
   opacity: 0.7;
 }
 
-.tutoring-session-row.online {
-  border-left: 3px solid #4caf50;
-}
-
 .tutoring-session-day {
   font-weight: 600;
   color: var(--text-primary);
+  padding-top: 2px;
+}
+
+.tutoring-session-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tutoring-session-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+}
+
+.tutoring-session-entry:only-child {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Online session indicator */
+.tutoring-session-entry.online {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(76, 175, 80, 0.04) 100%);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-left: 3px solid #4caf50;
+}
+
+.tutoring-session-entry.online:only-child {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(76, 175, 80, 0.04) 100%);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-left: 3px solid #4caf50;
+  padding: 8px 10px;
+}
+
+[data-theme="dark"] .tutoring-session-entry.online {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.12) 0%, rgba(76, 175, 80, 0.06) 100%);
+  border-color: rgba(76, 175, 80, 0.4);
+}
+
+[data-theme="dark"] .tutoring-session-entry.online:only-child {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.12) 0%, rgba(76, 175, 80, 0.06) 100%);
+  border-color: rgba(76, 175, 80, 0.4);
 }
 
 .tutoring-session-time {
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .tutoring-session-location {
   color: var(--text-secondary);
+  font-size: 12px;
 }
 
 .online-indicator {
@@ -2737,17 +2783,29 @@ body {
   }
 
   .tutoring-sessions-header {
-    grid-template-columns: 60px 1fr 1fr;
+    grid-template-columns: 50px 1fr;
     gap: 8px;
     font-size: 11px;
     padding: 6px 8px;
   }
 
   .tutoring-session-row {
-    grid-template-columns: 60px 1fr 1fr;
+    grid-template-columns: 50px 1fr;
     gap: 8px;
     padding: 10px;
     font-size: 13px;
+  }
+  
+  .tutoring-session-entry {
+    padding: 6px 8px;
+  }
+  
+  .tutoring-session-time {
+    font-size: 12px;
+  }
+  
+  .tutoring-session-location {
+    font-size: 11px;
   }
 }
 
@@ -2758,18 +2816,43 @@ body {
 
   .tutoring-session-row {
     grid-template-columns: 1fr;
-    gap: 4px;
+    gap: 8px;
     padding: 12px;
   }
 
   .tutoring-session-day {
     font-size: 14px;
+    font-weight: 600;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 4px;
+  }
+  
+  .tutoring-session-details {
+    gap: 6px;
+  }
+  
+  .tutoring-session-entry {
+    padding: 8px 10px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+  }
+  
+  .tutoring-session-entry:only-child {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    padding: 8px 10px;
   }
 
-  .tutoring-session-time,
-  .tutoring-session-location {
+  .tutoring-session-time {
     font-size: 13px;
-    padding-left: 8px;
-    border-left: 2px solid var(--border-light);
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  
+  .tutoring-session-location {
+    font-size: 12px;
+    color: var(--text-secondary);
   }
 }

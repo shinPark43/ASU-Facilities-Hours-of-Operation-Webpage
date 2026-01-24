@@ -16,9 +16,18 @@ const Tutoring = () => {
         const data = await tutoringAPI.getAllTutoringData();
         if (data && data.subjects && Object.keys(data.subjects).length > 0) {
           setTutoringData(data);
-          // Set the first subject as active by default
-          const firstSubject = Object.keys(data.subjects)[0];
-          setActiveSubject(firstSubject);
+          
+          // Set Computer Science as default if available, otherwise use first subject
+          const subjects = Object.keys(data.subjects);
+          const defaultSubject = subjects.find(s => s.toLowerCase().includes('computer science')) || subjects[0];
+          setActiveSubject(defaultSubject);
+          
+          // Only expand if there's exactly one course in the subject
+          const defaultSubjectCourses = data.subjects[defaultSubject]?.courses;
+          if (defaultSubjectCourses && Object.keys(defaultSubjectCourses).length === 1) {
+            const firstCourseName = Object.keys(defaultSubjectCourses)[0];
+            setExpandedCourses({ [firstCourseName]: true });
+          }
         } else {
           throw new Error('No tutoring data available');
         }
@@ -55,6 +64,79 @@ const Tutoring = () => {
   const formatTime = (time) => {
     if (!time || time === 'TBA') return 'TBA';
     return time;
+  };
+
+  // Parse time string to minutes for sorting
+  const parseTimeToMinutes = (timeStr) => {
+    if (!timeStr || timeStr === 'TBA') return 9999; // Put TBA at the end
+    
+    const lowerStr = timeStr.toLowerCase();
+    
+    // Handle "noon" anywhere in the string
+    if (lowerStr.includes('noon')) {
+      return 12 * 60; // 12:00 PM = 720 minutes
+    }
+    
+    // Handle "midnight"
+    if (lowerStr.includes('midnight')) {
+      return 0;
+    }
+    
+    // Get the start time (before the dash or comma)
+    let startTime = timeStr.split('-')[0].split(',')[0].trim();
+    
+    // Check AM/PM from the FULL string (not just start time)
+    // because "7-10 p.m." has PM only at the end
+    const isPM = lowerStr.includes('p.m') || lowerStr.includes('pm');
+    const isAM = lowerStr.includes('a.m') || lowerStr.includes('am');
+    
+    // Extract hours and minutes from start time
+    const timeMatch = startTime.match(/(\d{1,2})(?::(\d{2}))?/);
+    if (!timeMatch) return 9999;
+    
+    let hours = parseInt(timeMatch[1], 10);
+    const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+    
+    // Convert to 24-hour format
+    if (isPM && hours < 12) {
+      hours += 12;
+    } else if (isAM && hours === 12) {
+      hours = 0;
+    }
+    
+    return hours * 60 + minutes;
+  };
+
+  // Group sessions by day for merged display
+  const groupSessionsByDay = (sessions) => {
+    const dayOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const grouped = {};
+    
+    sessions.forEach(session => {
+      const day = session.day;
+      if (!grouped[day]) {
+        grouped[day] = [];
+      }
+      grouped[day].push(session);
+    });
+    
+    // Sort by day of week
+    const sortedDays = Object.keys(grouped).sort((a, b) => {
+      const aIndex = dayOrder.indexOf(a);
+      const bIndex = dayOrder.indexOf(b);
+      // Handle days not in the list (put them at the end)
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
+    
+    return sortedDays.map(day => ({
+      day,
+      // Sort sessions within each day by start time
+      sessions: grouped[day].sort((a, b) => {
+        return parseTimeToMinutes(a.time) - parseTimeToMinutes(b.time);
+      })
+    }));
   };
 
   if (loading) {
@@ -99,7 +181,17 @@ const Tutoring = () => {
             <button
               key={subject}
               className={`facility-tab ${activeSubject === subject ? 'active' : ''}`}
-              onClick={() => setActiveSubject(subject)}
+              onClick={() => {
+                setActiveSubject(subject);
+                // Only expand if there's exactly one course in the subject
+                const subjectCourses = tutoringData?.subjects[subject]?.courses;
+                if (subjectCourses && Object.keys(subjectCourses).length === 1) {
+                  const firstCourseName = Object.keys(subjectCourses)[0];
+                  setExpandedCourses({ [firstCourseName]: true });
+                } else {
+                  setExpandedCourses({});
+                }
+              }}
             >
               {subject}
             </button>
@@ -111,7 +203,18 @@ const Tutoring = () => {
           <select 
             className="facility-dropdown"
             value={activeSubject || ''}
-            onChange={(e) => setActiveSubject(e.target.value)}
+            onChange={(e) => {
+              const subject = e.target.value;
+              setActiveSubject(subject);
+              // Only expand if there's exactly one course in the subject
+              const subjectCourses = tutoringData?.subjects[subject]?.courses;
+              if (subjectCourses && Object.keys(subjectCourses).length === 1) {
+                const firstCourseName = Object.keys(subjectCourses)[0];
+                setExpandedCourses({ [firstCourseName]: true });
+              } else {
+                setExpandedCourses({});
+              }
+            }}
           >
             {subjects.map((subject) => (
               <option key={subject} value={subject}>
@@ -165,28 +268,41 @@ const Tutoring = () => {
                             <div className="tutoring-sessions-table">
                               <div className="tutoring-sessions-header">
                                 <span>Day</span>
-                                <span>Time</span>
-                                <span>Location</span>
+                                <span>Time & Location</span>
                               </div>
-                              {sessions.map((session, index) => (
-                                <div 
-                                  key={index} 
-                                  className={`tutoring-session-row ${session.is_tba ? 'tba' : ''} ${session.is_online ? 'online' : ''}`}
-                                >
-                                  <span className="tutoring-session-day">
-                                    {getDayAbbreviation(session.day)}
-                                  </span>
-                                  <span className="tutoring-session-time">
-                                    {formatTime(session.time)}
-                                  </span>
-                                  <span className="tutoring-session-location">
-                                    {session.location || 'TBA'}
-                                    {session.is_online && (
-                                      <span className="online-indicator"> (Online)</span>
-                                    )}
-                                  </span>
-                                </div>
-                              ))}
+                              {groupSessionsByDay(sessions).map((dayGroup, index) => {
+                                // Check if any session in this day group is online
+                                const isOnlineSession = (session) => {
+                                  const loc = (session.location || '').toLowerCase();
+                                  return loc.includes('upswing') || loc.includes('online');
+                                };
+                                
+                                return (
+                                  <div 
+                                    key={index} 
+                                    className="tutoring-session-row"
+                                  >
+                                    <span className="tutoring-session-day">
+                                      {getDayAbbreviation(dayGroup.day)}
+                                    </span>
+                                    <div className="tutoring-session-details">
+                                      {dayGroup.sessions.map((session, sessionIndex) => (
+                                        <div 
+                                          key={sessionIndex} 
+                                          className={`tutoring-session-entry ${isOnlineSession(session) ? 'online' : ''}`}
+                                        >
+                                          <span className="tutoring-session-time">
+                                            {formatTime(session.time)}
+                                          </span>
+                                          <span className="tutoring-session-location">
+                                            {session.location || 'TBA'}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>

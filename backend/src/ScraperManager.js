@@ -1123,6 +1123,7 @@ class ScraperManager {
             rows = table.querySelectorAll('tr');
           }
           const courseHours = [];
+          let lastValidDay = ''; // Track the last valid day for rows with empty day cells
           
           rows.forEach(row => {
             // Skip header rows (rows with th elements)
@@ -1137,8 +1138,19 @@ class ScraperManager {
               // Clean up day value - handle &nbsp; (non-breaking space) and empty values
               day = day.replace(/\u00A0/g, '').trim();
               
-              // Only add if we have at least a day
-              if (day) {
+              // If day is empty but we have time/location, use the last valid day
+              // This handles cases like Upswing rows that continue from previous day
+              if (!day && (time || location)) {
+                day = lastValidDay || 'Online'; // Use last day, or 'Online' as fallback
+              }
+              
+              // Update last valid day if current day is valid
+              if (day && day !== 'Online') {
+                lastValidDay = day;
+              }
+              
+              // Add if we have at least a day and some content
+              if (day && (time || location)) {
                 courseHours.push({
                   day: day,
                   time: time || 'TBA',
