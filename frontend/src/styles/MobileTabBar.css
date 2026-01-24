@@ -1,28 +1,28 @@
-/* Mobile Tab Bar - Attached to Header */
+/* Mobile Tab Bar - Fixed at Bottom */
 .mobile-tab-bar {
   display: none; /* Hidden by default, shown only on mobile */
   position: fixed;
-  top: calc(var(--header-height) + (var(--header-padding-mobile) * 2));
+  bottom: 0;
   left: 0;
   right: 0;
   height: 72px;
   z-index: 90;
   background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  border-top: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: none;
   border-left: none;
   border-right: none;
   border-radius: 0;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateY(0);
+  /* Safe area for devices with home indicator */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
-.mobile-tab-bar.hidden {
-  transform: translateY(calc(-100% - var(--header-height) - (var(--header-padding-mobile) * 2)));
-}
-
+/* Tab bar always visible at bottom - no hide on scroll */
+.mobile-tab-bar.hidden,
 .mobile-tab-bar.visible {
   transform: translateY(0);
 }
@@ -109,11 +109,11 @@
 /* Dark theme support - Matching design system */
 [data-theme="dark"] .mobile-tab-bar {
   background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  border-top: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: none;
   border-left: none;
   border-right: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
 }
 
@@ -165,14 +165,6 @@
     left: 0;
     right: 0;
     height: 68px;
-  }
-  
-  .mobile-tab-bar.hidden {
-    transform: translateY(calc(-100% - var(--header-height) - (var(--header-padding-mobile) * 2)));
-  }
-  
-  .mobile-tab-bar.visible {
-    transform: translateY(0);
   }
   
   .tab-container {

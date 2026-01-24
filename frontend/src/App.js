@@ -5,6 +5,7 @@ import Gym from './pages/Gym';
 import Library from './pages/Library';
 import Dining from './pages/Dining';
 import RamTram from './pages/RamTram';
+import Tutoring from './pages/Tutoring';
 import About from './pages/About';
 import HowToInstall from './pages/HowToInstall';
 import Landing from './pages/Landing';
@@ -20,6 +21,7 @@ function App() {
           <Route path="/gym" element={<Gym />} />
           <Route path="/dining" element={<Dining />} />
           <Route path="/ramtram" element={<RamTram />} />
+          <Route path="/tutoring" element={<Tutoring />} />
           <Route path="/about" element={<About />} />
           <Route path="/install" element={<HowToInstall />} />
           <Route path="/" element={<Navigate to="/library" replace />} />

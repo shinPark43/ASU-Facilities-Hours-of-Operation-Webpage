@@ -24,15 +24,17 @@ if (!fs.existsSync(dbModule)) {
 
 const scraper = require('../src/scraper');
 const db = require('../src/database');
+const tutoringDb = require('../src/tutoring-database');
 
 async function runScraper() {
   console.log('🚀 Starting ASU Facilities Hours Scraper...');
   console.log(`📅 Timestamp: ${new Date().toISOString()}`);
   
   try {
-    // Always initialize database first
-    console.log('📊 Initializing database...');
+    // Always initialize databases first
+    console.log('📊 Initializing databases...');
     await db.init();
+    await tutoringDb.init();
     
     // Get command line arguments
     const args = process.argv.slice(2);
@@ -68,8 +70,9 @@ async function runScraper() {
     
     console.log('\n🎉 Scraping completed successfully!');
     
-    // Close database connection
+    // Close database connections
     await db.close();
+    await tutoringDb.close();
     
   } catch (error) {
     console.error('❌ Scraping failed:', error);

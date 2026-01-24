@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const db = require('./database');
+const tutoringDb = require('./tutoring-database');
 
 // Helper function to wait for a specified time
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -95,6 +96,7 @@ class ScraperManager {
       recreation: null,
       dining: null,
       ram_tram: null,
+      tutoring: null,
       total_records: 0,
       started_at: new Date().toISOString()
     };
@@ -143,12 +145,23 @@ class ScraperManager {
         results.ram_tram = { error: error.message, success: false };
       }
 
+      console.log('📖 Scraping tutoring schedule...');
+      try {
+        results.tutoring = await retryWithBackoff(
+          () => this.scrapeTutoring(browser),
+          'Tutoring scraping'
+        );
+      } catch (error) {
+        results.tutoring = { error: error.message, success: false };
+      }
+
       // Calculate totals
       results.total_records = 
         (results.library?.count || 0) + 
         (results.recreation?.count || 0) + 
         (results.dining?.count || 0) +
-        (results.ram_tram?.count || 0);
+        (results.ram_tram?.count || 0) +
+        (results.tutoring?.sessions_count || 0);
 
       results.completed_at = new Date().toISOString();
       
@@ -164,7 +177,7 @@ class ScraperManager {
   }
 
   async scrapeSpecificFacility(facilityType) {
-    const validTypes = ['library', 'recreation', 'dining'];
+    const validTypes = ['library', 'recreation', 'dining', 'ram_tram', 'tutoring'];
     if (!validTypes.includes(facilityType)) {
       throw new Error(`Invalid facility type: ${facilityType}. Valid types are: ${validTypes.join(', ')}`);
     }
@@ -181,6 +194,8 @@ class ScraperManager {
         return await this.scrapeDining(browser);
       case 'ram_tram':
         return await this.scrapeRamTram(browser);
+      case 'tutoring':
+        return await this.scrapeTutoring(browser);
       default:
         throw new Error(`Unsupported facility type: ${facilityType}`);
     }
@@ -1004,6 +1019,318 @@ class ScraperManager {
       }
     }
     return ramTramHours;
+  }
+
+  async scrapeTutoring(browser) {
+    console.log('🔍 Scraping tutoring hours...');
+    
+    let page;
+    try {
+      tutoringDb.logScrapeActivity('started', 'Beginning tutoring hours scrape');
+      
+      page = await browser.newPage();
+      await page.setUserAgent(this.userAgent);
+      
+      await page.goto('https://www.angelo.edu/current-students/freshman-college/academic-tutoring.php', {
+        waitUntil: 'networkidle2',
+        timeout: this.config.timeout
+      });
+      
+      // Wait for accordion content to load
+      await this.waitForContent(page, [
+        '.lw_accordion',
+        'section.lw_accordion_block',
+        'table'
+      ]);
+      
+      await delay(3000);
+      
+      const tutoringData = await this.extractTutoringHours(page);
+      
+      if (!tutoringData || Object.keys(tutoringData).length === 0) {
+        throw new Error('No tutoring hours data found on the page');
+      }
+
+      // Also scrape Math Lab hours
+      console.log('🔍 Scraping Math Lab hours...');
+      const mathLabData = await this.scrapeMathLab(browser);
+      
+      // Merge Math Lab data with tutoring data
+      const mergedData = { ...tutoringData };
+      if (mathLabData && Object.keys(mathLabData).length > 0) {
+        Object.assign(mergedData, mathLabData);
+        console.log('✅ Math Lab hours merged with tutoring data');
+      }
+
+      // Sort subjects alphabetically
+      const sortedData = {};
+      Object.keys(mergedData).sort((a, b) => a.localeCompare(b)).forEach(key => {
+        sortedData[key] = mergedData[key];
+      });
+
+      const formattedData = this.formatTutoringHours(sortedData);
+      
+      // Update tutoring database
+      const counts = await tutoringDb.updateTutoringData(formattedData);
+      tutoringDb.logScrapeActivity('success', `Updated tutoring data`, counts);
+      
+      console.log('✅ Tutoring hours scraped successfully');
+      return { 
+        success: true, 
+        subjects_count: counts.subjects_count,
+        courses_count: counts.courses_count,
+        sessions_count: counts.sessions_count
+      };
+
+    } catch (error) {
+      console.error('❌ Tutoring scraping failed:', error);
+      tutoringDb.logScrapeActivity('error', error.message);
+      throw error;
+    } finally {
+      if (page) await page.close();
+    }
+  }
+
+  async scrapeMathLab(browser) {
+    console.log('🔍 Scraping Math Lab hours from dedicated page...');
+    
+    let page;
+    try {
+      page = await browser.newPage();
+      await page.setUserAgent(this.userAgent);
+      
+      await page.goto('https://www.angelo.edu/current-students/freshman-college/math-lab.php', {
+        waitUntil: 'networkidle2',
+        timeout: this.config.timeout
+      });
+      
+      await delay(2000);
+      
+      const mathLabData = await page.evaluate(() => {
+        const data = {};
+        
+        // Find the table with Math Lab hours
+        const tables = document.querySelectorAll('table');
+        let mathLabTable = null;
+        
+        for (const table of tables) {
+          const caption = table.querySelector('caption');
+          const tableText = table.innerText.toLowerCase();
+          if (caption?.innerText.toLowerCase().includes('math lab') || 
+              tableText.includes('math lab') ||
+              tableText.includes('sun') && tableText.includes('mon')) {
+            mathLabTable = table;
+            break;
+          }
+        }
+        
+        if (!mathLabTable) {
+          console.log('Math Lab table not found');
+          return null;
+        }
+        
+        // Parse the table - it has days as columns
+        const rows = mathLabTable.querySelectorAll('tr');
+        if (rows.length < 2) return null;
+        
+        // Get header row (days)
+        const headerCells = rows[0].querySelectorAll('td, th');
+        const days = [];
+        const dayMappings = {
+          'sun': 'Sunday', 'mon': 'Monday', 'tue': 'Tuesday',
+          'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday'
+        };
+        
+        headerCells.forEach(cell => {
+          const text = cell.innerText.toLowerCase().trim();
+          for (const [abbrev, fullDay] of Object.entries(dayMappings)) {
+            if (text.includes(abbrev)) {
+              days.push(fullDay);
+              break;
+            }
+          }
+        });
+        
+        // Get hours row
+        const hoursRow = rows[1];
+        const hoursCells = hoursRow.querySelectorAll('td, th');
+        
+        const sessions = [];
+        hoursCells.forEach((cell, index) => {
+          if (index < days.length) {
+            const hoursText = cell.innerText.trim();
+            const day = days[index];
+            
+            if (hoursText.toLowerCase() === 'closed' || !hoursText) {
+              // Skip closed days
+            } else {
+              sessions.push({
+                day: day,
+                time: hoursText,
+                location: 'Porter Henderson Library, Room 328'
+              });
+            }
+          }
+        });
+        
+        if (sessions.length > 0) {
+          data['Math Lab'] = {
+            'Math Lab (Drop-in Help)': sessions
+          };
+        }
+        
+        return data;
+      });
+      
+      console.log('✅ Math Lab hours extracted');
+      return mathLabData;
+      
+    } catch (error) {
+      console.error('⚠️ Math Lab scraping failed (continuing without it):', error.message);
+      return null;
+    } finally {
+      if (page) await page.close();
+    }
+  }
+
+  async extractTutoringHours(page) {
+    return await page.evaluate(() => {
+      const tutoringData = {};
+      
+      // Get all accordion sections (subjects)
+      const sections = document.querySelectorAll('section.lw_accordion_block');
+      
+      console.log('Found', sections.length, 'accordion sections');
+      
+      sections.forEach(section => {
+        // Get subject name from h4
+        const subjectTitle = section.querySelector('h4.lw_accordion_block_title');
+        let subjectName = subjectTitle?.textContent?.trim() || 'Unknown';
+        
+        // Clean up subject name (remove extra whitespace, arrows, etc.)
+        subjectName = subjectName.replace(/\s+/g, ' ').trim();
+        
+        // Skip if it looks like a header or navigation element
+        if (subjectName.toLowerCase().includes('hours of operation') || 
+            subjectName.toLowerCase().includes('schedule')) {
+          return;
+        }
+        
+        // Get all course tables within this subject
+        const contentDiv = section.querySelector('.lw_accordion_block_content');
+        if (!contentDiv) return;
+        
+        const tables = contentDiv.querySelectorAll('div.tableWrap table, table');
+        
+        console.log('Subject:', subjectName, '- Found', tables.length, 'tables');
+        
+        tables.forEach(table => {
+          // Get course name from caption
+          const caption = table.querySelector('caption');
+          let courseName = caption?.textContent?.trim() || '';
+          
+          // Clean up course name (remove &nbsp; and extra spaces)
+          courseName = courseName.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
+          
+          if (!courseName) return;
+          
+          // Get all hour rows - check both tbody and thead (some subjects have data in thead)
+          // Also get rows directly from table in case there's no tbody/thead wrapper
+          let rows = table.querySelectorAll('tbody tr');
+          if (rows.length === 0) {
+            // Fallback: get all tr elements and filter out header rows
+            rows = table.querySelectorAll('tr');
+          }
+          const courseHours = [];
+          let lastValidDay = ''; // Track the last valid day for rows with empty day cells
+          
+          rows.forEach(row => {
+            // Skip header rows (rows with th elements)
+            if (row.querySelector('th')) return;
+            
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 3) {
+              let day = cells[0]?.textContent?.trim() || '';
+              const time = cells[1]?.textContent?.trim() || '';
+              const location = cells[2]?.textContent?.trim() || '';
+              
+              // Clean up day value - handle &nbsp; (non-breaking space) and empty values
+              day = day.replace(/\u00A0/g, '').trim();
+              
+              // If day is empty but we have time/location, use the last valid day
+              // This handles cases like Upswing rows that continue from previous day
+              if (!day && (time || location)) {
+                day = lastValidDay || 'Online'; // Use last day, or 'Online' as fallback
+              }
+              
+              // Update last valid day if current day is valid
+              if (day && day !== 'Online') {
+                lastValidDay = day;
+              }
+              
+              // Add if we have at least a day and some content
+              if (day && (time || location)) {
+                courseHours.push({
+                  day: day,
+                  time: time || 'TBA',
+                  location: location || 'TBA'
+                });
+              }
+            }
+          });
+          
+          // Store with subject grouping
+          if (!tutoringData[subjectName]) {
+            tutoringData[subjectName] = {};
+          }
+          
+          // Handle multiple courses with same name by merging sessions
+          if (tutoringData[subjectName][courseName]) {
+            tutoringData[subjectName][courseName] = [
+              ...tutoringData[subjectName][courseName],
+              ...courseHours
+            ];
+          } else {
+            tutoringData[subjectName][courseName] = courseHours;
+          }
+        });
+      });
+      
+      console.log('Extraction complete. Found subjects:', Object.keys(tutoringData));
+      return tutoringData;
+    });
+  }
+
+  formatTutoringHours(tutoringData) {
+    // The data is already in the correct format from extraction
+    // Just ensure we have valid structure
+    const formatted = {};
+    
+    for (const [subjectName, courses] of Object.entries(tutoringData)) {
+      if (!subjectName || subjectName === 'Unknown') continue;
+      
+      formatted[subjectName] = {};
+      
+      for (const [courseName, sessions] of Object.entries(courses)) {
+        if (!courseName) continue;
+        
+        // Filter out empty or invalid sessions
+        const validSessions = sessions.filter(session => 
+          session.day && session.day !== ''
+        );
+        
+        if (validSessions.length > 0) {
+          formatted[subjectName][courseName] = validSessions;
+        }
+      }
+      
+      // Remove subject if no valid courses
+      if (Object.keys(formatted[subjectName]).length === 0) {
+        delete formatted[subjectName];
+      }
+    }
+    
+    return formatted;
   }
 
   async handleSundayWeekNavigation(page) {
