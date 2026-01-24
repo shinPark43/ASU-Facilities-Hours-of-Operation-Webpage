@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HiOutlineBookOpen } from 'react-icons/hi';
+import { HiOutlineBookOpen, HiOutlineAcademicCap } from 'react-icons/hi';
 import { FaDumbbell } from 'react-icons/fa';
 import { IoRestaurant } from 'react-icons/io5';
 import '../styles/MobileTabBar.css';
@@ -9,7 +9,7 @@ const MobileTabBar = ({ isHeaderVisible = true }) => {
   const location = useLocation();
   
   // Only show tab bar on main facility pages
-  const facilityPages = ['/library', '/gym', '/dining'];
+  const facilityPages = ['/library', '/gym', '/dining', '/tutoring'];
   const shouldShowTabBar = facilityPages.includes(location.pathname);
   
   const isActive = (path) => {
@@ -24,7 +24,8 @@ const MobileTabBar = ({ isHeaderVisible = true }) => {
   const tabs = [
     { path: '/library', label: 'Library', icon: HiOutlineBookOpen },
     { path: '/gym', label: 'Recreation', icon: FaDumbbell },
-    { path: '/dining', label: 'Dining', icon: IoRestaurant }
+    { path: '/dining', label: 'Dining', icon: IoRestaurant },
+    { path: '/tutoring', label: 'Tutoring', icon: HiOutlineAcademicCap }
   ];
 
   return (

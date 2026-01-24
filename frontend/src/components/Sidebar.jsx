@@ -27,6 +27,11 @@ const Sidebar = () => {
               Dine on Campus
             </Link>
           </li>
+          <li>
+            <Link to="/tutoring" className={isActive('/tutoring')}>
+              Tutoring
+            </Link>
+          </li>
         </ul>
       </nav>
     </aside>

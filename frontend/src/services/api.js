@@ -88,6 +88,52 @@ export const facilityAPI = {
   async getScrapeLogs(limit = 10) {
     return apiRequest(`/api/facilities/logs/recent?limit=${limit}`);
   },
+
+  // Get Ram Tram hours
+  async getRamTramHours() {
+    const response = await apiRequest('/api/facilities/ram_tram');
+    return response.data || {};
+  },
+};
+
+/**
+ * API functions for tutoring data
+ */
+export const tutoringAPI = {
+  // Get all tutoring data (subjects, courses, sessions)
+  async getAllTutoringData() {
+    const response = await apiRequest('/api/tutoring');
+    return response.data || {};
+  },
+
+  // Get all subjects
+  async getSubjects() {
+    const response = await apiRequest('/api/tutoring/subjects');
+    return response.data || [];
+  },
+
+  // Get courses for a subject
+  async getCoursesBySubject(subjectId) {
+    const response = await apiRequest(`/api/tutoring/subjects/${subjectId}/courses`);
+    return response.data || [];
+  },
+
+  // Get sessions for a course
+  async getSessionsByCourse(courseId) {
+    const response = await apiRequest(`/api/tutoring/courses/${courseId}/sessions`);
+    return response.data || [];
+  },
+
+  // Search tutoring by course name or code
+  async searchTutoring(query) {
+    const response = await apiRequest(`/api/tutoring/search?q=${encodeURIComponent(query)}`);
+    return response.data || {};
+  },
+
+  // Get recent tutoring scrape logs
+  async getScrapeLogs(limit = 10) {
+    return apiRequest(`/api/tutoring/logs/recent?limit=${limit}`);
+  },
 };
 
 /**

@@ -6,7 +6,9 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const db = require('./src/database');
+const tutoringDb = require('./src/tutoring-database');
 const facilityRoutes = require('./src/routes/facilities');
+const tutoringRoutes = require('./src/routes/tutoring');
 const scraper = require('./src/scraper');
 
 const app = express();
@@ -31,6 +33,7 @@ app.use('/api/', limiter); // Apply rate limiting to API routes only
 
 // Routes
 app.use('/api/facilities', facilityRoutes);
+app.use('/api/tutoring', tutoringRoutes);
 
 // Enhanced health check endpoint
 app.get('/api/health', async (req, res) => {
@@ -72,7 +75,9 @@ app.get('/', (req, res) => {
       facilities: '/api/facilities',
       library: '/api/facilities/library',
       recreation: '/api/facilities/recreation',
-      dining: '/api/facilities/dining'
+      dining: '/api/facilities/dining',
+      ram_tram: '/api/facilities/ram_tram',
+      tutoring: '/api/tutoring'
     }
   });
 });
@@ -100,9 +105,10 @@ let server;
 // Async startup function
 async function startServer() {
   try {
-    // Initialize database first
-    console.log('📊 Initializing database...');
+    // Initialize databases first
+    console.log('📊 Initializing databases...');
     await db.init();
+    await tutoringDb.init();
     
     // Schedule scraper to run daily at 6:10 PM Texas time
     cron.schedule('0 0 * * *', () => {
@@ -163,9 +169,10 @@ async function gracefulShutdown(signal) {
     await scraper.closeBrowser();
     console.log('✅ Browser instances closed');
 
-    // Close database connection
+    // Close database connections
     await db.close();
-    console.log('✅ Database connection closed');
+    await tutoringDb.close();
+    console.log('✅ Database connections closed');
 
     console.log('🎉 Graceful shutdown completed');
     process.exit(0);
