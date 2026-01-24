@@ -97,6 +97,25 @@ const Tutoring = () => {
     return time.split(',').map(t => t.trim());
   };
 
+  // Format course name - split if multiple courses are concatenated
+  // Pattern: Course codes like "POLS 2305", "MATH 1314", etc.
+  const formatCourseName = (name) => {
+    if (!name) return '';
+    
+    // Split where text ends and a new course code begins
+    // Handles: lowercase letters, digits, punctuation, and roman numerals (I, V, X)
+    // Requires 3-4 letter course codes to avoid splitting "BIOL" into "BI" + "OL"
+    // e.g., "FinancialACCT 2302" or "Spanish ISPAN 1302"
+    const splitPattern = /(?<=[a-z0-9\-)IVX])(?=[A-Z]{3,4}\s\d{4})/g;
+    const courses = name.split(splitPattern).map(c => c.trim()).filter(Boolean);
+    
+    if (courses.length <= 1) {
+      return name;
+    }
+    
+    return courses;
+  };
+
   // Parse time string to minutes for sorting
   const parseTimeToMinutes = (timeStr) => {
     if (!timeStr || timeStr === 'TBA') return 9999; // Put TBA at the end
@@ -331,7 +350,17 @@ const Tutoring = () => {
                         aria-expanded={isExpanded}
                       >
                         <div className="tutoring-course-info">
-                          <span className="tutoring-course-name">{courseName}</span>
+                          <span className="tutoring-course-name">
+                            {(() => {
+                              const formatted = formatCourseName(courseName);
+                              if (Array.isArray(formatted)) {
+                                return formatted.map((course, i) => (
+                                  <span key={i} className="tutoring-course-item">{course}</span>
+                                ));
+                              }
+                              return formatted;
+                            })()}
+                          </span>
                           {!!course.has_online && (
                             <span className="tutoring-online-badge">Online Available</span>
                           )}
