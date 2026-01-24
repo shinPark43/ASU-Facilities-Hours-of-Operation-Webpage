@@ -145,7 +145,7 @@ export function AnnouncementBanner({
         /* Responsive adjustments */
         @media (max-width: 768px) {
           .announcement-banner {
-            margin: 1rem 0;
+            margin: 0.5rem 0 0.75rem 0;
             border-radius: 6px;
           }
 

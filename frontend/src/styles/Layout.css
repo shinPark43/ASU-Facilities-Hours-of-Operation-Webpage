@@ -1486,22 +1486,24 @@ body {
   
   .main-content-wrapper {
     margin-left: 0;
-    padding: var(--content-spacing-mobile) 16px;
+    padding: 12px 16px;
     max-width: 100%;
   }
   
   /* Default spacing without tab bar */
   .main-content-wrapper:not(.with-tab-bar) {
     /* Mobile spacing: header only */
-    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 20px);
-    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 20px);
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 8px);
+    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 8px);
   }
   
-  /* Additional spacing when tab bar is present */
+  /* Additional spacing when tab bar is present (now at bottom) */
   .main-content-wrapper.with-tab-bar {
-    /* Mobile spacing: header + tab bar */
-    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 72px);
-    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 72px);
+    /* Mobile spacing: header only (tab bar now at bottom) */
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 8px);
+    min-height: calc(100vh - var(--header-height) - (var(--header-padding-mobile) * 2) - 8px);
+    /* Add bottom padding for bottom tab bar */
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px) + 24px);
   }
   
   .section-panel-header {
@@ -1713,19 +1715,21 @@ body {
   }
   
   .main-content-wrapper {
-    padding: var(--content-spacing-mobile) 12px;
+    padding: 10px 12px;
   }
   
   /* Default spacing without tab bar on ultra-mobile */
   .main-content-wrapper:not(.with-tab-bar) {
     /* Ultra-mobile spacing: header only */
-    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 16px);
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 8px);
   }
   
-  /* Additional spacing when tab bar is present on ultra-mobile */
+  /* Additional spacing when tab bar is present on ultra-mobile (now at bottom) */
   .main-content-wrapper.with-tab-bar {
-    /* Ultra-mobile spacing: header + tab bar */
-    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 68px);
+    /* Ultra-mobile spacing: header only (tab bar now at bottom) */
+    margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + 8px);
+    /* Add bottom padding for bottom tab bar */
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px) + 20px);
   }
   
   .facility-section {
@@ -1897,7 +1901,7 @@ body {
     }
     
     .main-content-wrapper {
-      margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + env(safe-area-inset-top) + 64px + var(--content-spacing-mobile));
+      margin-top: calc(var(--header-height) + (var(--header-padding-mobile) * 2) + env(safe-area-inset-top) + 8px);
     }
   }
 }
