@@ -68,10 +68,14 @@ const Gym = () => {
         link="https://www.angelo.edu/current-students/registrar/academic_calendar.php"
       />
 
-      <h2 className="section-panel-header">Recreation Center</h2>
-      <p className="section-subtitle">
-        Fitness facilities, swimming, climbing, and recreational activities
-      </p>
+      <div className="page-header-with-square-button">
+        <div className="page-header-content">
+          <h2 className="section-panel-header">Recreation Center</h2>
+          <p className="section-subtitle">
+            Fitness facilities, swimming, climbing, and recreational activities
+          </p>
+        </div>
+      </div>
 
       <div className="facility-section">
         <div className="facility-tabs">
