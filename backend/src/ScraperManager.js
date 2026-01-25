@@ -318,7 +318,8 @@ class ScraperManager {
       
       // Sunday-specific navigation: If today is Sunday, click next week arrow
       // This ensures we get the week that contains today's Sunday data
-      await this.handleSundayWeekNavigation(page);
+      // DISABLED: Commenting out for now to use default week display
+      // await this.handleSundayWeekNavigation(page);
       
       const hoursData = await this.extractDiningHours(page);
       
