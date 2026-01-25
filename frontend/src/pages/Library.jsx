@@ -56,7 +56,7 @@ const Library = () => {
     <div>
       <AnnouncementBanner 
         items={[
-          "<strong>Jan. 23</strong> - Last Day to Register or Make Schedule Changes for the Regular Spring 2026 Semester", 
+          "<strong>Feb. 4</strong> - Census Day, Regular Spring 2026 Semester",
           "<strong>Feb. 12</strong> - Late Registration Final Payment Deadline, Spring 2026"
         ]} 
         speedSec={280}
