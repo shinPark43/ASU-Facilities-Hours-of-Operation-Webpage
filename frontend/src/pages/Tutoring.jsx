@@ -271,10 +271,14 @@ const Tutoring = () => {
         </div>
       )}
 
-      <h2 className="section-panel-header">Academic Support Center</h2>
-      <p className="section-subtitle">
-        Free tutoring services for ASU students
-      </p>
+      <div className="page-header-with-square-button">
+        <div className="page-header-content">
+          <h2 className="section-panel-header">Academic Support Center</h2>
+          <p className="section-subtitle">
+            Free tutoring services for ASU students
+          </p>
+        </div>
+      </div>
 
       <div className="facility-section">
         {/* Subject Tabs */}

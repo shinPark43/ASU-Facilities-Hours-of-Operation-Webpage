@@ -61,17 +61,21 @@ const Gym = () => {
     <div>
       <AnnouncementBanner 
         items={[
-          "<strong>Jan. 23</strong> - Last Day to Register or Make Schedule Changes for the Regular Spring 2026 Semester", 
+          "<strong>Feb. 4</strong> - Census Day, Regular Spring 2026 Semester",
           "<strong>Feb. 12</strong> - Late Registration Final Payment Deadline, Spring 2026"
         ]} 
         speedSec={280}
         link="https://www.angelo.edu/current-students/registrar/academic_calendar.php"
       />
 
-      <h2 className="section-panel-header">Recreation Center</h2>
-      <p className="section-subtitle">
-        Fitness facilities, swimming, climbing, and recreational activities
-      </p>
+      <div className="page-header-with-square-button">
+        <div className="page-header-content">
+          <h2 className="section-panel-header">Recreation Center</h2>
+          <p className="section-subtitle">
+            Fitness facilities, swimming, climbing, and recreational activities
+          </p>
+        </div>
+      </div>
 
       <div className="facility-section">
         <div className="facility-tabs">
