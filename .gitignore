@@ -2,3 +2,7 @@ node_modules/
 *.log
 *.tmp 
 .env
+
+# SQLite WAL mode files (temporary files created automatically)
+*.db-shm
+*.db-wal
