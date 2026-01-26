@@ -110,8 +110,6 @@ async function startServer() {
     await db.init();
     await tutoringDb.init();
     
-    // TEMPORARILY DISABLED - Uncomment to re-enable cron jobs
-    /*
     // Daily scraper for facilities (library, recreation, dining, ram_tram)
     // Runs at midnight CST every day
     cron.schedule('0 0 * * *', async () => {
@@ -145,7 +143,6 @@ async function startServer() {
     }, {
       timezone: "America/Chicago" // CST/CDT for Texas
     });
-    */
 
     // Run scraper on startup (optional - for testing)
     // Only scrapes daily facilities, not tutoring (to save time during dev)
