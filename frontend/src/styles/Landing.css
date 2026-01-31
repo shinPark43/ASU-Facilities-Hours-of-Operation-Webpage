@@ -199,8 +199,7 @@
 }
 
 .team-info {
-  width: 33.2%;
-  max-width: 573px;
+  width: 50%;
   height: auto;
   left: 6.9%;
   top: 58%;
@@ -209,6 +208,27 @@
   letter-spacing: -0.96px;
   line-height: 1.5;
   white-space: pre-wrap;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.team-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.team-column-1 {
+  flex: 1;
+}
+
+.team-column-2 {
+  flex: 1;
+}
+
+.team-member {
+  margin-bottom: 0;
 }
 
 .team-member-name {
@@ -820,8 +840,7 @@
   
   .team-info {
     left: 6.9%;
-    width: auto;
-    max-width: 33.2%;
+    width: 40%;
   }
   
   .main-hero-heading {
