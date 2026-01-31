@@ -64,13 +64,21 @@
 /* Fixed Navigation Indicator */
 .fixed-scroll-indicator {
   position: fixed;
-  right: 10%;
-  top: 40%;
+  right: calc(10% - 20px);
+  top: calc(40% - 100px);
   z-index: 1000;
   pointer-events: all;
+  padding: 100px 20px;
+  height: 148px;
+  box-sizing: content-box;
+}
+
+.scroll-dots-container {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  transition: opacity 0.3s ease;
+  height: 100%;
 }
 
 .fixed-scroll-dot {
@@ -91,6 +99,81 @@
 .fixed-scroll-dot.active {
   background: #383535;
   width: 25px;
+}
+
+/* Section names menu - replaces dots on hover */
+.section-names-menu {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  width: 140px;
+  background: rgba(50, 50, 50, 0.95);
+  border-radius: 20px !important;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.section-names-menu.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hide dots when menu is visible */
+.fixed-scroll-indicator:hover .scroll-dots-container {
+  opacity: 0;
+}
+
+.section-name-item {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 6px 20px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.section-name-item:hover {
+  color: #ffffff;
+}
+
+.section-name-item.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Dark background sections (first and last) */
+.fixed-scroll-indicator.dark-section .fixed-scroll-dot {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.fixed-scroll-indicator.dark-section .fixed-scroll-dot.active {
+  background: #ffffff;
+}
+
+.fixed-scroll-indicator.dark-section .section-names-menu {
+  background: rgba(50, 50, 50, 0.95);
+}
+
+/* Light background sections */
+.fixed-scroll-indicator.light-section .fixed-scroll-dot {
+  background: #909090;
+}
+
+.fixed-scroll-indicator.light-section .fixed-scroll-dot.active {
+  background: #383535;
+}
+
+.fixed-scroll-indicator.light-section .section-names-menu {
+  background: rgba(50, 50, 50, 0.95);
 }
 
 /* Fixed Down Arrow Button - Original Design with Float Animation */
