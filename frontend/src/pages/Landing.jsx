@@ -28,8 +28,21 @@ import safari3 from '../assets/images/safari3.png';
 const Landing = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
   const containerRef = useRef(null);
   const totalSections = 8;
+
+  // Section names for navigation indicator
+  const sectionNames = [
+    'Home',
+    'About',
+    'Quick Access',
+    'Up-to-Date',
+    'Safari',
+    'Chrome',
+    'Samsung',
+    'Team'
+  ];
 
   // Scroll to specific section
   const scrollToSection = useCallback((sectionIndex) => {
@@ -112,16 +125,34 @@ const Landing = () => {
     <div className="landing-container" ref={containerRef}>
       {/* Navigation Indicators - Hidden on first section */}
       {currentSection !== 0 && (
-        <div className="fixed-scroll-indicator">
+      <div 
+        className={`fixed-scroll-indicator ${currentSection === 7 ? 'dark-section' : 'light-section'}`}
+        onMouseEnter={() => setIsMenuVisible(true)}
+        onMouseLeave={() => setIsMenuVisible(false)}
+      >
+        {/* Section names menu */}
+        <div className={`section-names-menu ${isMenuVisible ? 'visible' : ''}`}>
+          {sectionNames.map((name, i) => (
+            <button
+              key={i}
+              className={`section-name-item ${currentSection === i ? 'active' : ''}`}
+              onClick={() => scrollToSection(i)}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+        <div className="scroll-dots-container">
           {[...Array(totalSections)].map((_, i) => (
             <button
               key={i}
               className={`fixed-scroll-dot ${currentSection === i ? 'active' : ''}`}
               onClick={() => scrollToSection(i)}
-              aria-label={`Go to section ${i + 1}`}
+              aria-label={`Go to ${sectionNames[i]}`}
             ></button>
           ))}
         </div>
+      </div>
       )}
 
       {/* Down Arrow Button */}
@@ -287,14 +318,30 @@ const Landing = () => {
         <p className="section-heading team-heading">ASU Student Dev Team</p>
         <p className="section-subtitle">We create a better campus experience together</p>
         <div className="team-info">
-          <p className="team-member-name">Shin Park</p>
-          <p className="team-member-email">spark43@angelo.edu</p>
-          <p className="team-member-name">&nbsp;</p>
-          <p className="team-member-name">Dohyeong Kwon</p>
-          <p className="team-member-email">dkwon1@angelo.edu</p>
-          <p className="team-member-name">&nbsp;</p>
-          <p className="team-member-name">Yoona Nam</p>
-          <p className="team-member-email">ynam3@angelo.edu</p>
+          <div className="team-column team-column-1">
+            <div className="team-member">
+              <p className="team-member-name">Shin Park</p>
+              <p className="team-member-email">spark43@angelo.edu</p>
+            </div>
+            <div className="team-member">
+              <p className="team-member-name">Dohyeong Kwon</p>
+              <p className="team-member-email">dkwon1@angelo.edu</p>
+            </div>
+            <div className="team-member">
+              <p className="team-member-name">Yoona Nam</p>
+              <p className="team-member-email">ynam3@angelo.edu</p>
+            </div>
+          </div>
+          <div className="team-column team-column-2">
+            <div className="team-member">
+              <p className="team-member-name">Jane Ha</p>
+              <p className="team-member-email">jane.ha44@gmail.com</p>
+            </div>
+            <div className="team-member">
+              <p className="team-member-name">Bumjun Ko</p>
+              <p className="team-member-email">bko@angelo.edu</p>
+            </div>
+          </div>
         </div>
         <a className="social-icon instagram-icon" href="https://www.instagram.com/asuhours/?next=%2F" target="_blank" rel="noopener noreferrer">
           <img src={instagram_icon_team_page} alt="Instagram" />
