@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { HiOutlineMenu, HiOutlineX, HiOutlineHome, HiOutlineInformationCircle, HiOutlineDownload } from 'react-icons/hi';
+import { FaInstagram } from 'react-icons/fa';
 import '../styles/HamburgerMenu.css';
 
 const HamburgerMenu = () => {
@@ -103,6 +104,15 @@ const HamburgerMenu = () => {
             <p>ASU Facilities Hours</p>
             <p className="footer-subtitle">Real-time operating hours</p>
           </div>
+          <a
+            href="https://www.instagram.com/asuhours/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="menu-instagram-link"
+            aria-label="Follow us on Instagram"
+          >
+            <FaInstagram size={22} />
+          </a>
         </div>
       </div>
     </div>
