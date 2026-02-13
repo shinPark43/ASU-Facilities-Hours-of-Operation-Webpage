@@ -168,6 +168,17 @@ body {
   flex: 1;
 }
 
+.app-title-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.app-title-link:hover {
+  opacity: 0.9;
+}
+
 .app-title {
   font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 36px;

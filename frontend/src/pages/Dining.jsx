@@ -119,8 +119,9 @@ const Dining = () => {
 
       <AnnouncementBanner 
         items={[
-          "<strong>Feb. 12</strong> - Late Registration Final Payment Deadline, Spring 2026",
-          "<strong>Feb. 26</strong> - Last Day to Drop/Withdraw from the 1st 8-week Session"
+          "<strong>Feb. 23</strong> - Academic Advising Begins",
+          "<strong>Feb. 26</strong> - Last Day to Drop/Withdraw from the 1st 8-week Session",
+          "<strong>Click for more info</strong>"
         ]} 
         speedSec={280}
         link="https://www.angelo.edu/current-students/registrar/academic_calendar.php"

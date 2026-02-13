@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MobileTabBar from './MobileTabBar';
 import ScrollToTop from './ScrollToTop';
@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
   const location = useLocation();
   
   // Check if current page should show tab bar
-  const facilityPages = ['/library', '/gym', '/dining', '/tutoring'];
+  const facilityPages = ['/library', '/gym', '/dining', '/tutoring', '/ramtram'];
   const shouldShowTabBar = facilityPages.includes(location.pathname);
   
   // Check if current page is landing page
@@ -102,7 +102,9 @@ const Layout = ({ children }) => {
         <header className={`app-header ${isHeaderVisible ? 'visible' : 'hidden'}`}>
           <div className="header-content">
             <div className="header-text">
-              <h1 className="app-title">ASU Hours</h1>
+              <Link to="/library" className="app-title-link">
+                <h1 className="app-title">ASU Hours</h1>
+              </Link>
               <p className="app-subtitle">Weekly Operating Hours</p>
             </div>
             <div className="header-controls">
