@@ -197,6 +197,25 @@
   margin-top: 2px !important;
 }
 
+.menu-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu-instagram-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #E1306C;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.menu-instagram-link:active {
+  color: var(--text-secondary);
+  transform: scale(0.95);
+}
+
 /* Dark Theme Support - Minimal */
 [data-theme="dark"] .hamburger-button {
   background: transparent;

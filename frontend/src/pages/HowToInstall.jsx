@@ -12,7 +12,7 @@ const HowToInstall = () => {
       </div>
 
       <div className="install-card">
-        <div className="install-section">
+        <div className="install-page-content">
             <h3 className="facility-name">Mobile Installation Instructions</h3>
 
             <div className="install-platforms">
@@ -20,7 +20,7 @@ const HowToInstall = () => {
                 <h4 className="platform-title">For iOS (iPhone/iPad):</h4>
                 <ol className="install-steps">
                   <li>
-                    <strong>Scan the QR code</strong>: Use your phone's camera to scan the QR code below to access ASU Hours page
+                    <strong>Scan the QR code</strong>: Use your phone's camera to scan the QR code below to access ASU Hours page (skip this step if you're already viewing this on your phone)
                   </li>
                   <li>
                     <strong>Tap the Share button</strong>: Locate and tap the Share button (square with an arrow) at the bottom of the screen
@@ -35,7 +35,7 @@ const HowToInstall = () => {
                 <h4 className="platform-title">For Android:</h4>
                 <ol className="install-steps">
                   <li>
-                    <strong>Scan the QR code</strong>: Use your phone's camera to scan the QR code below to access ASU Hours page
+                    <strong>Scan the QR code</strong>: Use your phone's camera to scan the QR code below to access ASU Hours page (skip this step if you're already viewing this on your phone)
                   </li>
                   <li>
                     <strong>Access the menu</strong>: Tap the three dots (or three lines) in the top right corner of the browser

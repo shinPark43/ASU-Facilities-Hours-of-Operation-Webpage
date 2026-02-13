@@ -9,11 +9,11 @@
   box-shadow: 0 1px 3px var(--shadow-light), 0 4px 12px var(--shadow-medium);
 }
 
-.install-section {
+.install-page-content {
   padding: 0;
 }
 
-.install-section .facility-name {
+.install-page-content .facility-name {
   margin-top: 0;
   margin-bottom: 20px;
 }
