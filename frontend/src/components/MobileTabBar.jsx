@@ -3,13 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { HiOutlineBookOpen, HiOutlineAcademicCap } from 'react-icons/hi';
 import { FaDumbbell } from 'react-icons/fa';
 import { IoRestaurant } from 'react-icons/io5';
+import { TbBus } from 'react-icons/tb';
 import '../styles/MobileTabBar.css';
 
 const MobileTabBar = ({ isHeaderVisible = true }) => {
   const location = useLocation();
   
   // Only show tab bar on main facility pages
-  const facilityPages = ['/library', '/gym', '/dining', '/tutoring'];
+  const facilityPages = ['/library', '/gym', '/dining', '/tutoring', '/ramtram'];
   const shouldShowTabBar = facilityPages.includes(location.pathname);
   
   const isActive = (path) => {
@@ -25,7 +26,8 @@ const MobileTabBar = ({ isHeaderVisible = true }) => {
     { path: '/library', label: 'Library', icon: HiOutlineBookOpen },
     { path: '/gym', label: 'Recreation', icon: FaDumbbell },
     { path: '/dining', label: 'Dining', icon: IoRestaurant },
-    { path: '/tutoring', label: 'Tutoring', icon: HiOutlineAcademicCap }
+    { path: '/tutoring', label: 'Tutoring', icon: HiOutlineAcademicCap },
+    { path: '/ramtram', label: 'Ram Tram', icon: TbBus }
   ];
 
   return (

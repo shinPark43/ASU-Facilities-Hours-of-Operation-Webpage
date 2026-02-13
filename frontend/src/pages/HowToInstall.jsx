@@ -11,9 +11,8 @@ const HowToInstall = () => {
         </p>
       </div>
 
-      <div className="facility-section">
-        <div className="facility-content active">
-          <div className="install-section">
+      <div className="install-card">
+        <div className="install-section">
             <h3 className="facility-name">Mobile Installation Instructions</h3>
 
             <div className="install-platforms">
@@ -64,7 +63,6 @@ const HowToInstall = () => {
             </div>
           </div>
         </div>
-      </div>
 
       <div className="hours-info">
         <strong>Need help?</strong> If you're having trouble installing the app, try refreshing 
