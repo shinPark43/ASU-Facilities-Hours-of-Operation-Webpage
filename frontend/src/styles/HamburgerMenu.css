@@ -207,13 +207,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
+  color: #E1306C;
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.menu-instagram-link:hover {
-  color: #E1306C;
-  transform: scale(1.1);
+.menu-instagram-link:active {
+  color: var(--text-secondary);
+  transform: scale(0.95);
 }
 
 /* Dark Theme Support - Minimal */
