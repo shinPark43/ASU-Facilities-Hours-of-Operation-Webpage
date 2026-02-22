@@ -1037,3 +1037,226 @@
     height: 30px;
   }
 }
+
+/*
+ * iPad Pro (1024px) and below only.
+ * Applies when viewport width <= 1024px; desktop layout unchanged above that.
+ * Sizes use fixed px; adjust left/top (%) and font-size/width/height (px) as needed.
+ */
+@media (max-width: 1024px) {
+  /* Fixed "ASU Hours" title (top-left); above 1024px uses default left: 3.7%, top: 6% */
+  .section-title {
+    left: 9.8%;
+    top: 6.4%;
+    font-size: 40px;
+  }
+
+  /* Main heading: "Real-Time Operating Hours For ASU Facilities" */
+  .main-hero-heading {
+    left: 9.3%;
+    top: 11.2%;
+    font-size: 78px;
+    width: auto;
+  }
+
+  /* Subheading: "Anytime, Anywhere / Access with Mobile Device" */
+  .hero-feature-text {
+    left: 24%;
+    top: 88.3%;
+    font-size: 20px;
+    width: auto;
+  }
+
+  /* Left phone image (!important needed to override base left) */
+  .hero-image-1 {
+    left: 14% !important;
+    top: 34%;
+    width: 320px;
+    max-height: 700px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Right phone image */
+  .hero-image-2 {
+    left: 55% !important;
+    top: 34%;
+    width: 320px;
+    max-height: 700px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* QR code image */
+  .hero-icon {
+    left: 10%;
+    top: 83%;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+  }
+
+  /* ========== Section 1: The All-in-One / Campus Operating Hours App ========== */
+  .hero-section .hero-heading {
+    left: 9.4%;
+    top: 26.7%;
+    font-size: 80px;
+    width: 90%;
+  }
+  /* iPad and below: line break after "Campus Operating", "Hours App" on second line */
+  .hero-section .hero-heading .hero-heading-line2 {
+    display: block;
+  }
+  .hero-section .hero-description {
+    left: 10%;
+    top: 50%;
+    font-size: 45px;
+    width: 90%;
+  }
+
+  /* ========== Section 2: Quick Mobile Access ========== */
+  .landing-section[data-section="2"] .section-heading {
+    left: 9.4%;
+    top: 26.7%;
+    font-size: 80px;
+    width: 90%;
+  }
+  .landing-section[data-section="2"] .section-description {
+    left: 10%;
+    top: 35.5%;
+    font-size: 45px;
+    width: 90%;
+  }
+  /* iPad and below: line break after "can check essential information"; "instantly from their phones" on one line */
+  .landing-section[data-section="2"] .section2-ipad-br {
+    display: block;
+  }
+  .landing-section[data-section="2"] .section2-desktop-br {
+    display: none;
+  }
+
+  /* ========== Section 3: Up-to-Date Information ========== */
+  .landing-section[data-section="3"] .section-heading {
+    left: 9.7%;
+    top: 26.7%;
+    font-size: 70px;
+    width: 90%;
+  }
+  .landing-section[data-section="3"] .section-description {
+    left: 9.7%;
+    top: 35%;
+    font-size: 42px;
+    width: 90%;
+  }
+
+  /* ========== Section 4: How to install - Safari ========== */
+  .landing-section[data-section="4"] .install-guide-title {
+    left: 20.0%;
+    top: 25.7%;
+    font-size: 60px;
+  }
+  .landing-section[data-section="4"] .install-guide-row {
+    left: 9.7%;
+    top: 35%;
+    width: 92%;
+  }
+  .landing-section[data-section="4"] .install-guide-img {
+    height: 400px;
+    max-height: 50vh;
+  }
+  .landing-section[data-section="4"] .install-guide-label {
+    font-size: 30px;
+  }
+
+  /* ========== Section 5: How to install - Chrome ========== */
+  .landing-section[data-section="5"] .install-guide-title {
+    left: 17.0%;
+    top: 25.7%;
+    font-size: 60px;
+  }
+  .landing-section[data-section="5"] .install-guide-row {
+    left: 2.0%;
+    top: 35%;
+    width: 92%;
+  }
+  .landing-section[data-section="5"] .install-guide-img {
+    height: 400px;
+    max-height: 50vh;
+  }
+  .landing-section[data-section="5"] .install-guide-label {
+    font-size: 20px;
+  }
+
+  /* ========== Section 6: How to install - Samsung Internet ========== */
+  .landing-section[data-section="6"] .install-guide-title {
+    position: absolute !important;
+    left: 15.1% !important;
+    top: 25.7% !important;
+    font-size: 60px;
+  }
+  .landing-section[data-section="6"] .samsung-title-internet {
+    display: none;
+  }
+  .landing-section[data-section="6"] .install-guide-row {
+    position: absolute !important;
+    left: 2.7% !important;
+    top: 35% !important;
+    width: 92%;
+  }
+  .landing-section[data-section="6"] .install-guide-img {
+    height: 400px;
+    max-height: 50vh;
+  }
+  .landing-section[data-section="6"] .install-guide-label {
+    font-size: 20px;
+  }
+
+  /* ========== Section 7: ASU Student Dev Team ========== */
+  .team-section .team-heading {
+    left: 9.8% !important;
+    top: 23% !important;
+    font-size: 70px;
+    width: 90%;
+  }
+  .team-section .section-subtitle {
+    left: 9.8%;
+    top: 29.5% !important;
+    font-size: 30px;
+    width: 90%;
+  }
+  .team-section .team-info {
+    left: 10% !important;
+    top: 40.9% !important;
+    width: 86%;
+  }
+  .team-section .team-member-name {
+    font-size: 30px;
+  }
+  .team-section .team-member-email {
+    font-size: 23px;
+  }
+  .team-section .email-icon {
+    left: 9.8%;
+    top: 35.0%;
+    width: 50px;
+    height: 50px;
+  }
+  .team-section .youtube-icon {
+    left: 16.8%;
+    top: 35.0%;
+    width: 50px;
+    height: 50px;
+  }
+  .team-section .instagram-icon {
+    left: 23.8%;
+    top: 35.0%;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/*
+  Landing page mobile (phone, tablet) optimization in progress.
+  iPad Air, iPhone 12, iPhone 12 Pro Max versions to be added.
+  To be done by Bumjun.
+*/

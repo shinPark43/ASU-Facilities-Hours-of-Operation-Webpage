@@ -220,8 +220,7 @@ const Landing = () => {
         <p className="section-heading">Quick Mobile Access</p>
         <div className="section-description">
           <p>Students and faculty</p>
-          <p>can check essential information instantly</p>
-          <p>from their phones</p>
+          <p>can check essential information <span className="section2-ipad-br"></span><span className="section2-line2">instantly <br className="section2-desktop-br" />from their phones</span></p>
           <p>without repeating searches.</p>
         </div>
       </div>
@@ -289,7 +288,7 @@ const Landing = () => {
       {/* Seventh page (How to Install3)- Section 6 */}
       <div className="landing-section install-section" data-section="6">
         <div className="section-gradient"></div>
-        <p className="install-guide-title">How to install - Samsung Internet</p>
+        <p className="install-guide-title">How to install - Samsung<span className="samsung-title-internet"> Internet</span></p>
         <div className="install-guide-row samsung-internet-row">
           <div className="install-guide-item">
             <img src={si1} alt="Samsung Internet Step 1" className="install-guide-img" />
