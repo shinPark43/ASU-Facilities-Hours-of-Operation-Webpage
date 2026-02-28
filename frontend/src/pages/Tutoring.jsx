@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { tutoringAPI } from '../services/api.js';
 import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
 
@@ -25,6 +26,7 @@ const Tutoring = () => {
   const [error, setError] = useState(null);
   const [tutoringData, setTutoringData] = useState(null);
   const [activeSubject, setActiveSubject] = useState(null);
+  const [searchParams] = useSearchParams();
   const [expandedCourses, setExpandedCourses] = useState({});
   const [showNoticePopup, setShowNoticePopup] = useState(false);
 
@@ -59,6 +61,19 @@ const Tutoring = () => {
 
     fetchTutoringData();
   }, []);
+
+  useEffect(() => {
+    const subjectParam = searchParams.get('subject');
+    if (!subjectParam || !tutoringData) return;
+    if (!tutoringData.subjects[subjectParam]) return;
+    setActiveSubject(subjectParam);
+    const subjectCourses = tutoringData.subjects[subjectParam]?.courses;
+    if (subjectCourses && Object.keys(subjectCourses).length === 1) {
+      setExpandedCourses({ [Object.keys(subjectCourses)[0]]: true });
+    } else {
+      setExpandedCourses({});
+    }
+  }, [searchParams, tutoringData]);
 
   const toggleCourse = (courseName) => {
     setExpandedCourses(prev => ({

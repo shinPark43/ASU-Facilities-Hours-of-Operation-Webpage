@@ -102,7 +102,7 @@ const Layout = ({ children }) => {
         <header className={`app-header ${isHeaderVisible ? 'visible' : 'hidden'}`}>
           <div className="header-content">
             <div className="header-text">
-              <Link to="/library" className="app-title-link">
+              <Link to="/home" className="app-title-link">
                 <h1 className="app-title">ASU Hours</h1>
               </Link>
               <p className="app-subtitle">Weekly Operating Hours</p>

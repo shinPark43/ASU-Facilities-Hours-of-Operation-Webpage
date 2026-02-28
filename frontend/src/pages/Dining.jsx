@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { facilityAPI } from '../services/api.js';
 import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, normalizeTimeFormat, isToday } from '../utils/timeUtils.js';
-import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
 
 const Dining = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hours, setHours] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
+  const [searchParams] = useSearchParams();
   const [showNotice, setShowNotice] = useState(() => {
     // Notice only applies to Jan 24-25, 2026
     const today = new Date();
@@ -59,6 +60,12 @@ const Dining = () => {
 
     fetchDiningHours();
   }, []);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (!tabParam || !hours) return;
+    if (hours[tabParam]) setActiveTab(tabParam);
+  }, [searchParams, hours]);
 
   if (loading) {
     return (
@@ -116,16 +123,6 @@ const Dining = () => {
           </div>
         </div>
       )}
-
-      <AnnouncementBanner 
-        items={[
-          "<strong>Feb. 23</strong> - Academic Advising Begins",
-          "<strong>Feb. 26</strong> - Last Day to Drop/Withdraw from the 1st 8-week Session",
-          "<strong>Click for more info</strong>"
-        ]} 
-        speedSec={280}
-        link="https://www.angelo.edu/current-students/registrar/academic_calendar.php"
-      />
 
       <div className="page-header-with-square-button">
         <div className="page-header-content">

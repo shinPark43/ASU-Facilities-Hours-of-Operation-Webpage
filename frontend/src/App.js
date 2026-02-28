@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
+import Home from './pages/Home';
 import Gym from './pages/Gym';
 import Library from './pages/Library';
 import Dining from './pages/Dining';
@@ -16,6 +17,7 @@ function App() {
     <Router basename="/ASU-Facilities-Hours-of-Operation-Webpage">
       <Layout>
         <Routes>
+          <Route path="/home" element={<Home />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/library" element={<Library />} />
           <Route path="/gym" element={<Gym />} />
@@ -24,9 +26,9 @@ function App() {
           <Route path="/tutoring" element={<Tutoring />} />
           <Route path="/about" element={<About />} />
           <Route path="/install" element={<HowToInstall />} />
-          <Route path="/" element={<Navigate to="/library" replace />} />
-          {/* Catch all undefined routes and redirect to library */}
-          <Route path="*" element={<Navigate to="/library" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          {/* Catch all undefined routes and redirect to home */}
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </Layout>
     </Router>
