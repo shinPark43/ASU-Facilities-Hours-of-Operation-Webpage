@@ -414,6 +414,30 @@
   padding: 0 0 2rem;
 }
 
+.section-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+}
+
+.section-header-row .home-section-title {
+  margin-bottom: 0;
+}
+
+.section-view-all {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.15s;
+}
+
+.section-view-all:hover {
+  color: var(--text-primary, #111);
+}
+
 .highlights-scroll {
   display: flex;
   gap: 10px;
@@ -428,6 +452,7 @@
 
 .highlight-card {
   min-width: 240px;
+  max-width: 240px;
   border-radius: 16px;
   padding: 18px 20px 20px;
   flex-shrink: 0;
@@ -471,7 +496,7 @@
 .highlight-badge.amber { color: rgba(255, 255, 255, 0.55); }
 
 .highlight-card-title {
-  font-size: 1.05rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: #ffffff;
   margin-bottom: 10px;
@@ -540,4 +565,14 @@
 .instagram-cta-arrow {
   font-size: 0.9rem;
   opacity: 0.40;
+}
+
+/* ─── 5. Footer ───────────────────────────────────────────── */
+
+.home-footer-text {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding-bottom: 1.5rem;
+  opacity: 0.6;
 }

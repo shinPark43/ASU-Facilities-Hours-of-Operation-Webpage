@@ -280,6 +280,13 @@ export const fetchFacilityData = async (facilityType) => {
 };
 
 /**
+ * API functions for academic calendar events
+ */
+export const calendarAPI = {
+  getUpcoming: () => apiRequest('/api/calendar/upcoming'),
+};
+
+/**
  * Health check function to test API connectivity
  */
 export const checkAPIHealth = async () => {

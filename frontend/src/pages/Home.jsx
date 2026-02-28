@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlineBookOpen, HiOutlineAcademicCap, HiOutlineSearch } from 'react-icons/hi';
 import { FaDumbbell, FaInstagram, FaUtensils } from 'react-icons/fa';
 import { TbBus } from 'react-icons/tb';
-import { fetchFacilityData, tutoringAPI } from '../services/api.js';
+import { fetchFacilityData, tutoringAPI, calendarAPI } from '../services/api.js';
 import { getCurrentDayName, isClosedTime, parseMultipleTimeRanges } from '../utils/timeUtils.js';
 import '../styles/Home.css';
 
@@ -52,22 +52,11 @@ const FACILITY_CONFIGS = [
 ];
 
 const HIGHLIGHT_CARDS = [
-  {
-    badgeVariant: 'red',
-    accentColor: 'red',
-    badge: 'CRITICAL',
-    title: 'Last Day to Drop',
-    subtitle: 'Feb. 26 · Last day to drop the 1st 8-week session',
-    link: 'https://www.angelo.edu/current-students/registrar/academic_calendar.php',
-  },
-  {
-    badgeVariant: 'amber',
-    accentColor: 'amber',
-    badge: 'UPCOMING',
-    title: 'Academic Advising',
-    subtitle: 'Feb. 23 · Advising opens for next term',
-    link: 'https://www.angelo.edu/current-students/registrar/academic_calendar.php',
-  },
+  { id: 'hc-1', accentColor: 'red',   badge: 'DEADLINE', title: 'Loading…', subtitle: '' },
+  { id: 'hc-2', accentColor: 'amber', badge: 'UPCOMING', title: 'Loading…', subtitle: '' },
+  { id: 'hc-3', accentColor: 'amber', badge: 'UPCOMING', title: 'Loading…', subtitle: '' },
+  { id: 'hc-4', accentColor: 'amber', badge: 'UPCOMING', title: 'Loading…', subtitle: '' },
+  { id: 'hc-5', accentColor: 'amber', badge: 'UPCOMING', title: 'Loading…', subtitle: '' },
 ];
 
 const getClosingTime = (str) => {
@@ -81,6 +70,7 @@ const getClosingTime = (str) => {
 const Home = () => {
   const [facilityData, setFacilityData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [calendarEvents, setCalendarEvents] = useState(HIGHLIGHT_CARDS);
   const [now, setNow] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
@@ -93,12 +83,13 @@ const Home = () => {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes] = await Promise.allSettled([
+      const [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes, calendarRes] = await Promise.allSettled([
         fetchFacilityData('library'),
         fetchFacilityData('recreation'),
         fetchFacilityData('dining'),
         fetchFacilityData('ram_tram'),
         tutoringAPI.getAllTutoringData(),
+        calendarAPI.getUpcoming(),
       ]);
 
       const responses = [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes];
@@ -109,6 +100,10 @@ const Home = () => {
           results[key] = responses[i].value;
         }
       });
+
+      if (calendarRes.status === 'fulfilled' && calendarRes.value?.data?.length > 0) {
+        setCalendarEvents(calendarRes.value.data);
+      }
 
       setFacilityData(results);
       setLoading(false);
@@ -337,21 +332,36 @@ const Home = () => {
 
       {/* 3. Academic Highlights */}
       <section className="highlights-section">
-        <h2 className="home-section-title">Academic Highlights</h2>
+        <div className="section-header-row">
+          <h2 className="home-section-title">Academic Highlights</h2>
+          <a
+            href="https://www.angelo.edu/current-students/registrar/academic_calendar.php"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="section-view-all"
+          >
+            View All →
+          </a>
+        </div>
         <div className="highlights-scroll">
-          {HIGHLIGHT_CARDS.map((card) => (
+          {calendarEvents.map((card, i) => {
+            const accentColor = i === 0 ? 'red' : 'amber';
+            return (
             <a
-              key={card.title}
-              href={card.link}
+              key={card.id || card.title + i}
+              href={card.link || 'https://www.angelo.edu/current-students/registrar/academic_calendar.php'}
               target="_blank"
               rel="noopener noreferrer"
-              className={`highlight-card accent-${card.accentColor}`}
+              className={`highlight-card accent-${accentColor}`}
             >
-              <span className={`highlight-badge ${card.badgeVariant}`}>{card.badge}</span>
+              <span className={`highlight-badge ${accentColor === 'red' ? 'red' : 'amber'}`}>
+                {card.badge}
+              </span>
               <p className="highlight-card-title">{card.title}</p>
-              <p className="highlight-card-subtitle">{card.subtitle}</p>
+              <p className="highlight-card-subtitle">{card.subtitle || card.date}</p>
             </a>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -372,6 +382,9 @@ const Home = () => {
           <span className="instagram-cta-arrow">→</span>
         </a>
       </section>
+
+      {/* 5. Footer */}
+      <p className="home-footer-text">ASU Hours is developed and maintained by ASU students.</p>
     </div>
   );
 };
