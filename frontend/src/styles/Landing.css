@@ -176,6 +176,11 @@
   background: rgba(50, 50, 50, 0.95);
 }
 
+/* Hamburger menu - hidden on desktop, shown on iPad and smaller */
+.hamburger-nav {
+  display: none;
+}
+
 /* Fixed Down Arrow Button - Original Design with Float Animation */
 .fixed-down-arrow {
   position: fixed;
@@ -1044,6 +1049,81 @@
  * Sizes use fixed px; adjust left/top (%) and font-size/width/height (px) as needed.
  */
 @media (max-width: 1024px) {
+  /* Hide desktop scroll indicator, show hamburger menu */
+  .fixed-scroll-indicator {
+    display: none !important;
+  }
+  .hamburger-nav {
+    display: block;
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 1000;
+  }
+  .hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    z-index: 1001;
+  }
+  .hamburger-line {
+    display: block;
+    width: 44px;
+    height: 5px;
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+  .hamburger-light .hamburger-line {
+    background: #333;
+  }
+  .hamburger-dark .hamburger-line {
+    background: #fff;
+  }
+  .hamburger-menu {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    width: 160px;
+    background: rgba(50, 50, 50, 0.95);
+    border-radius: 16px;
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+  }
+  .hamburger-menu.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .hamburger-menu .section-name-item {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 10px 20px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    text-align: center;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+  .hamburger-menu .section-name-item:hover {
+    color: #ffffff;
+  }
+  .hamburger-menu .section-name-item.active {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
   /* Fixed "ASU Hours" title (top-left); above 1024px uses default left: 3.7%, top: 6% */
   .section-title {
     left: 9.8%;
@@ -1051,38 +1131,41 @@
     font-size: 40px;
   }
 
-  /* Main heading: "Real-Time Operating Hours For ASU Facilities" */
+  /* Main heading: "Real-Time Operating Hours" on one line, "For ASU Facilities" below */
   .main-hero-heading {
     left: 9.3%;
     top: 11.2%;
-    font-size: 78px;
+    font-size: 70px;
     width: auto;
+  }
+  .main-hero-heading .hero-heading-desktop-br {
+    display: none;
   }
 
   /* Subheading: "Anytime, Anywhere / Access with Mobile Device" */
   .hero-feature-text {
     left: 24%;
-    top: 88.3%;
+    top: 90.3%;
     font-size: 20px;
     width: auto;
   }
 
   /* Left phone image (!important needed to override base left) */
   .hero-image-1 {
-    left: 14% !important;
-    top: 34%;
-    width: 320px;
-    max-height: 700px;
+    left: 5.3% !important;
+    top: 25%;
+    width: 450px;
+    max-height: 800px;
     height: auto;
     object-fit: contain;
   }
 
   /* Right phone image */
   .hero-image-2 {
-    left: 55% !important;
-    top: 34%;
-    width: 320px;
-    max-height: 700px;
+    left: 51.5% !important;
+    top: 25%;
+    width: 450px;
+    max-height: 800px;
     height: auto;
     object-fit: contain;
   }
@@ -1090,7 +1173,7 @@
   /* QR code image */
   .hero-icon {
     left: 10%;
-    top: 83%;
+    top: 85%;
     width: 120px;
     height: 120px;
     object-fit: contain;

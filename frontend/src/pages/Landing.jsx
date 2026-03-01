@@ -155,6 +155,30 @@ const Landing = () => {
       </div>
       )}
 
+      {/* Hamburger menu - iPad and smaller only, always visible */}
+      <div className="hamburger-nav">
+        <button
+          className={`hamburger-btn ${currentSection === 0 || currentSection === 7 ? 'hamburger-dark' : 'hamburger-light'}`}
+          onClick={() => setIsMenuVisible(!isMenuVisible)}
+          aria-label="Toggle navigation menu"
+        >
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+        </button>
+        <div className={`hamburger-menu ${isMenuVisible ? 'visible' : ''}`}>
+          {sectionNames.map((name, i) => (
+            <button
+              key={i}
+              className={`section-name-item ${currentSection === i ? 'active' : ''}`}
+              onClick={() => { scrollToSection(i); setIsMenuVisible(false); }}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Down Arrow Button */}
       {currentSection < totalSections - 1 && (
         <button 
@@ -187,8 +211,7 @@ const Landing = () => {
         </div> */}
         
         <div className="main-hero-heading">
-          <p>Real-Time</p>
-          <p>Operating Hours</p>
+          <p>Real-Time<br className="hero-heading-desktop-br" /> Operating Hours</p>
           <p>For ASU Facilities</p>
         </div>
         <img className="hero-icon" src={imgQrCode} alt="QR Code" />
