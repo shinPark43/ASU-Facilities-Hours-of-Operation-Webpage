@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { facilityAPI } from '../services/api.js';
 import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, isToday } from '../utils/timeUtils.js';
-import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
+
+const facilityTabs = [
+  { id: 'main-library', label: 'Main Library', key: 'Main Library' },
+  { id: 'research-desk', label: 'Research Assistance', key: 'Research Assistance Desk' },
+  { id: 'west-texas', label: 'West Texas', key: 'West Texas Collection' }
+];
 
 const Library = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hours, setHours] = useState(null);
   const [activeTab, setActiveTab] = useState('main-library');
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const fetchLibraryHours = async () => {
@@ -29,6 +36,13 @@ const Library = () => {
     fetchLibraryHours();
   }, []);
 
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (!tabParam) return;
+    const matched = facilityTabs.find(t => t.key === tabParam);
+    if (matched) setActiveTab(matched.id);
+  }, [searchParams]);
+
   if (loading) {
     return (
       <div className="loading">
@@ -46,24 +60,8 @@ const Library = () => {
     );
   }
 
-  const facilityTabs = [
-    { id: 'main-library', label: 'Main Library', key: 'Main Library' },
-    { id: 'research-desk', label: 'Research Assistance', key: 'Research Assistance Desk' },
-    { id: 'west-texas', label: 'West Texas', key: 'West Texas Collection' }
-  ];
-
   return (
     <div>
-      <AnnouncementBanner 
-        items={[
-          "<strong>Feb. 23</strong> - Academic Advising Begins",
-          "<strong>Feb. 26</strong> - Last Day to Drop/Withdraw from the 1st 8-week Session",
-          "<strong>Click for more info</strong>"
-        ]} 
-        speedSec={280}
-        link="https://www.angelo.edu/current-students/registrar/academic_calendar.php"
-      />
-
       <div className="page-header-with-square-button">
         <div className="page-header-content">
           <h2 className="section-panel-header">Porter Henderson Library</h2>

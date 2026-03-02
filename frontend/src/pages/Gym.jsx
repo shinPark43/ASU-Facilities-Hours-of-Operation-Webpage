@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { facilityAPI } from '../services/api.js';
 import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, isToday } from '../utils/timeUtils.js';
-import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
 
 const Gym = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('CHP (Fitness Center)');
   const [facilities, setFacilities] = useState(null);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const fetchRecreationHours = async () => {
@@ -28,6 +29,12 @@ const Gym = () => {
 
     fetchRecreationHours();
   }, []);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (!tabParam) return;
+    setActiveTab(tabParam);
+  }, [searchParams]);
 
   if (loading) {
     return (
@@ -59,16 +66,6 @@ const Gym = () => {
 
   return (
     <div>
-      <AnnouncementBanner 
-        items={[
-          "<strong>Feb. 23</strong> - Academic Advising Begins",
-          "<strong>Feb. 26</strong> - Last Day to Drop/Withdraw from the 1st 8-week Session",
-          "<strong>Click for more info</strong>"
-        ]} 
-        speedSec={280}
-        link="https://www.angelo.edu/current-students/registrar/academic_calendar.php"
-      />
-
       <div className="page-header-with-square-button">
         <div className="page-header-content">
           <h2 className="section-panel-header">Recreation Center</h2>

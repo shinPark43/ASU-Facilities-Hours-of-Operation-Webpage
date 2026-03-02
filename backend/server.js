@@ -9,6 +9,7 @@ const db = require('./src/database');
 const tutoringDb = require('./src/tutoring-database');
 const facilityRoutes = require('./src/routes/facilities');
 const tutoringRoutes = require('./src/routes/tutoring');
+const calendarRoutes = require('./src/routes/calendar');
 const scraper = require('./src/scraper');
 
 const app = express();
@@ -41,6 +42,7 @@ app.use('/api/', limiter); // Apply rate limiting to API routes only
 // Routes
 app.use('/api/facilities', facilityRoutes);
 app.use('/api/tutoring', tutoringRoutes);
+app.use('/api/calendar', calendarRoutes);
 
 // Enhanced health check endpoint
 app.get('/api/health', async (req, res) => {
