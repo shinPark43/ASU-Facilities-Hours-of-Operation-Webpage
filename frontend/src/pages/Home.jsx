@@ -67,6 +67,33 @@ const getClosingTime = (str) => {
   return match ? match[1].trim() : null;
 };
 
+const isCurrentlyRunning = (timeString, now) => {
+  if (!timeString) return false;
+  // Matches: "4:30 - 8:30 p.m."  or  "11:30 a.m. - 11:30 p.m."
+  const match = timeString.match(
+    /(\d{1,2}):(\d{2})\s*(?:([ap])\.?m?\.?)?\s*[-–]\s*(\d{1,2}):(\d{2})\s*([ap])\.?m?\.?/i
+  );
+  if (!match) return false;
+
+  const toMins = (h, m, period) => {
+    let hrs = parseInt(h);
+    const mins = parseInt(m);
+    const p = period.toLowerCase();
+    if (p === 'p' && hrs !== 12) hrs += 12;
+    if (p === 'a' && hrs === 12) hrs = 0;
+    return hrs * 60 + mins;
+  };
+
+  const endPeriod   = match[6];                          // always present
+  const startPeriod = match[3] ? match[3] : endPeriod;  // infer from end if missing
+
+  const startMins = toMins(match[1], match[2], startPeriod);
+  const endMins   = toMins(match[4], match[5], endPeriod);
+  const nowMins   = now.getHours() * 60 + now.getMinutes();
+
+  return nowMins >= startMins && nowMins < endMins;
+};
+
 const Home = () => {
   const [facilityData, setFacilityData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -136,7 +163,8 @@ const Home = () => {
         return { isOpen: false, hoursStr: 'Not running today' };
       }
       if (isObject) {
-        return { isOpen: true, hoursStr: `${todayValue.time} · ${todayValue.route}` };
+        const currentlyRunning = isCurrentlyRunning(todayValue.time, now);
+        return { isOpen: currentlyRunning, hoursStr: `${todayValue.time} · ${todayValue.route}` };
       }
       return { isOpen: false, hoursStr: todayValue };
     }
@@ -166,7 +194,7 @@ const Home = () => {
         return (
           <div className="status-row">
             <span className="status-dot" />
-            <span className="facility-status-text open">{hoursStr}</span>
+            <span className="facility-status-text open">Running</span>
           </div>
         );
       }

@@ -130,6 +130,16 @@
   overflow-y: auto;
 }
 
+.menu-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 8px 20px;
+}
+
+[data-theme="dark"] .menu-divider {
+  background: var(--border-color);
+}
+
 .menu-item {
   display: flex;
   align-items: center;

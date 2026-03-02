@@ -44,6 +44,10 @@
   padding: 12px 16px;
   text-decoration: none;
   color: rgba(0, 0, 0, 0.6);
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
   font-weight: 500;
   font-size: 13px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -150,6 +154,70 @@
 
 [data-theme="dark"] .tab-item.active .tab-label {
   color: var(--asu-blue-light);
+}
+
+/* Bottom sheet backdrop */
+.more-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 85;
+}
+
+/* Sheet panel — slides up from above the tab bar */
+.more-sheet {
+  position: fixed;
+  bottom: 72px;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+  z-index: 88;
+  padding: 8px 0 12px;
+  animation: sheetSlideUp 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.more-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+.more-sheet-item:hover { background: var(--bg-tertiary); }
+.more-sheet-item.active { color: var(--asu-blue); }
+.more-sheet-item-icon {
+  display: flex;
+  align-items: center;
+  width: 28px;
+  color: inherit;
+}
+.more-sheet-item-arrow {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+[data-theme="dark"] .more-sheet {
+  background: var(--bg-secondary);
+  border-top-color: var(--border-color);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .more-sheet-item.active { color: var(--asu-blue-light); }
+
+@media (max-width: 480px) {
+  .more-sheet { bottom: 68px; }
 }
 
 /* Show only on mobile */

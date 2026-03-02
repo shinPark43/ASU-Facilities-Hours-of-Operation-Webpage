@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { HiOutlineMenu, HiOutlineX, HiOutlineHome, HiOutlineInformationCircle, HiOutlineDownload } from 'react-icons/hi';
-import { FaInstagram } from 'react-icons/fa';
+import { HiOutlineMenu, HiOutlineX, HiOutlineHome, HiOutlineInformationCircle,
+         HiOutlineDownload, HiOutlineBookOpen, HiOutlineAcademicCap } from 'react-icons/hi';
+import { FaInstagram, FaDumbbell } from 'react-icons/fa';
+import { IoRestaurant } from 'react-icons/io5';
+import { TbBus } from 'react-icons/tb';
 import '../styles/HamburgerMenu.css';
 
 const HamburgerMenu = () => {
@@ -10,10 +13,18 @@ const HamburgerMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const menuItems = [
-    { path: '/library', label: 'Home', icon: HiOutlineHome },
-    { path: '/install', label: 'How to Install', icon: HiOutlineDownload },
-    { path: '/about', label: 'About', icon: HiOutlineInformationCircle }
+  const facilityItems = [
+    { path: '/home',     label: 'Home',          icon: HiOutlineHome },
+    { path: '/library',  label: 'Library',        icon: HiOutlineBookOpen },
+    { path: '/gym',      label: 'Gym',            icon: FaDumbbell },
+    { path: '/dining',   label: 'Dining',         icon: IoRestaurant },
+    { path: '/tutoring', label: 'Tutoring',       icon: HiOutlineAcademicCap },
+    { path: '/ramtram',  label: 'Ram Tram',       icon: TbBus },
+  ];
+
+  const utilityItems = [
+    { path: '/install',  label: 'How to Install', icon: HiOutlineDownload },
+    { path: '/about',    label: 'About',          icon: HiOutlineInformationCircle },
   ];
 
   const toggleMenu = () => {
@@ -79,7 +90,7 @@ const HamburgerMenu = () => {
         </div>
         
         <nav className="menu-nav">
-          {menuItems.map((item) => {
+          {facilityItems.map((item) => {
             const IconComponent = item.icon;
             return (
               <button
@@ -87,13 +98,22 @@ const HamburgerMenu = () => {
                 className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
                 onClick={() => handleMenuItemClick(item.path)}
               >
-                <span className="menu-icon">
-                  <IconComponent size={22} />
-                </span>
+                <span className="menu-icon"><IconComponent size={22} /></span>
                 <span className="menu-label">{item.label}</span>
-                {location.pathname === item.path && (
-                  <span className="active-indicator">•</span>
-                )}
+              </button>
+            );
+          })}
+          <div className="menu-divider" />
+          {utilityItems.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <button
+                key={item.path}
+                className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
+                onClick={() => handleMenuItemClick(item.path)}
+              >
+                <span className="menu-icon"><IconComponent size={22} /></span>
+                <span className="menu-label">{item.label}</span>
               </button>
             );
           })}
