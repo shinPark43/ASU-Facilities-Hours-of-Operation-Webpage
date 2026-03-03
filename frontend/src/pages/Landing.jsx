@@ -29,8 +29,20 @@ const Landing = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [chromeActiveStep, setChromeActiveStep] = useState(0);
   const containerRef = useRef(null);
+  const chromeCarouselRef = useRef(null);
   const totalSections = 8;
+  const chromeOnboardingSteps = [
+    { image: chrome1, label: 'Tap menu icon' },
+    { image: chrome2, label: 'Add to Home screen' },
+    { image: chrome3, label: 'Tap Install' },
+    { image: chrome4, label: 'Confirm Install' }
+  ];
+  const chromeOnboardingPages = [
+    chromeOnboardingSteps.slice(0, 2),
+    chromeOnboardingSteps.slice(2, 4)
+  ];
 
   // Section names for navigation indicator
   const sectionNames = [
@@ -120,6 +132,28 @@ const Landing = () => {
       scrollToSection(currentSection + 1);
     }
   };
+
+  const handleChromeCarouselScroll = useCallback(() => {
+    const carousel = chromeCarouselRef.current;
+    if (!carousel) return;
+    const stepWidth = carousel.clientWidth;
+    if (!stepWidth) return;
+
+    const nextStep = Math.round(carousel.scrollLeft / stepWidth);
+    const boundedStep = Math.max(0, Math.min(chromeOnboardingPages.length - 1, nextStep));
+    setChromeActiveStep(boundedStep);
+  }, [chromeOnboardingPages.length]);
+
+  const scrollToChromeStep = useCallback((stepIndex) => {
+    const carousel = chromeCarouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollTo({
+      left: stepIndex * carousel.clientWidth,
+      behavior: 'smooth'
+    });
+    setChromeActiveStep(stepIndex);
+  }, []);
 
   return (
     <div className="landing-container" ref={containerRef}>
@@ -305,6 +339,45 @@ const Landing = () => {
             <img src={chrome4} alt="Chrome Step 4" className="install-guide-img" />
             <p className="install-guide-label">Confirm Install</p>
           </div>
+        </div>
+        <div className="chrome-onboarding-wrapper" aria-label="Chrome installation onboarding cards">
+          <article className="chrome-onboarding-card">
+            <div
+              className="chrome-onboarding-carousel"
+              ref={chromeCarouselRef}
+              onScroll={handleChromeCarouselScroll}
+            >
+              {chromeOnboardingPages.map((pageSteps, pageIndex) => (
+                <div className="chrome-onboarding-slide" key={`chrome-page-${pageIndex}`}>
+                  <div className="chrome-onboarding-pair">
+                    {pageSteps.map((step, stepIndex) => (
+                      <div className="chrome-onboarding-panel" key={step.label}>
+                        <div className="chrome-onboarding-media">
+                          <img
+                            src={step.image}
+                            alt={`Chrome onboarding step ${pageIndex * 2 + stepIndex + 1}`}
+                            className="chrome-onboarding-image"
+                          />
+                        </div>
+                        <p className="chrome-onboarding-text">{step.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="chrome-onboarding-dots">
+              {chromeOnboardingPages.map((_, dotIndex) => (
+                <button
+                  key={`chrome-dot-${dotIndex}`}
+                  type="button"
+                  className={`chrome-onboarding-dot ${dotIndex === chromeActiveStep ? 'is-active' : ''}`}
+                  onClick={() => scrollToChromeStep(dotIndex)}
+                  aria-label={`Go to Chrome step ${dotIndex + 1}`}
+                ></button>
+              ))}
+            </div>
+          </article>
         </div>
       </div>
 

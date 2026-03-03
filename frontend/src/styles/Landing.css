@@ -670,6 +670,10 @@
   font-weight: 300;
 }
 
+.chrome-onboarding-wrapper {
+  display: none;
+}
+
 /* How to Install Dropdown Menu */
 /* .install-dropdown {
   position: absolute;
@@ -1053,6 +1057,7 @@
   .fixed-scroll-indicator {
     display: none !important;
   }
+
   .hamburger-nav {
     display: block;
     position: fixed;
@@ -1060,6 +1065,7 @@
     right: 24px;
     z-index: 1000;
   }
+
   .hamburger-btn {
     background: none;
     border: none;
@@ -1070,6 +1076,7 @@
     gap: 9px;
     z-index: 1001;
   }
+
   .hamburger-line {
     display: block;
     width: 44px;
@@ -1077,12 +1084,15 @@
     border-radius: 3px;
     transition: background 0.2s ease;
   }
+
   .hamburger-light .hamburger-line {
     background: #333;
   }
+
   .hamburger-dark .hamburger-line {
     background: #fff;
   }
+
   .hamburger-menu {
     position: absolute;
     top: 48px;
@@ -1098,11 +1108,13 @@
     transform: translateY(-8px);
     transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
   }
+
   .hamburger-menu.visible {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
   }
+
   .hamburger-menu .section-name-item {
     background: none;
     border: none;
@@ -1116,9 +1128,11 @@
     white-space: nowrap;
     transition: color 0.2s ease;
   }
+
   .hamburger-menu .section-name-item:hover {
     color: #ffffff;
   }
+
   .hamburger-menu .section-name-item.active {
     color: #ffffff;
     font-weight: 600;
@@ -1204,6 +1218,7 @@
     font-size: 80px;
     width: 90%;
   }
+
   .landing-section[data-section="2"] .section-description {
     left: 10%;
     top: 35.5%;
@@ -1214,6 +1229,7 @@
   .landing-section[data-section="2"] .section2-ipad-br {
     display: block;
   }
+
   .landing-section[data-section="2"] .section2-desktop-br {
     display: none;
   }
@@ -1225,6 +1241,7 @@
     font-size: 70px;
     width: 90%;
   }
+
   .landing-section[data-section="3"] .section-description {
     left: 9.7%;
     top: 35%;
@@ -1238,36 +1255,176 @@
     top: 25.7%;
     font-size: 60px;
   }
+
   .landing-section[data-section="4"] .install-guide-row {
     left: 9.7%;
     top: 35%;
     width: 92%;
   }
+
   .landing-section[data-section="4"] .install-guide-img {
     height: 400px;
     max-height: 50vh;
   }
+
   .landing-section[data-section="4"] .install-guide-label {
     font-size: 30px;
   }
 
   /* ========== Section 5: How to install - Chrome ========== */
+  .landing-section[data-section="5"] {
+    --chrome-card-scale: 1;
+    --chrome-card-width: calc(560px * var(--chrome-card-scale));
+    --chrome-card-height: calc(650px * var(--chrome-card-scale));
+    --chrome-card-radius: calc(34px * var(--chrome-card-scale));
+    --chrome-photo-inset: calc(14px * var(--chrome-card-scale));
+    --chrome-panel-gap: calc(14px * var(--chrome-card-scale));
+    --chrome-photo-radius: calc(18px * var(--chrome-card-scale));
+    --chrome-media-height: calc(500px * var(--chrome-card-scale));
+    --chrome-slide-bottom-space: calc(92px * var(--chrome-card-scale));
+    --chrome-text-size: calc(17px * var(--chrome-card-scale));
+    --chrome-text-max-width: calc(230px * var(--chrome-card-scale));
+    --chrome-dot-size: calc(12px * var(--chrome-card-scale));
+    --chrome-dot-gap: calc(14px * var(--chrome-card-scale));
+    --chrome-dot-bottom: calc(26px * var(--chrome-card-scale));
+  }
+
   .landing-section[data-section="5"] .install-guide-title {
-    left: 17.0%;
-    top: 25.7%;
-    font-size: 60px;
+    left: 50%;
+    top: 10.5%;
+    transform: translateX(-50%);
+    font-size: 58px;
+    line-height: 1.1;
+    white-space: nowrap;
   }
+
   .landing-section[data-section="5"] .install-guide-row {
-    left: 2.0%;
-    top: 35%;
-    width: 92%;
+    display: none;
   }
-  .landing-section[data-section="5"] .install-guide-img {
-    height: 400px;
-    max-height: 50vh;
+
+  .landing-section[data-section="5"] .chrome-onboarding-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: calc(10.5% + (58px * 1.1) + 3.2%);
+    left: 0;
+    transform: none;
+    width: 100%;
+    max-width: 1024px;
+    padding: 0 18px;
+    box-sizing: border-box;
   }
-  .landing-section[data-section="5"] .install-guide-label {
-    font-size: 20px;
+
+  .landing-section[data-section="5"] .chrome-onboarding-card {
+    width: var(--chrome-card-width);
+    height: var(--chrome-card-height);
+    background: #cfcfcf;
+    border-radius: var(--chrome-card-radius) !important;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-carousel {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-slide {
+    width: 100%;
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+    padding: var(--chrome-photo-inset) var(--chrome-photo-inset) var(--chrome-slide-bottom-space);
+    box-sizing: border-box;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-pair {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--chrome-panel-gap);
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-panel {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-media {
+    width: 100%;
+    height: var(--chrome-media-height);
+    border-radius: var(--chrome-photo-radius) !important;
+    background: #efefef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-image {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--chrome-photo-radius) !important;
+    display: block;
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-text {
+    margin: calc(10px * var(--chrome-card-scale)) 0 0;
+    color: #202020;
+    text-align: center;
+    font-size: var(--chrome-text-size);
+    line-height: 1.3;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 500;
+    max-width: var(--chrome-text-max-width);
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-dots {
+    position: absolute;
+    bottom: var(--chrome-dot-bottom);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--chrome-dot-gap);
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-dot {
+    width: var(--chrome-dot-size);
+    height: var(--chrome-dot-size);
+    border-radius: 999px !important;
+    background: #9c9c9c;
+    display: block;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .landing-section[data-section="5"] .chrome-onboarding-dot.is-active {
+    background: #ffffff;
   }
 
   /* ========== Section 6: How to install - Samsung Internet ========== */
@@ -1277,19 +1434,23 @@
     top: 25.7% !important;
     font-size: 60px;
   }
+
   .landing-section[data-section="6"] .samsung-title-internet {
     display: none;
   }
+
   .landing-section[data-section="6"] .install-guide-row {
     position: absolute !important;
     left: 2.7% !important;
     top: 35% !important;
     width: 92%;
   }
+
   .landing-section[data-section="6"] .install-guide-img {
     height: 400px;
     max-height: 50vh;
   }
+
   .landing-section[data-section="6"] .install-guide-label {
     font-size: 20px;
   }
@@ -1301,35 +1462,42 @@
     font-size: 70px;
     width: 90%;
   }
+
   .team-section .section-subtitle {
     left: 9.8%;
     top: 29.5% !important;
     font-size: 30px;
     width: 90%;
   }
+  
   .team-section .team-info {
     left: 10% !important;
     top: 40.9% !important;
     width: 86%;
   }
+
   .team-section .team-member-name {
     font-size: 30px;
   }
+
   .team-section .team-member-email {
     font-size: 23px;
   }
+
   .team-section .email-icon {
     left: 9.8%;
     top: 35.0%;
     width: 50px;
     height: 50px;
   }
+
   .team-section .youtube-icon {
     left: 16.8%;
     top: 35.0%;
     width: 50px;
     height: 50px;
   }
+
   .team-section .instagram-icon {
     left: 23.8%;
     top: 35.0%;
