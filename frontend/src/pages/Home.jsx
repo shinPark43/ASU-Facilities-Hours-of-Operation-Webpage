@@ -140,7 +140,15 @@ const Home = () => {
   }, []);
 
   const hour = now.getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const greeting = hour < 5
+    ? 'Good night'
+    : hour < 12
+      ? 'Good morning'
+      : hour < 17
+        ? 'Good afternoon'
+        : hour < 22
+          ? 'Good evening'
+          : 'Good night';
   const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
