@@ -174,7 +174,8 @@ const Home = () => {
         const currentlyRunning = isCurrentlyRunning(todayValue.time, now);
         return { isOpen: currentlyRunning, hoursStr: `${todayValue.time} · ${todayValue.route}` };
       }
-      return { isOpen: false, hoursStr: todayValue };
+      const currentlyRunning = isCurrentlyRunning(todayValue, now);
+      return { isOpen: currentlyRunning, hoursStr: todayValue };
     }
 
     if (!todayValue) {
