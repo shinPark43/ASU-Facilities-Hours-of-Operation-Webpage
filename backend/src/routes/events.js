@@ -66,7 +66,7 @@ router.get('/upcoming', async (req, res) => {
     }
 
     allEvents.sort((a, b) => a.ts_start - b.ts_start);
-    const upcoming = allEvents.slice(0, 20).map(formatEvent);
+    const upcoming = allEvents.slice(0, 25).map(formatEvent);
 
     cache.set(cacheKey, upcoming);
     if (cache.size > 20) cache.delete(cache.keys().next().value);
