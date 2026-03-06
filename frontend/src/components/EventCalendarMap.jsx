@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import MapGL, { Marker } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../styles/EventCalendarMap.css';
@@ -112,6 +112,14 @@ const EventCalendarMap = ({ events = [] }) => {
   );
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [openCalDropdown, setOpenCalDropdown] = useState(null);
+  const [mapActive, setMapActive] = useState(false);
+  const sheetRef = useRef(null);
+
+  useEffect(() => {
+    if (selectedLocation && sheetRef.current) {
+      sheetRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [selectedLocation]);
 
   // Sync with theme changes from Layout
   useEffect(() => {
@@ -205,7 +213,12 @@ const EventCalendarMap = ({ events = [] }) => {
               style={{ width: '100%', height: '100%' }}
               mapStyle={theme === 'dark' ? DARK_STYLE : LIGHT_STYLE}
               mapboxAccessToken={MAPBOX_TOKEN}
-              onClick={() => setSelectedLocation(null)}
+              scrollZoom={mapActive}
+              dragPan={mapActive}
+              dragRotate={mapActive}
+              touchZoomRotate={mapActive}
+              keyboard={mapActive}
+              onClick={mapActive ? () => setSelectedLocation(null) : undefined}
             >
               {locationGroups.map(group => {
                 const isSelected = selectedLocation &&
@@ -232,11 +245,18 @@ const EventCalendarMap = ({ events = [] }) => {
               })}
 
             </MapGL>
+            {!mapActive && (
+              <div className="ecm-map-overlay" onClick={() => setMapActive(true)}>
+                <div className="ecm-map-overlay-hint">
+                  <span className="ecm-map-overlay-text">Tap to explore map</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {selectedLocation && (
-          <div className="ecm-sheet">
+          <div className="ecm-sheet" ref={sheetRef}>
             <div className="ecm-sheet-header">
               <span className="ecm-sheet-location">
                 {selectedLocation[0].location || 'Campus Event'}
@@ -284,20 +304,21 @@ const EventCalendarMap = ({ events = [] }) => {
           </p>
           <div className="ecm-no-location-strip">
             {unmappableEvents.map(event => (
-              <a
-                key={event.id}
-                href={event.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ecm-no-location-card"
-              >
-                <span className="ecm-no-location-badge">EVENT</span>
-                <span className="ecm-no-location-title">{event.title}</span>
-                <span className="ecm-no-location-meta">
-                  {event.date} · {event.time}
-                  {event.location ? ` · ${event.location}` : ''}
-                </span>
-              </a>
+              <div key={event.id} className="ecm-no-location-card">
+                <div className="ecm-no-location-top">
+                  <span className="ecm-no-location-badge">EVENT</span>
+                  <span className="ecm-no-location-title">{event.title}</span>
+                  <span className="ecm-no-location-meta">
+                    {event.date} · {event.time}
+                    {event.location ? ` · ${event.location}` : ''}
+                  </span>
+                </div>
+                <div className="ecm-no-location-actions">
+                  <a href={event.link} target="_blank" rel="noopener noreferrer"
+                     className="ecm-sheet-link">View →</a>
+                  {renderCalDropdown(event, true)}
+                </div>
+              </div>
             ))}
           </div>
         </>
