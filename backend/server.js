@@ -10,6 +10,7 @@ const tutoringDb = require('./src/tutoring-database');
 const facilityRoutes = require('./src/routes/facilities');
 const tutoringRoutes = require('./src/routes/tutoring');
 const calendarRoutes = require('./src/routes/calendar');
+const eventsRoutes = require('./src/routes/events');
 const scraper = require('./src/scraper');
 
 const app = express();
@@ -25,6 +26,7 @@ const limiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  skip: (req) => req.ip === '::1' || req.ip === '127.0.0.1', // Skip rate limit for localhost
 });
 
 // Middleware
@@ -43,6 +45,7 @@ app.use('/api/', limiter); // Apply rate limiting to API routes only
 app.use('/api/facilities', facilityRoutes);
 app.use('/api/tutoring', tutoringRoutes);
 app.use('/api/calendar', calendarRoutes);
+app.use('/api/events', eventsRoutes);
 
 // Enhanced health check endpoint
 app.get('/api/health', async (req, res) => {

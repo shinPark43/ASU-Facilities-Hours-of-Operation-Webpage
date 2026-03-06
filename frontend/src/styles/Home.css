@@ -510,7 +510,13 @@
   line-height: 1.45;
 }
 
-/* ─── 4. Instagram CTA ────────────────────────────────────── */
+/* ─── 4. Event Calendar Map ───────────────────────────────── */
+
+.event-map-section {
+  padding: 0 0 2rem;
+}
+
+/* ─── 5. Instagram CTA ────────────────────────────────────── */
 
 .instagram-section {
   padding: 0 0 2rem;
@@ -567,7 +573,7 @@
   opacity: 0.40;
 }
 
-/* ─── 5. Footer ───────────────────────────────────────────── */
+/* ─── 6. Footer ───────────────────────────────────────────── */
 
 .home-footer-text {
   font-size: 0.7rem;

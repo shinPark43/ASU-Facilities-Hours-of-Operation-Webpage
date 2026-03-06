@@ -287,6 +287,13 @@ export const calendarAPI = {
 };
 
 /**
+ * API functions for campus events calendar
+ */
+export const eventsAPI = {
+  getUpcoming: () => apiRequest('/api/events/upcoming'),
+};
+
+/**
  * Health check function to test API connectivity
  */
 export const checkAPIHealth = async () => {

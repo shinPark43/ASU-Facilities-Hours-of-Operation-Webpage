@@ -1373,6 +1373,24 @@ class ScraperManager {
     }
   }
 
+  async scrapeEvents() {
+    const browser = await this.getBrowser();
+    const page = await browser.newPage();
+    try {
+      await page.setUserAgent(this.userAgent);
+      await page.goto('https://www.angelo.edu/events/calendar/', {
+        waitUntil: 'domcontentloaded',
+        timeout: 20000,
+      });
+      const eventsData = await page.evaluate(() => {
+        return window.livewhale?.calendar?.preload_data?.events || {};
+      });
+      return eventsData;
+    } finally {
+      await page.close();
+    }
+  }
+
   async close() {
     if (this.browser) {
       console.log('🔄 Closing browser instance...');
