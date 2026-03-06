@@ -1,4 +1,6 @@
 const puppeteer = require('puppeteer');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const db = require('./database');
 const tutoringDb = require('./tutoring-database');
 
@@ -1046,21 +1048,23 @@ class ScraperManager {
       
       await delay(3000);
       
-      const tutoringData = await this.extractTutoringHours(page);
-      
+      const [tutoringData, mathLabData, writingCenterData] = await Promise.all([
+        this.extractTutoringHours(page),
+        this.scrapeMathLab(),
+        this.scrapeWritingCenter(),
+      ]);
+
       if (!tutoringData || Object.keys(tutoringData).length === 0) {
         throw new Error('No tutoring hours data found on the page');
       }
+      console.log(`📋 Tutoring extraction found ${Object.keys(tutoringData).length} subjects`);
 
-      // Also scrape Math Lab hours
-      console.log('🔍 Scraping Math Lab hours...');
-      const mathLabData = await this.scrapeMathLab(browser);
-      
-      // Merge Math Lab data with tutoring data
       const mergedData = { ...tutoringData };
-      if (mathLabData && Object.keys(mathLabData).length > 0) {
-        Object.assign(mergedData, mathLabData);
-        console.log('✅ Math Lab hours merged with tutoring data');
+      for (const [label, data] of [['Math Lab', mathLabData], ['Writing Center', writingCenterData]]) {
+        if (data && Object.keys(data).length > 0) {
+          Object.assign(mergedData, data);
+          console.log(`✅ ${label} hours merged with tutoring data`);
+        }
       }
 
       // Sort subjects alphabetically
@@ -1092,105 +1096,119 @@ class ScraperManager {
     }
   }
 
-  async scrapeMathLab(browser) {
+  async scrapeMathLab() {
     console.log('🔍 Scraping Math Lab hours from dedicated page...');
-    
-    let page;
     try {
-      page = await browser.newPage();
-      await page.setUserAgent(this.userAgent);
-      
-      await page.goto('https://www.angelo.edu/current-students/freshman-college/math-lab.php', {
-        waitUntil: 'networkidle2',
-        timeout: this.config.timeout
+      const { data: html } = await axios.get(
+        'https://www.angelo.edu/current-students/freshman-college/math-lab.php',
+        { timeout: this.config.timeout, headers: { 'User-Agent': this.userAgent } }
+      );
+      const $ = cheerio.load(html);
+
+      const DAY_ABBREVS = {
+        sun: 'Sunday', mon: 'Monday', tue: 'Tuesday',
+        wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday',
+      };
+
+      // Find the table whose first row contains ≥3 day abbreviations
+      let mathLabTable = null;
+      $('table').each((_, table) => {
+        const firstRowText = $(table).find('tr').first().text().toLowerCase();
+        const hits = Object.keys(DAY_ABBREVS).filter(a => firstRowText.includes(a)).length;
+        if (hits >= 3) { mathLabTable = table; return false; }
       });
-      
-      await delay(2000);
-      
-      const mathLabData = await page.evaluate(() => {
-        const data = {};
-        
-        // Find the table with Math Lab hours
-        const tables = document.querySelectorAll('table');
-        let mathLabTable = null;
-        
-        for (const table of tables) {
-          const caption = table.querySelector('caption');
-          const tableText = table.innerText.toLowerCase();
-          if (caption?.innerText.toLowerCase().includes('math lab') || 
-              tableText.includes('math lab') ||
-              tableText.includes('sun') && tableText.includes('mon')) {
-            mathLabTable = table;
-            break;
-          }
-        }
-        
-        if (!mathLabTable) {
-          console.log('Math Lab table not found');
-          return null;
-        }
-        
-        // Parse the table - it has days as columns
-        const rows = mathLabTable.querySelectorAll('tr');
-        if (rows.length < 2) return null;
-        
-        // Get header row (days)
-        const headerCells = rows[0].querySelectorAll('td, th');
-        const days = [];
-        const dayMappings = {
-          'sun': 'Sunday', 'mon': 'Monday', 'tue': 'Tuesday',
-          'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday'
-        };
-        
-        headerCells.forEach(cell => {
-          const text = cell.innerText.toLowerCase().trim();
-          for (const [abbrev, fullDay] of Object.entries(dayMappings)) {
-            if (text.includes(abbrev)) {
-              days.push(fullDay);
-              break;
-            }
-          }
-        });
-        
-        // Get hours row
-        const hoursRow = rows[1];
-        const hoursCells = hoursRow.querySelectorAll('td, th');
-        
-        const sessions = [];
-        hoursCells.forEach((cell, index) => {
-          if (index < days.length) {
-            const hoursText = cell.innerText.trim();
-            const day = days[index];
-            
-            if (hoursText.toLowerCase() === 'closed' || !hoursText) {
-              // Skip closed days
-            } else {
-              sessions.push({
-                day: day,
-                time: hoursText,
-                location: 'Porter Henderson Library, Room 328'
-              });
-            }
-          }
-        });
-        
-        if (sessions.length > 0) {
-          data['Math Lab'] = {
-            'Math Lab (Drop-in Help)': sessions
-          };
-        }
-        
-        return data;
+      if (!mathLabTable) return null;
+
+      const rows = $(mathLabTable).find('tr').toArray();
+
+      // Dynamically find the header row (first row with ≥3 day abbrev cells)
+      let headerRowIdx = -1;
+      let days = [];
+      for (let i = 0; i < rows.length; i++) {
+        const cells = $(rows[i]).find('td, th').toArray().map(c => $(c).text().trim().toLowerCase());
+        const mapped = cells.map(t => Object.entries(DAY_ABBREVS).find(([a]) => t.includes(a))?.[1] ?? null);
+        if (mapped.filter(Boolean).length >= 3) { headerRowIdx = i; days = mapped; break; }
+      }
+      if (headerRowIdx === -1 || headerRowIdx + 1 >= rows.length) return null;
+
+      // Parse the row immediately following the header
+      const sessions = [];
+      $(rows[headerRowIdx + 1]).find('td, th').each((i, cell) => {
+        const time = $(cell).text().trim();
+        if (!days[i] || !time || time.toLowerCase() === 'closed') return;
+        sessions.push({ day: days[i], time, location: 'Porter Henderson Library, Room 328' });
       });
-      
+
       console.log('✅ Math Lab hours extracted');
-      return mathLabData;
-      
+      return sessions.length > 0 ? { 'Math Lab': { 'Math Lab (Drop-in Help)': sessions } } : null;
+
     } catch (error) {
       console.error('⚠️ Math Lab scraping failed (continuing without it):', error.message);
       return null;
-    } finally {
-      if (page) await page.close();
+    }
+  }
+
+  async scrapeWritingCenter() {
+    console.log('🔍 Scraping Writing Center hours from dedicated page...');
+    try {
+      const { data: html } = await axios.get(
+        'https://www.angelo.edu/current-students/writing-center/',
+        { timeout: this.config.timeout, headers: { 'User-Agent': this.userAgent } }
+      );
+      const $ = cheerio.load(html);
+
+      const DAY_ABBREVS = {
+        sun: 'Sunday', mon: 'Monday', tue: 'Tuesday',
+        wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday',
+      };
+
+      // Tables use column-per-day layout (same as Math Lab):
+      // row 0: day headers  row 1: time values
+      function parseColumnarTable(tableEl) {
+        const rows = $(tableEl).find('tr').toArray();
+        if (rows.length < 2) return [];
+
+        // Find header row (first row with ≥2 day abbrev cells)
+        let headerRowIdx = -1;
+        let days = [];
+        for (let i = 0; i < rows.length; i++) {
+          const cells = $(rows[i]).find('td, th').toArray().map(c => $(c).text().trim().toLowerCase());
+          const mapped = cells.map(t => Object.entries(DAY_ABBREVS).find(([a]) => t.includes(a))?.[1] ?? null);
+          if (mapped.filter(Boolean).length >= 2) { headerRowIdx = i; days = mapped; break; }
+        }
+        if (headerRowIdx === -1 || headerRowIdx + 1 >= rows.length) return [];
+
+        const sessions = [];
+        $(rows[headerRowIdx + 1]).find('td, th').each((i, cell) => {
+          const time = $(cell).text().trim();
+          if (!days[i] || !time || /^(off|closed)$/i.test(time)) return;
+          sessions.push({ day: days[i], time, location: 'ASU Writing Center' });
+        });
+        return sessions;
+      }
+
+      // Walk elements in document order: track last-seen heading, attach to next valid table
+      const courses = {};
+      let currentHeading = null;
+      $('h1, h2, h3, h4, h5, h6, table').each((_, el) => {
+        const tag = el.tagName.toLowerCase();
+        if (/^h[1-6]$/.test(tag)) {
+          currentHeading = $(el).text().trim() || null;
+        } else if (tag === 'table') {
+          const sessions = parseColumnarTable(el);
+          if (sessions.length >= 2) {
+            const label = currentHeading || `Section ${Object.keys(courses).length + 1}`;
+            courses[label] = sessions;
+          }
+        }
+      });
+
+      console.log('✅ Writing Center hours extracted');
+      return Object.keys(courses).length > 0 ? { 'Writing Center': courses } : null;
+
+    } catch (error) {
+      console.error('⚠️ Writing Center scraping failed (continuing without it):', error.message);
+      return null;
     }
   }
 
@@ -1200,8 +1218,6 @@ class ScraperManager {
       
       // Get all accordion sections (subjects)
       const sections = document.querySelectorAll('section.lw_accordion_block');
-      
-      console.log('Found', sections.length, 'accordion sections');
       
       sections.forEach(section => {
         // Get subject name from h4
@@ -1222,8 +1238,6 @@ class ScraperManager {
         if (!contentDiv) return;
         
         const tables = contentDiv.querySelectorAll('div.tableWrap table, table');
-        
-        console.log('Subject:', subjectName, '- Found', tables.length, 'tables');
         
         tables.forEach(table => {
           // Get course name from caption
@@ -1296,8 +1310,6 @@ class ScraperManager {
           }
         });
       });
-      
-      console.log('Extraction complete. Found subjects:', Object.keys(tutoringData));
       return tutoringData;
     });
   }
