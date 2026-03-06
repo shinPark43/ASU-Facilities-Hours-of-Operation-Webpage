@@ -185,7 +185,7 @@
 .fixed-down-arrow {
   position: fixed;
   bottom: 5%;
-  left: 47.7%;
+  left: calc(50% - 40px);
   z-index: 1000;
   width: 80px;
   height: 30px;
@@ -222,6 +222,52 @@
 
 /* Gray arrow for other sections */
 .fixed-down-arrow.gray-arrow img {
+  filter: none;
+}
+
+/* Fixed Up Arrow Button - mirrors down arrow */
+.fixed-up-arrow {
+  position: fixed;
+  top: 5%;
+  left: calc(50% - 40px);
+  z-index: 1000;
+  width: 80px;
+  height: 30px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: none;
+  pointer-events: all;
+  padding: 0;
+  animation: float 2s ease-in-out infinite;
+}
+
+.fixed-up-arrow:hover {
+  background: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.fixed-up-arrow img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transform: rotate(180deg) !important;
+}
+
+.fixed-up-arrow img:hover {
+  transform: rotate(180deg) !important;
+}
+
+.fixed-up-arrow.white-arrow img {
+  filter: brightness(0) invert(1);
+}
+
+.fixed-up-arrow.gray-arrow img {
   filter: none;
 }
 
@@ -1061,9 +1107,9 @@
   .hamburger-nav {
     display: block;
     position: fixed;
-    top: 24px;
-    right: 24px;
-    z-index: 1000;
+    top: 18px;
+    right: 18px;
+    z-index: 1400;
   }
 
   .hamburger-btn {
@@ -1074,7 +1120,8 @@
     display: flex;
     flex-direction: column;
     gap: 9px;
-    z-index: 1001;
+    z-index: 1402;
+    position: relative;
   }
 
   .hamburger-line {
@@ -1093,49 +1140,85 @@
     background: #fff;
   }
 
-  .hamburger-menu {
-    position: absolute;
-    top: 48px;
-    right: 0;
-    width: 160px;
-    background: rgba(50, 50, 50, 0.95);
-    border-radius: 16px;
-    padding: 12px 0;
-    display: flex;
-    flex-direction: column;
+  .hamburger-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.42);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-8px);
-    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+    transition: opacity 0.26s ease, visibility 0.26s ease !important;
+    z-index: 1398;
+  }
+
+  .hamburger-backdrop.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .hamburger-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(76vw, 360px);
+    height: 100vh;
+    background: linear-gradient(180deg, #26282b 0%, #1f2124 100%);
+    border-radius: 0;
+    padding: 92px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(104%);
+    transition: transform 0.26s ease !important;
+    z-index: 1401;
+    box-sizing: border-box;
+    box-shadow: -16px 0 40px rgba(0, 0, 0, 0.38);
   }
 
   .hamburger-menu.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+
+  .hamburger-menu-title {
+    margin: 0;
+    position: absolute;
+    top: 46px;
+    left: 32px;
+    transform: translateY(-50%);
+    color: #ffffff;
+    font-size: 30px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+    line-height: 1.1;
+    pointer-events: none;
   }
 
   .hamburger-menu .section-name-item {
-    background: none;
+    background: rgba(255, 255, 255, 0.03);
     border: none;
-    color: rgba(255, 255, 255, 0.6);
-    padding: 10px 20px;
-    font-size: 16px;
+    color: rgba(255, 255, 255, 0.72);
+    padding: 14px 18px;
+    font-size: 24px;
     font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    text-align: center;
+    font-weight: 500;
+    text-align: left;
     cursor: pointer;
     white-space: nowrap;
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, background 0.2s ease;
+    border-radius: 12px !important;
   }
 
   .hamburger-menu .section-name-item:hover {
     color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .hamburger-menu .section-name-item.active {
     color: #ffffff;
-    font-weight: 600;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.14);
   }
 
   /* Fixed "ASU Hours" title (top-left); above 1024px uses default left: 3.7%, top: 6% */
@@ -1234,6 +1317,50 @@
     display: none;
   }
 
+  .combined-info-section {
+    overflow-y: auto;
+  }
+
+  .combined-info-section .combined-info-content {
+    position: absolute;
+    left: 9.7%;
+    right: 9.7%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 150px;
+    z-index: 5;
+  }
+
+  .combined-info-section .combined-info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .combined-info-section .combined-info-heading {
+    margin: 0;
+    color: #000000;
+    font-size: 80px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -1.8px;
+  }
+
+  .combined-info-section .combined-info-description {
+    color: rgba(0, 0, 0, 0.58);
+    font-size: 45px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    line-height: 1.18;
+  }
+
+  .combined-info-section .combined-info-description p {
+    margin: 0;
+  }
+
   /* ========== Section 3: Up-to-Date Information ========== */
   .landing-section[data-section="3"] .section-heading {
     left: 9.7%;
@@ -1249,36 +1376,19 @@
     width: 90%;
   }
 
-  /* ========== Section 4: How to install - Safari ========== */
-  .landing-section[data-section="4"] .install-guide-title {
-    left: 20.0%;
-    top: 25.7%;
-    font-size: 60px;
-  }
-
-  .landing-section[data-section="4"] .install-guide-row {
-    left: 9.7%;
-    top: 35%;
-    width: 92%;
-  }
-
-  .landing-section[data-section="4"] .install-guide-img {
-    height: 400px;
-    max-height: 50vh;
-  }
-
-  .landing-section[data-section="4"] .install-guide-label {
-    font-size: 30px;
-  }
-
-  /* ========== Section 5: How to install - Chrome ========== */
-  .landing-section[data-section="5"] {
-    --chrome-card-scale: 1;
-    --chrome-card-width: calc(560px * var(--chrome-card-scale));
+  /* ========== Sections 4-6: How to install onboarding card ========== */
+  .landing-section.onboarding-install-section {
+    --asu-hours-top: 6.4%;
+    --chrome-title-top: 12%;
+    --chrome-card-top-base: calc(18.9% + (58px * 1.1));
+    --chrome-card-top: calc(var(--chrome-card-top-base) - (var(--chrome-title-top) - var(--asu-hours-top)) + 1.5%);
+    --chrome-card-scale: 1.4;
+    --chrome-card-width: calc(650px * var(--chrome-card-scale));
     --chrome-card-height: calc(650px * var(--chrome-card-scale));
     --chrome-card-radius: calc(34px * var(--chrome-card-scale));
-    --chrome-photo-inset: calc(14px * var(--chrome-card-scale));
-    --chrome-panel-gap: calc(14px * var(--chrome-card-scale));
+    --chrome-photo-inset: calc(30px * var(--chrome-card-scale));
+    --chrome-panel-width: calc(260px * var(--chrome-card-scale));
+    --chrome-panel-gap: calc(60px * var(--chrome-card-scale));
     --chrome-photo-radius: calc(18px * var(--chrome-card-scale));
     --chrome-media-height: calc(500px * var(--chrome-card-scale));
     --chrome-slide-bottom-space: calc(92px * var(--chrome-card-scale));
@@ -1289,25 +1399,25 @@
     --chrome-dot-bottom: calc(26px * var(--chrome-card-scale));
   }
 
-  .landing-section[data-section="5"] .install-guide-title {
+  .landing-section.onboarding-install-section .install-guide-title {
     left: 50%;
-    top: 10.5%;
+    top: var(--chrome-title-top);
     transform: translateX(-50%);
     font-size: 58px;
     line-height: 1.1;
     white-space: nowrap;
   }
 
-  .landing-section[data-section="5"] .install-guide-row {
+  .landing-section.onboarding-install-section .install-guide-row {
     display: none;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-wrapper {
+  .landing-section.onboarding-install-section .chrome-onboarding-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: calc(10.5% + (58px * 1.1) + 3.2%);
+    top: var(--chrome-card-top);
     left: 0;
     transform: none;
     width: 100%;
@@ -1316,7 +1426,7 @@
     box-sizing: border-box;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-card {
+  .landing-section.onboarding-install-section .chrome-onboarding-card {
     width: var(--chrome-card-width);
     height: var(--chrome-card-height);
     background: #cfcfcf;
@@ -1326,7 +1436,7 @@
     box-sizing: border-box;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-carousel {
+  .landing-section.onboarding-install-section .chrome-onboarding-carousel {
     width: 100%;
     height: 100%;
     display: flex;
@@ -1337,11 +1447,11 @@
     scrollbar-width: none;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-carousel::-webkit-scrollbar {
+  .landing-section.onboarding-install-section .chrome-onboarding-carousel::-webkit-scrollbar {
     display: none;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-slide {
+  .landing-section.onboarding-install-section .chrome-onboarding-slide {
     width: 100%;
     min-width: 100%;
     height: 100%;
@@ -1354,23 +1464,68 @@
     position: relative;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-pair {
+  .landing-section.onboarding-install-section .chrome-onboarding-boundary-arrow {
+    position: absolute;
+    right: 0;
+    top: calc(var(--chrome-photo-inset) + (var(--chrome-media-height) / 2) - (26px / 2));
+    transform: translateX(50%);
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(30px * var(--chrome-card-scale));
+    line-height: 1;
+    color: #727272;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-pair {
     width: 100%;
     display: flex;
     align-items: flex-start;
+    justify-content: center;
     gap: var(--chrome-panel-gap);
+    position: relative;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-panel {
-    flex: 1;
-    min-width: 0;
+  .landing-section.onboarding-install-section .chrome-onboarding-pair::after {
+    content: '→';
+    position: absolute;
+    left: 50%;
+    top: calc((var(--chrome-media-height) / 2) - (26px / 2));
+    transform: translateX(-50%);
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(30px * var(--chrome-card-scale));
+    line-height: 1;
+    color: #727272;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-pair.is-single::after {
+    display: none;
+  }
+
+  .landing-section.safari-install-section .chrome-onboarding-pair.is-single {
+    justify-content: flex-start;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-panel {
+    flex: none;
+    width: var(--chrome-panel-width);
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-media {
-    width: 100%;
+  .landing-section.onboarding-install-section .chrome-onboarding-media {
+    width: var(--chrome-panel-width);
     height: var(--chrome-media-height);
     border-radius: var(--chrome-photo-radius) !important;
     background: #efefef;
@@ -1380,7 +1535,7 @@
     overflow: hidden;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-image {
+  .landing-section.onboarding-install-section .chrome-onboarding-image {
     width: 100%;
     height: 100%;
     max-width: 100%;
@@ -1390,8 +1545,8 @@
     display: block;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-text {
-    margin: calc(10px * var(--chrome-card-scale)) 0 0;
+  .landing-section.onboarding-install-section .chrome-onboarding-text {
+    margin: 0;
     color: #202020;
     text-align: center;
     font-size: var(--chrome-text-size);
@@ -1401,7 +1556,27 @@
     max-width: var(--chrome-text-max-width);
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-dots {
+  .landing-section.onboarding-install-section .chrome-onboarding-text-block {
+    width: 100%;
+    margin-top: calc(10px * var(--chrome-card-scale));
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-step-title {
+    margin: 0 0 calc(4px * var(--chrome-card-scale)) 0;
+    color: #202020;
+    text-align: center;
+    font-size: var(--chrome-text-size);
+    line-height: 1.2;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 700;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-text.is-indented {
+    padding-left: calc(16px * var(--chrome-card-scale));
+    box-sizing: border-box;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-dots {
     position: absolute;
     bottom: var(--chrome-dot-bottom);
     left: 50%;
@@ -1412,7 +1587,7 @@
     gap: var(--chrome-dot-gap);
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-dot {
+  .landing-section.onboarding-install-section .chrome-onboarding-dot {
     width: var(--chrome-dot-size);
     height: var(--chrome-dot-size);
     border-radius: 999px !important;
@@ -1423,56 +1598,33 @@
     cursor: pointer;
   }
 
-  .landing-section[data-section="5"] .chrome-onboarding-dot.is-active {
+  .landing-section.onboarding-install-section .chrome-onboarding-dot.is-active {
     background: #ffffff;
   }
 
-  /* ========== Section 6: How to install - Samsung Internet ========== */
-  .landing-section[data-section="6"] .install-guide-title {
-    position: absolute !important;
-    left: 15.1% !important;
-    top: 25.7% !important;
-    font-size: 60px;
-  }
-
-  .landing-section[data-section="6"] .samsung-title-internet {
+  /* Samsung title length helper on iPad */
+  .landing-section.samsung-install-section .samsung-title-internet {
     display: none;
-  }
-
-  .landing-section[data-section="6"] .install-guide-row {
-    position: absolute !important;
-    left: 2.7% !important;
-    top: 35% !important;
-    width: 92%;
-  }
-
-  .landing-section[data-section="6"] .install-guide-img {
-    height: 400px;
-    max-height: 50vh;
-  }
-
-  .landing-section[data-section="6"] .install-guide-label {
-    font-size: 20px;
   }
 
   /* ========== Section 7: ASU Student Dev Team ========== */
   .team-section .team-heading {
     left: 9.8% !important;
-    top: 23% !important;
+    top: 13% !important;
     font-size: 70px;
     width: 90%;
   }
 
   .team-section .section-subtitle {
     left: 9.8%;
-    top: 29.5% !important;
+    top: 19.5% !important;
     font-size: 30px;
     width: 90%;
   }
   
   .team-section .team-info {
     left: 10% !important;
-    top: 40.9% !important;
+    top: 30.9% !important;
     width: 86%;
   }
 
@@ -1486,21 +1638,21 @@
 
   .team-section .email-icon {
     left: 9.8%;
-    top: 35.0%;
+    top: 25.0%;
     width: 50px;
     height: 50px;
   }
 
   .team-section .youtube-icon {
     left: 16.8%;
-    top: 35.0%;
+    top: 25.0%;
     width: 50px;
     height: 50px;
   }
 
   .team-section .instagram-icon {
     left: 23.8%;
-    top: 35.0%;
+    top: 25.0%;
     width: 50px;
     height: 50px;
   }
