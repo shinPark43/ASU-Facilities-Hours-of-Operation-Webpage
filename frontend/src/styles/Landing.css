@@ -176,11 +176,16 @@
   background: rgba(50, 50, 50, 0.95);
 }
 
+/* Hamburger menu - hidden on desktop, shown on iPad and smaller */
+.hamburger-nav {
+  display: none;
+}
+
 /* Fixed Down Arrow Button - Original Design with Float Animation */
 .fixed-down-arrow {
   position: fixed;
   bottom: 5%;
-  left: 47.7%;
+  left: calc(50% - 40px);
   z-index: 1000;
   width: 80px;
   height: 30px;
@@ -217,6 +222,52 @@
 
 /* Gray arrow for other sections */
 .fixed-down-arrow.gray-arrow img {
+  filter: none;
+}
+
+/* Fixed Up Arrow Button - mirrors down arrow */
+.fixed-up-arrow {
+  position: fixed;
+  top: 5%;
+  left: calc(50% - 40px);
+  z-index: 1000;
+  width: 80px;
+  height: 30px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: none;
+  pointer-events: all;
+  padding: 0;
+  animation: float 2s ease-in-out infinite;
+}
+
+.fixed-up-arrow:hover {
+  background: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.fixed-up-arrow img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transform: rotate(180deg) !important;
+}
+
+.fixed-up-arrow img:hover {
+  transform: rotate(180deg) !important;
+}
+
+.fixed-up-arrow.white-arrow img {
+  filter: brightness(0) invert(1);
+}
+
+.fixed-up-arrow.gray-arrow img {
   filter: none;
 }
 
@@ -665,6 +716,10 @@
   font-weight: 300;
 }
 
+.chrome-onboarding-wrapper {
+  display: none;
+}
+
 /* How to Install Dropdown Menu */
 /* .install-dropdown {
   position: absolute;
@@ -1037,3 +1092,575 @@
     height: 30px;
   }
 }
+
+/*
+ * iPad Pro (1024px) and below only.
+ * Applies when viewport width <= 1024px; desktop layout unchanged above that.
+ * Sizes use fixed px; adjust left/top (%) and font-size/width/height (px) as needed.
+ */
+@media (max-width: 1024px) {
+  /* Hide desktop scroll indicator, show hamburger menu */
+  .fixed-scroll-indicator {
+    display: none !important;
+  }
+
+  .hamburger-nav {
+    display: block;
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 1400;
+  }
+
+  .hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    z-index: 1402;
+    position: relative;
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 44px;
+    height: 5px;
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+
+  .hamburger-light .hamburger-line {
+    background: #333;
+  }
+
+  .hamburger-dark .hamburger-line {
+    background: #fff;
+  }
+
+  .hamburger-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.42);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.26s ease, visibility 0.26s ease !important;
+    z-index: 1398;
+  }
+
+  .hamburger-backdrop.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .hamburger-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(76vw, 360px);
+    height: 100vh;
+    background: linear-gradient(180deg, #26282b 0%, #1f2124 100%);
+    border-radius: 0;
+    padding: 92px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(104%);
+    transition: transform 0.26s ease !important;
+    z-index: 1401;
+    box-sizing: border-box;
+    box-shadow: -16px 0 40px rgba(0, 0, 0, 0.38);
+  }
+
+  .hamburger-menu.visible {
+    transform: translateX(0);
+  }
+
+  .hamburger-menu-title {
+    margin: 0;
+    position: absolute;
+    top: 46px;
+    left: 32px;
+    transform: translateY(-50%);
+    color: #ffffff;
+    font-size: 30px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+    line-height: 1.1;
+    pointer-events: none;
+  }
+
+  .hamburger-menu .section-name-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: none;
+    color: rgba(255, 255, 255, 0.72);
+    padding: 14px 18px;
+    font-size: 24px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s ease, background 0.2s ease;
+    border-radius: 12px !important;
+  }
+
+  .hamburger-menu .section-name-item:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .hamburger-menu .section-name-item.active {
+    color: #ffffff;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  /* Fixed "ASU Hours" title (top-left); above 1024px uses default left: 3.7%, top: 6% */
+  .section-title {
+    left: 9.8%;
+    top: 6.4%;
+    font-size: 40px;
+  }
+
+  /* Main heading: "Real-Time Operating Hours" on one line, "For ASU Facilities" below */
+  .main-hero-heading {
+    left: 9.3%;
+    top: 11.2%;
+    font-size: 70px;
+    width: auto;
+  }
+  .main-hero-heading .hero-heading-desktop-br {
+    display: none;
+  }
+
+  /* Subheading: "Anytime, Anywhere / Access with Mobile Device" */
+  .hero-feature-text {
+    left: 63.3%;
+    top: 78.0%;
+    font-size: 22px;
+    width: auto;
+  }
+
+  /* Left phone image (!important needed to override base left) */
+  .hero-image-1 {
+    left: 5.3% !important;
+    top: 25%;
+    width: 450px;
+    max-height: 800px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Right phone image */
+  .hero-image-2 {
+    left: 51.5% !important;
+    top: 25%;
+    width: 450px;
+    max-height: 800px;
+    height: auto;
+    object-fit: contain;
+    display: none !important;
+  }
+
+  /* QR code image */
+  .hero-icon {
+    left: 50%;
+    top: 73%;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+  }
+
+  /* ========== Section 1: The All-in-One / Campus Operating Hours App ========== */
+  .hero-section .hero-heading {
+    left: 9.4%;
+    top: 26.7%;
+    font-size: 80px;
+    width: 90%;
+  }
+  /* iPad and below: line break after "Campus Operating", "Hours App" on second line */
+  .hero-section .hero-heading .hero-heading-line2 {
+    display: block;
+  }
+  .hero-section .hero-description {
+    left: 10%;
+    top: 50%;
+    font-size: 45px;
+    width: 90%;
+  }
+
+  /* ========== Section 2: Quick Mobile Access ========== */
+  .landing-section[data-section="2"] .section-heading {
+    left: 9.4%;
+    top: 26.7%;
+    font-size: 80px;
+    width: 90%;
+  }
+
+  .landing-section[data-section="2"] .section-description {
+    left: 10%;
+    top: 35.5%;
+    font-size: 45px;
+    width: 90%;
+  }
+  /* iPad and below: line break after "can check essential information"; "instantly from their phones" on one line */
+  .landing-section[data-section="2"] .section2-ipad-br {
+    display: block;
+  }
+
+  .landing-section[data-section="2"] .section2-desktop-br {
+    display: none;
+  }
+
+  .combined-info-section {
+    overflow-y: auto;
+  }
+
+  .combined-info-section .combined-info-content {
+    position: absolute;
+    left: 9.7%;
+    right: 9.7%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 150px;
+    z-index: 5;
+  }
+
+  .combined-info-section .combined-info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .combined-info-section .combined-info-heading {
+    margin: 0;
+    color: #000000;
+    font-size: 80px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -1.8px;
+  }
+
+  .combined-info-section .combined-info-description {
+    color: rgba(0, 0, 0, 0.58);
+    font-size: 45px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    line-height: 1.18;
+  }
+
+  .combined-info-section .combined-info-description p {
+    margin: 0;
+  }
+
+  /* ========== Section 3: Up-to-Date Information ========== */
+  .landing-section[data-section="3"] .section-heading {
+    left: 9.7%;
+    top: 26.7%;
+    font-size: 70px;
+    width: 90%;
+  }
+
+  .landing-section[data-section="3"] .section-description {
+    left: 9.7%;
+    top: 35%;
+    font-size: 42px;
+    width: 90%;
+  }
+
+  /* ========== Sections 4-6: How to install onboarding card ========== */
+  .landing-section.onboarding-install-section {
+    --asu-hours-top: 6.4%;
+    --chrome-title-top: 12%;
+    --chrome-card-top-base: calc(18.9% + (58px * 1.1));
+    --chrome-card-top: calc(var(--chrome-card-top-base) - (var(--chrome-title-top) - var(--asu-hours-top)) + 1.5%);
+    --chrome-card-scale: 1.4;
+    --chrome-card-width: calc(650px * var(--chrome-card-scale));
+    --chrome-card-height: calc(650px * var(--chrome-card-scale));
+    --chrome-card-radius: calc(34px * var(--chrome-card-scale));
+    --chrome-photo-inset: calc(30px * var(--chrome-card-scale));
+    --chrome-panel-width: calc(260px * var(--chrome-card-scale));
+    --chrome-panel-gap: calc(60px * var(--chrome-card-scale));
+    --chrome-photo-radius: calc(18px * var(--chrome-card-scale));
+    --chrome-media-height: calc(500px * var(--chrome-card-scale));
+    --chrome-slide-bottom-space: calc(92px * var(--chrome-card-scale));
+    --chrome-text-size: calc(17px * var(--chrome-card-scale));
+    --chrome-text-max-width: calc(230px * var(--chrome-card-scale));
+    --chrome-dot-size: calc(12px * var(--chrome-card-scale));
+    --chrome-dot-gap: calc(14px * var(--chrome-card-scale));
+    --chrome-dot-bottom: calc(26px * var(--chrome-card-scale));
+  }
+
+  .landing-section.onboarding-install-section .install-guide-title {
+    left: 50%;
+    top: var(--chrome-title-top);
+    transform: translateX(-50%);
+    font-size: 58px;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .landing-section.onboarding-install-section .install-guide-row {
+    display: none;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: var(--chrome-card-top);
+    left: 0;
+    transform: none;
+    width: 100%;
+    max-width: 1024px;
+    padding: 0 18px;
+    box-sizing: border-box;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-card {
+    width: var(--chrome-card-width);
+    height: var(--chrome-card-height);
+    background: #cfcfcf;
+    border-radius: var(--chrome-card-radius) !important;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-carousel {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-slide {
+    width: 100%;
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+    padding: var(--chrome-photo-inset) var(--chrome-photo-inset) var(--chrome-slide-bottom-space);
+    box-sizing: border-box;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-boundary-arrow {
+    position: absolute;
+    right: 0;
+    top: calc(var(--chrome-photo-inset) + (var(--chrome-media-height) / 2) - (26px / 2));
+    transform: translateX(50%);
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(30px * var(--chrome-card-scale));
+    line-height: 1;
+    color: #727272;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-pair {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--chrome-panel-gap);
+    position: relative;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-pair::after {
+    content: '→';
+    position: absolute;
+    left: 50%;
+    top: calc((var(--chrome-media-height) / 2) - (26px / 2));
+    transform: translateX(-50%);
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(30px * var(--chrome-card-scale));
+    line-height: 1;
+    color: #727272;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-pair.is-single::after {
+    display: none;
+  }
+
+  .landing-section.safari-install-section .chrome-onboarding-pair.is-single {
+    justify-content: flex-start;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-panel {
+    flex: none;
+    width: var(--chrome-panel-width);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-media {
+    width: var(--chrome-panel-width);
+    height: var(--chrome-media-height);
+    border-radius: var(--chrome-photo-radius) !important;
+    background: #efefef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-image {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--chrome-photo-radius) !important;
+    display: block;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-text {
+    margin: 0;
+    color: #202020;
+    text-align: center;
+    font-size: var(--chrome-text-size);
+    line-height: 1.3;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 500;
+    max-width: var(--chrome-text-max-width);
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-text-block {
+    width: 100%;
+    margin-top: calc(10px * var(--chrome-card-scale));
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-step-title {
+    margin: 0 0 calc(4px * var(--chrome-card-scale)) 0;
+    color: #202020;
+    text-align: center;
+    font-size: var(--chrome-text-size);
+    line-height: 1.2;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 700;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-text.is-indented {
+    padding-left: calc(16px * var(--chrome-card-scale));
+    box-sizing: border-box;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-dots {
+    position: absolute;
+    bottom: var(--chrome-dot-bottom);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--chrome-dot-gap);
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-dot {
+    width: var(--chrome-dot-size);
+    height: var(--chrome-dot-size);
+    border-radius: 999px !important;
+    background: #9c9c9c;
+    display: block;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .landing-section.onboarding-install-section .chrome-onboarding-dot.is-active {
+    background: #ffffff;
+  }
+
+  /* Samsung title length helper on iPad */
+  .landing-section.samsung-install-section .samsung-title-internet {
+    display: none;
+  }
+
+  /* ========== Section 7: ASU Student Dev Team ========== */
+  .team-section .team-heading {
+    left: 9.8% !important;
+    top: 13% !important;
+    font-size: 70px;
+    width: 90%;
+  }
+
+  .team-section .section-subtitle {
+    left: 9.8%;
+    top: 19.5% !important;
+    font-size: 30px;
+    width: 90%;
+  }
+  
+  .team-section .team-info {
+    left: 10% !important;
+    top: 30.9% !important;
+    width: 86%;
+  }
+
+  .team-section .team-member-name {
+    font-size: 30px;
+  }
+
+  .team-section .team-member-email {
+    font-size: 23px;
+  }
+
+  .team-section .email-icon {
+    left: 9.8%;
+    top: 25.0%;
+    width: 50px;
+    height: 50px;
+  }
+
+  .team-section .youtube-icon {
+    left: 16.8%;
+    top: 25.0%;
+    width: 50px;
+    height: 50px;
+  }
+
+  .team-section .instagram-icon {
+    left: 23.8%;
+    top: 25.0%;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/*
+  Landing page mobile (phone, tablet) optimization in progress.
+  iPad Air, iPhone 12, iPhone 12 Pro Max versions to be added.
+  To be done by Bumjun.
+*/

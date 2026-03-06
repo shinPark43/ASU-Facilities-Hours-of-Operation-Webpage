@@ -29,20 +29,77 @@ const Landing = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isTabletOrBelow, setIsTabletOrBelow] = useState(() => window.innerWidth <= 1024);
+  const [safariActiveStep, setSafariActiveStep] = useState(0);
+  const [chromeActiveStep, setChromeActiveStep] = useState(0);
+  const [samsungActiveStep, setSamsungActiveStep] = useState(0);
   const containerRef = useRef(null);
-  const totalSections = 8;
-
-  // Section names for navigation indicator
-  const sectionNames = [
-    'Home',
-    'About',
-    'Quick Access',
-    'Up-to-Date',
-    'Safari',
-    'Chrome',
-    'Samsung',
-    'Team'
+  const safariCarouselRef = useRef(null);
+  const chromeCarouselRef = useRef(null);
+  const samsungCarouselRef = useRef(null);
+  const safariSectionIndex = isTabletOrBelow ? 3 : 4;
+  const chromeSectionIndex = isTabletOrBelow ? 4 : 5;
+  const samsungSectionIndex = isTabletOrBelow ? 5 : 6;
+  const teamSectionIndex = isTabletOrBelow ? 6 : 7;
+  const shouldHideSectionTitle =
+    isTabletOrBelow &&
+    [1, 2, safariSectionIndex, chromeSectionIndex, samsungSectionIndex].includes(currentSection);
+  const sectionNames = isTabletOrBelow
+    ? ['Home', 'About', 'Quick+Up-to-Date', 'Safari', 'Chrome', 'Samsung', 'Team']
+    : ['Home', 'About', 'Quick Access', 'Up-to-Date', 'Safari', 'Chrome', 'Samsung', 'Team'];
+  const mobileDrawerItems = [
+    { label: 'Home', index: 0 },
+    { label: 'About', index: 1 },
+    { label: 'Safari', index: safariSectionIndex },
+    { label: 'Chrome', index: chromeSectionIndex },
+    { label: 'Samsung', index: samsungSectionIndex },
+    { label: 'Team', index: teamSectionIndex }
   ];
+  const totalSections = sectionNames.length;
+  const safariOnboardingSteps = [
+    { image: safari1, label: 'Tap share icon', stepTitle: 'Step 1', isIndented: true },
+    { image: safari2, label: 'Add to Home Screen', stepTitle: 'Step 2', isIndented: true },
+    { image: safari3, label: 'Tap Add', stepTitle: 'Step 3', isIndented: true }
+  ];
+  const chromeOnboardingSteps = [
+    { image: chrome1, label: 'Tap menu icon', stepTitle: 'Step 1', isIndented: true },
+    { image: chrome2, label: 'Add to Home Screen', stepTitle: 'Step 2', isIndented: true },
+    { image: chrome3, label: 'Tap Install', stepTitle: 'Step 3', isIndented: true },
+    { image: chrome4, label: 'Confirm Install', stepTitle: 'Step 4', isIndented: true }
+  ];
+  const samsungOnboardingSteps = [
+    { image: si1, label: 'Open menu', stepTitle: 'Step 1', isIndented: true },
+    { image: si2, label: 'Tap Add to', stepTitle: 'Step 2', isIndented: true },
+    { image: si3, label: 'Install as web app', stepTitle: 'Step 3', isIndented: true },
+    { image: si4, label: 'Confirm Add', stepTitle: 'Step 4', isIndented: true }
+  ];
+  const safariOnboardingPages = [
+    safariOnboardingSteps.slice(0, 2),
+    safariOnboardingSteps.slice(2)
+  ];
+  const chromeOnboardingPages = [
+    chromeOnboardingSteps.slice(0, 2),
+    chromeOnboardingSteps.slice(2, 4)
+  ];
+  const samsungOnboardingPages = [
+    samsungOnboardingSteps.slice(0, 2),
+    samsungOnboardingSteps.slice(2, 4)
+  ];
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsTabletOrBelow(window.innerWidth <= 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (currentSection >= totalSections) {
+      setCurrentSection(totalSections - 1);
+    }
+  }, [currentSection, totalSections]);
 
   // Scroll to specific section
   const scrollToSection = useCallback((sectionIndex) => {
@@ -96,7 +153,45 @@ const Landing = () => {
         container.removeEventListener('wheel', handleWheel);
       }
     };
-  }, [currentSection, isScrolling, scrollToSection]);
+  }, [currentSection, isScrolling, scrollToSection, totalSections]);
+
+  // Keep currentSection synced when user scrolls manually
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let rafId = null;
+    const handleScroll = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const sections = Array.from(container.querySelectorAll('[data-section]'));
+        if (!sections.length) return;
+
+        const scrollTop = container.scrollTop;
+        let nearestIndex = currentSection;
+        let minDistance = Number.POSITIVE_INFINITY;
+
+        sections.forEach((section) => {
+          const index = Number(section.getAttribute('data-section'));
+          const distance = Math.abs(section.offsetTop - scrollTop);
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearestIndex = index;
+          }
+        });
+
+        if (nearestIndex !== currentSection) {
+          setCurrentSection(nearestIndex);
+        }
+      });
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [currentSection]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -112,7 +207,7 @@ const Landing = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSection, isScrolling, scrollToSection]);
+  }, [currentSection, isScrolling, scrollToSection, totalSections]);
 
   // Navigate to next section
   const goToNextSection = () => {
@@ -121,12 +216,84 @@ const Landing = () => {
     }
   };
 
+  const goToPreviousSection = () => {
+    if (currentSection > 0) {
+      scrollToSection(currentSection - 1);
+    }
+  };
+
+  const handleChromeCarouselScroll = useCallback(() => {
+    const carousel = chromeCarouselRef.current;
+    if (!carousel) return;
+    const stepWidth = carousel.clientWidth;
+    if (!stepWidth) return;
+
+    const nextStep = Math.round(carousel.scrollLeft / stepWidth);
+    const boundedStep = Math.max(0, Math.min(chromeOnboardingPages.length - 1, nextStep));
+    setChromeActiveStep(boundedStep);
+  }, [chromeOnboardingPages.length]);
+
+  const scrollToChromeStep = useCallback((stepIndex) => {
+    const carousel = chromeCarouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollTo({
+      left: stepIndex * carousel.clientWidth,
+      behavior: 'smooth'
+    });
+    setChromeActiveStep(stepIndex);
+  }, []);
+
+  const handleSafariCarouselScroll = useCallback(() => {
+    const carousel = safariCarouselRef.current;
+    if (!carousel) return;
+    const stepWidth = carousel.clientWidth;
+    if (!stepWidth) return;
+
+    const nextStep = Math.round(carousel.scrollLeft / stepWidth);
+    const boundedStep = Math.max(0, Math.min(safariOnboardingPages.length - 1, nextStep));
+    setSafariActiveStep(boundedStep);
+  }, [safariOnboardingPages.length]);
+
+  const scrollToSafariStep = useCallback((stepIndex) => {
+    const carousel = safariCarouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollTo({
+      left: stepIndex * carousel.clientWidth,
+      behavior: 'smooth'
+    });
+    setSafariActiveStep(stepIndex);
+  }, []);
+
+  const handleSamsungCarouselScroll = useCallback(() => {
+    const carousel = samsungCarouselRef.current;
+    if (!carousel) return;
+    const stepWidth = carousel.clientWidth;
+    if (!stepWidth) return;
+
+    const nextStep = Math.round(carousel.scrollLeft / stepWidth);
+    const boundedStep = Math.max(0, Math.min(samsungOnboardingPages.length - 1, nextStep));
+    setSamsungActiveStep(boundedStep);
+  }, [samsungOnboardingPages.length]);
+
+  const scrollToSamsungStep = useCallback((stepIndex) => {
+    const carousel = samsungCarouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollTo({
+      left: stepIndex * carousel.clientWidth,
+      behavior: 'smooth'
+    });
+    setSamsungActiveStep(stepIndex);
+  }, []);
+
   return (
     <div className="landing-container" ref={containerRef}>
       {/* Navigation Indicators - Hidden on first section */}
       {currentSection !== 0 && (
       <div 
-        className={`fixed-scroll-indicator ${currentSection === 7 ? 'dark-section' : 'light-section'}`}
+        className={`fixed-scroll-indicator ${currentSection === teamSectionIndex ? 'dark-section' : 'light-section'}`}
         onMouseEnter={() => setIsMenuVisible(true)}
         onMouseLeave={() => setIsMenuVisible(false)}
       >
@@ -155,6 +322,35 @@ const Landing = () => {
       </div>
       )}
 
+      {/* Hamburger menu - iPad and smaller only, always visible */}
+      <div className="hamburger-nav">
+        <button
+          className={`hamburger-btn ${currentSection === 0 || currentSection === teamSectionIndex ? 'hamburger-dark' : 'hamburger-light'}`}
+          onClick={() => setIsMenuVisible(!isMenuVisible)}
+          aria-label="Toggle navigation menu"
+        >
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+        </button>
+        <div
+          className={`hamburger-backdrop ${isMenuVisible ? 'visible' : ''}`}
+          onClick={() => setIsMenuVisible(false)}
+        ></div>
+        <div className={`hamburger-menu ${isMenuVisible ? 'visible' : ''}`}>
+          <p className="hamburger-menu-title">ASU Hours</p>
+          {mobileDrawerItems.map((item) => (
+            <button
+              key={item.label}
+              className={`section-name-item ${currentSection === item.index ? 'active' : ''}`}
+              onClick={() => { scrollToSection(item.index); setIsMenuVisible(false); }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Down Arrow Button */}
       {currentSection < totalSections - 1 && (
         <button 
@@ -166,10 +362,23 @@ const Landing = () => {
         </button>
       )}
 
+      {/* Up Arrow Button - only on install pages */}
+      {isTabletOrBelow && [safariSectionIndex, chromeSectionIndex, samsungSectionIndex].includes(currentSection) && (
+        <button
+          className={`fixed-up-arrow ${currentSection === teamSectionIndex ? 'white-arrow' : 'gray-arrow'}`}
+          onClick={goToPreviousSection}
+          aria-label="Scroll to previous section"
+        >
+          <img src={currentSection === teamSectionIndex ? white_arrow_icon : gray_arrow_icon} alt="Scroll up" />
+        </button>
+      )}
+
       {/* ASU Hours Title */}
-      <p className={`section-title ${currentSection === 0 ? 'main-hero-title' : ''} ${currentSection === 7 ? 'team-title' : ''}`}>
-        ASU Hours
-      </p>
+      {!shouldHideSectionTitle && (
+        <p className={`section-title ${currentSection === 0 ? 'main-hero-title' : ''} ${currentSection === teamSectionIndex ? 'team-title' : ''}`}>
+          ASU Hours
+        </p>
+      )}
 
       {/* First page (Main)- Section 0 (First) */}
       <div className="landing-section main-hero-section" data-section="0">
@@ -187,8 +396,7 @@ const Landing = () => {
         </div> */}
         
         <div className="main-hero-heading">
-          <p>Real-Time</p>
-          <p>Operating Hours</p>
+          <p>Real-Time<br className="hero-heading-desktop-br" /> Operating Hours</p>
           <p>For ASU Facilities</p>
         </div>
         <img className="hero-icon" src={imgQrCode} alt="QR Code" />
@@ -208,25 +416,47 @@ const Landing = () => {
           <p>Campus Operating Hours App</p>
             </div>
         <div className="hero-description">
-          <p>Our solution</p>
-          <p>for the inconvenience of checking</p>
-          <p>facility operating hours</p>
+          <p>Our solution for the inconvenience</p>
+          <p>of checking facility operating hours</p>
+          <p>across campus</p>
             </div>
     </div>
 
       {/* Third page (Information2) - Section 2 */}
-      <div className="landing-section" data-section="2">
+      <div className={`landing-section ${isTabletOrBelow ? 'combined-info-section' : ''}`} data-section="2">
         <div className="section-gradient"></div>
-        <p className="section-heading">Quick Mobile Access</p>
-        <div className="section-description">
-          <p>Students and faculty</p>
-          <p>can check essential information instantly</p>
-          <p>from their phones</p>
-          <p>without repeating searches.</p>
-        </div>
+        {isTabletOrBelow ? (
+          <div className="combined-info-content">
+            <div className="combined-info-block">
+              <p className="combined-info-heading">Quick Mobile Access</p>
+              <div className="combined-info-description">
+                <p>Students and faculty can check</p>
+                <p>essential information instantly from</p>
+                <p>their phones without repeating searches.</p>
+              </div>
+            </div>
+            <div className="combined-info-block">
+              <p className="combined-info-heading">Up-to-Date Information</p>
+              <div className="combined-info-description">
+                <p>Operating hours and schedules are</p>
+                <p>automatically updated every day,</p>
+                <p>ensuring accuracy without manual checks.</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <p className="section-heading">Quick Mobile Access</p>
+            <div className="section-description">
+              <p>Students and faculty</p>
+              <p>can check essential information <span className="section2-ipad-br"></span><span className="section2-line2">instantly <br className="section2-desktop-br" />from their phones</span></p>
+              <p>without repeating searches.</p>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Fourth page (Information3) - Section 3 */}
+      {!isTabletOrBelow && (
       <div className="landing-section" data-section="3">
         <div className="section-gradient"></div>
         <p className="section-heading">Up-to-Date Information</p>
@@ -236,9 +466,10 @@ const Landing = () => {
           <p>ensuring accuracy without manual checks.</p>
         </div>
       </div>
+      )}
 
       {/* Fifth page (How to Install1)- Section 4 */}
-      <div className="landing-section install-section" data-section="4">
+      <div className="landing-section install-section onboarding-install-section safari-install-section" data-section={safariSectionIndex}>
         <div className="section-gradient hero-gradient"></div>
         <p className="install-guide-title">How to install - Safari</p>
         <div className="install-guide-row chrome-row">
@@ -257,10 +488,62 @@ const Landing = () => {
             <p className="install-guide-label">Tap Add</p>
           </div>
         </div>
+        <div className="chrome-onboarding-wrapper" aria-label="Safari installation onboarding cards">
+          <article className="chrome-onboarding-card">
+            <div
+              className="chrome-onboarding-carousel"
+              ref={safariCarouselRef}
+              onScroll={handleSafariCarouselScroll}
+            >
+              {safariOnboardingPages.map((pageSteps, pageIndex) => (
+                <div className="chrome-onboarding-slide" key={`safari-page-${pageIndex}`}>
+                  <div className={`chrome-onboarding-pair ${pageSteps.length === 1 ? 'is-single' : ''}`}>
+                    {pageSteps.map((step, stepIndex) => (
+                      <div className="chrome-onboarding-panel" key={step.label}>
+                        <div className="chrome-onboarding-media">
+                          <img
+                            src={step.image}
+                            alt={`Safari onboarding step ${pageIndex * 2 + stepIndex + 1}`}
+                            className="chrome-onboarding-image"
+                          />
+                        </div>
+                        <div className="chrome-onboarding-text-block">
+                          {step.stepTitle && (
+                            <p className="chrome-onboarding-step-title">{step.stepTitle}</p>
+                          )}
+                          <p className={`chrome-onboarding-text ${step.isIndented ? 'is-indented' : ''}`}>
+                            {step.label}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {pageIndex < safariOnboardingPages.length - 1 && (
+                    <span className="chrome-onboarding-boundary-arrow" aria-hidden="true">→</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="chrome-onboarding-dots">
+              <button
+                type="button"
+                className={`chrome-onboarding-dot ${safariActiveStep === 0 ? 'is-active' : ''}`}
+                onClick={() => scrollToSafariStep(0)}
+                aria-label="Show Safari Step 1 and Step 2"
+              ></button>
+              <button
+                type="button"
+                className={`chrome-onboarding-dot ${safariActiveStep === 1 ? 'is-active' : ''}`}
+                onClick={() => scrollToSafariStep(1)}
+                aria-label="Show Safari Step 3"
+              ></button>
+            </div>
+          </article>
+        </div>
       </div>
 
       {/* Sixth page (How to Install2)- Section 5 */}
-      <div className="landing-section install-section" data-section="5">
+      <div className="landing-section install-section onboarding-install-section chrome-install-section" data-section={chromeSectionIndex}>
         <div className="section-gradient"></div>
         <p className="install-guide-title">How to install - Chrome</p>
         <div className="install-guide-row chrome-row">
@@ -284,12 +567,64 @@ const Landing = () => {
             <p className="install-guide-label">Confirm Install</p>
           </div>
         </div>
+        <div className="chrome-onboarding-wrapper" aria-label="Chrome installation onboarding cards">
+          <article className="chrome-onboarding-card">
+            <div
+              className="chrome-onboarding-carousel"
+              ref={chromeCarouselRef}
+              onScroll={handleChromeCarouselScroll}
+            >
+              {chromeOnboardingPages.map((pageSteps, pageIndex) => (
+                <div className="chrome-onboarding-slide" key={`chrome-page-${pageIndex}`}>
+                  <div className={`chrome-onboarding-pair ${pageSteps.length === 1 ? 'is-single' : ''}`}>
+                    {pageSteps.map((step, stepIndex) => (
+                      <div className="chrome-onboarding-panel" key={step.label}>
+                        <div className="chrome-onboarding-media">
+                          <img
+                            src={step.image}
+                            alt={`Chrome onboarding step ${pageIndex * 2 + stepIndex + 1}`}
+                            className="chrome-onboarding-image"
+                          />
+                        </div>
+                        <div className="chrome-onboarding-text-block">
+                          {step.stepTitle && (
+                            <p className="chrome-onboarding-step-title">{step.stepTitle}</p>
+                          )}
+                          <p className={`chrome-onboarding-text ${step.isIndented ? 'is-indented' : ''}`}>
+                            {step.label}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {pageIndex < chromeOnboardingPages.length - 1 && (
+                    <span className="chrome-onboarding-boundary-arrow" aria-hidden="true">→</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="chrome-onboarding-dots">
+              <button
+                type="button"
+                className={`chrome-onboarding-dot ${chromeActiveStep === 0 ? 'is-active' : ''}`}
+                onClick={() => scrollToChromeStep(0)}
+                aria-label="Show Step 1 and Step 2"
+              ></button>
+              <button
+                type="button"
+                className={`chrome-onboarding-dot ${chromeActiveStep === 1 ? 'is-active' : ''}`}
+                onClick={() => scrollToChromeStep(1)}
+                aria-label="Show Step 3 and Step 4"
+              ></button>
+            </div>
+          </article>
+        </div>
       </div>
 
       {/* Seventh page (How to Install3)- Section 6 */}
-      <div className="landing-section install-section" data-section="6">
+      <div className="landing-section install-section onboarding-install-section samsung-install-section" data-section={samsungSectionIndex}>
         <div className="section-gradient"></div>
-        <p className="install-guide-title">How to install - Samsung Internet</p>
+        <p className="install-guide-title">How to install - Samsung<span className="samsung-title-internet"> Internet</span></p>
         <div className="install-guide-row samsung-internet-row">
           <div className="install-guide-item">
             <img src={si1} alt="Samsung Internet Step 1" className="install-guide-img" />
@@ -311,10 +646,62 @@ const Landing = () => {
             <p className="install-guide-label">Confirm Add</p>
           </div>
         </div>
+        <div className="chrome-onboarding-wrapper" aria-label="Samsung installation onboarding cards">
+          <article className="chrome-onboarding-card">
+            <div
+              className="chrome-onboarding-carousel"
+              ref={samsungCarouselRef}
+              onScroll={handleSamsungCarouselScroll}
+            >
+              {samsungOnboardingPages.map((pageSteps, pageIndex) => (
+                <div className="chrome-onboarding-slide" key={`samsung-page-${pageIndex}`}>
+                  <div className={`chrome-onboarding-pair ${pageSteps.length === 1 ? 'is-single' : ''}`}>
+                    {pageSteps.map((step, stepIndex) => (
+                      <div className="chrome-onboarding-panel" key={step.label}>
+                        <div className="chrome-onboarding-media">
+                          <img
+                            src={step.image}
+                            alt={`Samsung onboarding step ${pageIndex * 2 + stepIndex + 1}`}
+                            className="chrome-onboarding-image"
+                          />
+                        </div>
+                        <div className="chrome-onboarding-text-block">
+                          {step.stepTitle && (
+                            <p className="chrome-onboarding-step-title">{step.stepTitle}</p>
+                          )}
+                          <p className={`chrome-onboarding-text ${step.isIndented ? 'is-indented' : ''}`}>
+                            {step.label}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {pageIndex < samsungOnboardingPages.length - 1 && (
+                    <span className="chrome-onboarding-boundary-arrow" aria-hidden="true">→</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="chrome-onboarding-dots">
+              <button
+                type="button"
+                className={`chrome-onboarding-dot ${samsungActiveStep === 0 ? 'is-active' : ''}`}
+                onClick={() => scrollToSamsungStep(0)}
+                aria-label="Show Samsung Step 1 and Step 2"
+              ></button>
+              <button
+                type="button"
+                className={`chrome-onboarding-dot ${samsungActiveStep === 1 ? 'is-active' : ''}`}
+                onClick={() => scrollToSamsungStep(1)}
+                aria-label="Show Samsung Step 3 and Step 4"
+              ></button>
+            </div>
+          </article>
+        </div>
       </div>
 
       {/* Last page (Team) - Section 7 */}
-      <div className="landing-section team-section" data-section="7">
+      <div className="landing-section team-section" data-section={teamSectionIndex}>
         <p className="section-heading team-heading">ASU Student Dev Team</p>
         <p className="section-subtitle">We create a better campus experience together</p>
         <div className="team-info">
@@ -328,8 +715,8 @@ const Landing = () => {
               <p className="team-member-email">dkwon1@angelo.edu</p>
             </div>
             <div className="team-member">
-              <p className="team-member-name">Yoona Nam</p>
-              <p className="team-member-email">ynam3@angelo.edu</p>
+              <p className="team-member-name">Bumjun Ko</p>
+              <p className="team-member-email">bko@angelo.edu</p>
             </div>
           </div>
           <div className="team-column team-column-2">
@@ -338,8 +725,8 @@ const Landing = () => {
               <p className="team-member-email">jane.ha44@gmail.com</p>
             </div>
             <div className="team-member">
-              <p className="team-member-name">Bumjun Ko</p>
-              <p className="team-member-email">bko@angelo.edu</p>
+              <p className="team-member-name">Yoona Nam</p>
+              <p className="team-member-email">ynam3@angelo.edu</p>
             </div>
           </div>
         </div>
