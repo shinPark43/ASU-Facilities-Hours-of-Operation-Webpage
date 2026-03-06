@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlineBookOpen, HiOutlineAcademicCap, HiOutlineSearch } from 'react-icons/hi';
 import { FaDumbbell, FaInstagram, FaUtensils } from 'react-icons/fa';
 import { TbBus } from 'react-icons/tb';
-import { fetchFacilityData, tutoringAPI, calendarAPI } from '../services/api.js';
+import { fetchFacilityData, tutoringAPI, calendarAPI, eventsAPI } from '../services/api.js';
+import EventCalendarMap from '../components/EventCalendarMap';
 import { getCurrentDayName, isClosedTime, parseMultipleTimeRanges } from '../utils/timeUtils.js';
 import '../styles/Home.css';
 
@@ -98,6 +99,7 @@ const Home = () => {
   const [facilityData, setFacilityData] = useState({});
   const [loading, setLoading] = useState(true);
   const [calendarEvents, setCalendarEvents] = useState(HIGHLIGHT_CARDS);
+  const [campusEvents, setCampusEvents] = useState([]);
   const [now, setNow] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
@@ -110,13 +112,14 @@ const Home = () => {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes, calendarRes] = await Promise.allSettled([
+      const [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes, calendarRes, eventsRes] = await Promise.allSettled([
         fetchFacilityData('library'),
         fetchFacilityData('recreation'),
         fetchFacilityData('dining'),
         fetchFacilityData('ram_tram'),
         tutoringAPI.getAllTutoringData(),
         calendarAPI.getUpcoming(),
+        eventsAPI.getUpcoming(),
       ]);
 
       const responses = [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes];
@@ -130,6 +133,10 @@ const Home = () => {
 
       if (calendarRes.status === 'fulfilled' && calendarRes.value?.data?.length > 0) {
         setCalendarEvents(calendarRes.value.data);
+      }
+
+      if (eventsRes.status === 'fulfilled' && eventsRes.value?.data?.length > 0) {
+        setCampusEvents(eventsRes.value.data);
       }
 
       setFacilityData(results);
@@ -402,7 +409,23 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 4. Instagram CTA */}
+      {/* 4. Event Calendar Map */}
+      <section className="event-map-section">
+        <div className="section-header-row">
+          <h2 className="home-section-title">Campus Events</h2>
+          <a
+            href="https://www.angelo.edu/events/calendar/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="section-view-all"
+          >
+            View All →
+          </a>
+        </div>
+        <EventCalendarMap events={campusEvents} />
+      </section>
+
+      {/* 5. Instagram CTA */}
       <section className="instagram-section">
         <h2 className="home-section-title">Follow Us</h2>
         <a
@@ -420,7 +443,7 @@ const Home = () => {
         </a>
       </section>
 
-      {/* 5. Footer */}
+      {/* 6. Footer */}
       <p className="home-footer-text">ASU Hours is developed and maintained by ASU students.</p>
     </div>
   );

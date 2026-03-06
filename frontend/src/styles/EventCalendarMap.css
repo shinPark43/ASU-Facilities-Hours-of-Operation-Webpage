@@ -1,0 +1,423 @@
+/* EventCalendarMap Component Styles */
+
+.ecm-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Map group — map card + sheet snap together with no gap */
+.ecm-map-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Map card */
+.ecm-map-card {
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+}
+
+.ecm-map-card--open {
+  border-radius: 16px 16px 0 0;
+  border-bottom: none;
+}
+
+/* Map wrapper */
+.ecm-map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.ecm-map-card--open .ecm-map-wrapper {
+  border-radius: 16px 16px 0 0;
+}
+
+/* Tap-to-interact overlay */
+.ecm-map-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ecm-map-overlay-hint {
+  padding: 9px 18px;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .ecm-map-overlay-hint {
+  background: rgba(30, 30, 30, 0.82);
+}
+
+.ecm-map-overlay-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #111;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .ecm-map-overlay-text {
+  color: #f0f0f0;
+}
+
+@media (min-width: 1024px) {
+  .ecm-map-wrapper {
+    height: 420px;
+  }
+}
+
+/* Marker */
+.ecm-marker {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--asu-blue, #003f7f);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.ecm-marker:hover {
+  transform: scale(1.3);
+}
+
+.ecm-marker--selected {
+  transform: scale(1.4);
+}
+
+[data-theme="dark"] .ecm-marker {
+  border-color: var(--bg-secondary);
+}
+
+.ecm-marker-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--asu-blue, #003f7f);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #fff;
+}
+
+/* Sheet — snaps below the map card, sharing the same border */
+.ecm-sheet {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 12px 14px;
+  animation: ecm-slide-up 0.22s ease;
+}
+
+@keyframes ecm-slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ecm-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ecm-sheet-location {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ecm-sheet-back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-muted);
+  padding: 0;
+  line-height: 1;
+}
+
+.ecm-sheet-back:hover { color: var(--text-primary); }
+
+.ecm-sheet-event {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ecm-sheet-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.ecm-sheet-meta {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.ecm-sheet-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+  flex-wrap: wrap;
+}
+
+.ecm-sheet-link {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.ecm-sheet-link:hover { text-decoration: underline; }
+
+/* Add to Calendar dropdown */
+.ecm-cal-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.ecm-cal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.ecm-cal-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.ecm-cal-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.ecm-cal-btn--icon {
+  padding: 7px 9px;
+}
+
+.ecm-cal-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 148px;
+  overflow: hidden;
+  z-index: 100;
+  animation: ecm-slide-up 0.15s ease;
+}
+
+.ecm-cal-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.ecm-cal-item:hover { background: var(--bg-secondary); }
+
+.ecm-cal-item + .ecm-cal-item {
+  border-top: 1px solid var(--border-light);
+}
+
+/* Multi-event sheet list */
+.ecm-sheet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ecm-sheet-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+}
+
+.ecm-sheet-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ecm-sheet-item-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+  flex-wrap: wrap;
+}
+
+.ecm-sheet-item-text .ecm-sheet-title {
+  font-size: 0.84rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* No-location hint */
+.ecm-no-location-hint {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* No-location strip */
+.ecm-no-location-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ecm-no-location-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.ecm-no-location-card {
+  flex: 0 0 auto;
+  min-width: 200px;
+  max-width: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 20px 16px;
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  transition: opacity 0.2s ease;
+}
+
+.ecm-no-location-card:hover {
+  opacity: 0.85;
+}
+
+
+.ecm-no-location-top {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ecm-no-location-badge {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.ecm-no-location-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.ecm-no-location-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.ecm-no-location-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+}
+
+/* Open upward — prevents clipping by overflow-x: auto on the strip */
+.ecm-no-location-actions .ecm-cal-menu {
+  bottom: calc(100% + 6px);
+  top: auto;
+}
+
+/* No-token warning */
+.ecm-no-token {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-light);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.ecm-no-token code {
+  font-family: monospace;
+  color: var(--text-primary);
+}
