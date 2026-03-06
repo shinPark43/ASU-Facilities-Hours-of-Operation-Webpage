@@ -9,9 +9,9 @@ const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 function formatEvent(e) {
   const tsMs = e.ts_start * 1000;
   const date = new Date(tsMs).toLocaleDateString('en-US', {
-    weekday: 'short', month: 'short', day: 'numeric',
+    weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Chicago',
   });
-  const fmtTime = ts => new Date(ts * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const fmtTime = ts => new Date(ts * 1000).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago' });
   const time = e.is_all_day === '1' || e.is_all_day === true
     ? 'All Day'
     : e.ts_end
