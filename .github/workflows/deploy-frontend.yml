@@ -49,6 +49,7 @@ jobs:
       env:
         # Set your backend API URL here
         REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+        REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
         # PUBLIC_URL will be derived from homepage in package.json
       run: |
         cd frontend
