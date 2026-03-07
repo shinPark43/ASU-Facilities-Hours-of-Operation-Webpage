@@ -4,7 +4,7 @@ const { getScraperManager } = require('../scraper');
 const { lookupVenueCoords } = require('../venueCoords');
 
 const cache = new Map();
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
 function formatEvent(e) {
   const tsMs = e.ts_start * 1000;
@@ -66,7 +66,7 @@ router.get('/upcoming', async (req, res) => {
     }
 
     allEvents.sort((a, b) => a.ts_start - b.ts_start);
-    const upcoming = allEvents.slice(0, 25).map(formatEvent);
+    const upcoming = allEvents.map(formatEvent);
 
     cache.set(cacheKey, upcoming);
     if (cache.size > 20) cache.delete(cache.keys().next().value);

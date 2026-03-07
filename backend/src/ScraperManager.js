@@ -1390,14 +1390,62 @@ class ScraperManager {
     const page = await browser.newPage();
     try {
       await page.setUserAgent(this.userAgent);
+
+      // Set up interceptor for the LiveWhale API response fired when clicking "Next"
+      let resolveWeek2;
+      const week2Promise = new Promise(resolve => { resolveWeek2 = resolve; });
+      page.on('response', async res => {
+        if (res.url().includes('/live/calendar/view/week/date/')) {
+          try {
+            const json = await res.json();
+            resolveWeek2(json.events || {});
+          } catch {
+            resolveWeek2({});
+          }
+        }
+      });
+
       await page.goto('https://www.angelo.edu/events/calendar/', {
-        waitUntil: 'domcontentloaded',
-        timeout: 20000,
+        waitUntil: 'domcontentloaded', timeout: 20000,
       });
-      const eventsData = await page.evaluate(() => {
-        return window.livewhale?.calendar?.preload_data?.events || {};
-      });
-      return eventsData;
+
+      let week1Data = {};
+      try {
+        week1Data = await page.evaluate(() =>
+          window.livewhale?.calendar?.preload_data?.events || {}
+        );
+      } catch (err) {
+        console.warn('Failed to read current-week events:', err.message);
+      }
+
+      // Click "Next" to trigger the API call for next week
+      try {
+        const clicked = await page.evaluate(() => {
+          const spans = document.querySelectorAll('.lw_sr_only');
+          for (const span of spans) {
+            if (span.textContent.trim() === 'Next') {
+              span.closest('a').click();
+              return true;
+            }
+          }
+          return false;
+        });
+        if (!clicked) {
+          console.warn('Next week link not found on calendar page');
+          resolveWeek2({});
+        }
+      } catch (err) {
+        console.warn('Failed to click next-week link:', err.message);
+        resolveWeek2({});
+      }
+
+      // Wait up to 10 seconds for next-week API response
+      const week2Data = await Promise.race([
+        week2Promise,
+        new Promise(resolve => setTimeout(() => resolve({}), 10000)),
+      ]);
+
+      return { ...week1Data, ...week2Data };
     } finally {
       await page.close();
     }
