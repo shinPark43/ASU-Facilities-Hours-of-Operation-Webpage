@@ -74,7 +74,7 @@ class ScraperManager {
         '--disable-accelerated-2d-canvas',
         '--no-first-run',
         '--no-zygote',
-        '--single-process',
+        ...(process.platform === 'linux' ? ['--single-process'] : []),
         '--disable-gpu'
       ],
       timeout: 30000
