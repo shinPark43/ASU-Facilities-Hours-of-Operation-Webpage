@@ -11,6 +11,7 @@ import youtube_icon_team_page from '../assets/images/youtube_icon_team_page.svg'
 import envelope_icon_team_page from '../assets/images/email_icon_team_page.svg';
 import white_arrow_icon from '../assets/images/white_arrow_icon.svg';
 import gray_arrow_icon from '../assets/images/gray_arrow_icon.svg';
+import asuHoursLogo from '../assets/images/logo_1.png';
 
 //How to Install guide images
 import chrome1 from '../assets/images/Chrome1.png';
@@ -396,14 +397,31 @@ const Landing = () => {
         </div> */}
         
         <div className="main-hero-heading">
-          <p>Real-Time<br className="hero-heading-desktop-br" /> Operating Hours</p>
+          <p>
+            {isTabletOrBelow ? (
+              'Operating Hours'
+            ) : (
+              <>
+                Real-Time<br className="hero-heading-desktop-br" /> Operating Hours
+              </>
+            )}
+          </p>
           <p>For ASU Facilities</p>
         </div>
         <img className="hero-icon" src={imgQrCode} alt="QR Code" />
         <div className="hero-feature-text">
           <p>Anytime, Anywhere</p>
-          <p>Access with Mobile Device</p>
-            </div>
+          <p>{isTabletOrBelow ? 'Access with Your Mobile Device' : 'Access with Mobile Device'}</p>
+        </div>
+        <div className="hero-download-actions">
+          <button type="button" className="hero-download-btn hero-download-btn-app" aria-label="ASU Hours App">
+            <img className="hero-download-app-logo" src={asuHoursLogo} alt="" aria-hidden="true" />
+            <span className="hero-download-app-text">ASU Hours</span>
+          </button>
+          <button type="button" className="hero-download-btn hero-download-btn-qr" aria-label="Show QR">
+            <img src={imgQrCode} alt="QR" />
+          </button>
+        </div>
         <img className="hero-image-1" src={apllicationImage1} alt="Mobile App Screenshot 1" />
         <img className="hero-image-2" src={apllicationImage2} alt="Mobile App Screenshot 2" />
             </div>
