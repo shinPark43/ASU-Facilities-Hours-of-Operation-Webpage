@@ -1,4 +1,10 @@
 /* Scroll to Top Button Styles */
+
+/* Hide when schedule modal is open */
+body:has(.schedule-overlay) .scroll-to-top {
+  display: none;
+}
+
 .scroll-to-top {
   position: fixed;
   bottom: 2rem;

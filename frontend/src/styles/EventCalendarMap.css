@@ -318,9 +318,6 @@
 
 .ecm-sheet-item-text .ecm-sheet-title {
   font-size: 0.84rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* No-location hint */
@@ -328,6 +325,23 @@
   margin: 0;
   font-size: 0.74rem;
   color: var(--text-muted);
+}
+
+/* Map marker hint */
+.ecm-map-hint {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* No-location strip */
@@ -420,4 +434,63 @@
 .ecm-no-token code {
   font-family: monospace;
   color: var(--text-primary);
+}
+
+.ecm-filter-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.ecm-filter-tab {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1;
+  padding: 7px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.ecm-filter-tab:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.ecm-filter-tab:focus {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.ecm-filter-tab--active {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.ecm-filter-tab:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.ecm-filter-tab--active:focus-visible {
+  outline-color: var(--bg-primary);
+}
+
+.ecm-empty-state {
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
 }

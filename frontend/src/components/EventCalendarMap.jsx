@@ -5,6 +5,44 @@ import '../styles/EventCalendarMap.css';
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
+const FILTERS = ['Today', 'This Week', 'Next Week'];
+
+function getChicagoBoundaries() {
+  const now = new Date();
+  const chicagoDateStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+
+  function chicagoMidnight(dateStr) {
+    const probe = new Date(`${dateStr}T12:00:00Z`);
+    const chicagoNoon = new Date(probe.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+    const offsetMs = probe.getTime() - chicagoNoon.getTime();
+    return new Date(`${dateStr}T00:00:00`).getTime() + offsetMs;
+  }
+
+  const addDays = (dateStr, n) => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+  };
+
+  const chicagoDayOfWeek = new Date(
+    new Date(`${chicagoDateStr}T12:00:00Z`).toLocaleString('en-US', { timeZone: 'America/Chicago' })
+  ).getDay(); // 0=Sun, 1=Mon...
+  const daysFromMonday = (chicagoDayOfWeek + 6) % 7;
+
+  const thisMonStr    = addDays(chicagoDateStr, -daysFromMonday);
+  const nextMonStr    = addDays(thisMonStr, 7);
+  const nextSunEndStr = addDays(nextMonStr, 7);
+  const tomorrowStr   = addDays(chicagoDateStr, 1);
+
+  return {
+    todayStart:    chicagoMidnight(chicagoDateStr) / 1000,
+    todayEnd:      chicagoMidnight(tomorrowStr)    / 1000,
+    thisWeekStart: chicagoMidnight(thisMonStr)     / 1000,
+    thisWeekEnd:   chicagoMidnight(nextMonStr)     / 1000,
+    nextWeekStart: chicagoMidnight(nextMonStr)     / 1000,
+    nextWeekEnd:   chicagoMidnight(nextSunEndStr)  / 1000,
+  };
+}
+
 const ASU_CENTER = { longitude: -100.4648, latitude: 31.4405 };
 
 const LIGHT_STYLE = 'mapbox://styles/mapbox/standard';
@@ -113,6 +151,7 @@ const EventCalendarMap = ({ events = [] }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [openCalDropdown, setOpenCalDropdown] = useState(null);
   const [mapActive, setMapActive] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('This Week');
   const sheetRef = useRef(null);
 
   useEffect(() => {
@@ -134,8 +173,26 @@ const EventCalendarMap = ({ events = [] }) => {
     return () => observer.disconnect();
   }, []);
 
-  const mappableEvents = events.filter(e => e.lat != null && e.lng != null);
-  const unmappableEvents = events.filter(e => e.lat == null || e.lng == null);
+  // Clear selection when filter changes
+  useEffect(() => {
+    setSelectedLocation(null);
+    setOpenCalDropdown(null);
+  }, [activeFilter]);
+
+  const filteredEvents = useMemo(() => {
+    const b = getChicagoBoundaries();
+    switch (activeFilter) {
+      case 'Today':
+        return events.filter(e => e.tsStart >= b.todayStart && e.tsStart < b.todayEnd);
+      case 'Next Week':
+        return events.filter(e => e.tsStart >= b.nextWeekStart && e.tsStart < b.nextWeekEnd);
+      default: // 'This Week'
+        return events.filter(e => e.tsStart >= b.thisWeekStart && e.tsStart < b.thisWeekEnd);
+    }
+  }, [events, activeFilter]);
+
+  const mappableEvents   = filteredEvents.filter(e => e.lat != null && e.lng != null);
+  const unmappableEvents = filteredEvents.filter(e => e.lat == null || e.lng == null);
 
   const locationGroups = useMemo(() => {
     const groups = new Map();
@@ -200,6 +257,24 @@ const EventCalendarMap = ({ events = [] }) => {
 
   return (
     <div className="ecm-container">
+      <div className="ecm-filter-tabs" role="tablist" aria-label="Event date filter">
+        {FILTERS.map(f => (
+          <button
+            key={f}
+            role="tab"
+            aria-selected={activeFilter === f}
+            className={`ecm-filter-tab${activeFilter === f ? ' ecm-filter-tab--active' : ''}`}
+            onClick={() => setActiveFilter(f)}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {filteredEvents.length === 0 && (
+        <p className="ecm-empty-state">No events for {activeFilter.toLowerCase()}.</p>
+      )}
+
       <div className="ecm-map-group">
         <div className={`ecm-map-card${selectedLocation ? ' ecm-map-card--open' : ''}`}>
           <div className="ecm-map-wrapper">
@@ -251,6 +326,9 @@ const EventCalendarMap = ({ events = [] }) => {
                   <span className="ecm-map-overlay-text">Tap to explore map</span>
                 </div>
               </div>
+            )}
+            {mapActive && mappableEvents.length > 0 && !selectedLocation && (
+              <p className="ecm-map-hint">Tap a marker to view events at that location.</p>
             )}
           </div>
         </div>

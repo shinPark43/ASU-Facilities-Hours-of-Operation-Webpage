@@ -4,7 +4,7 @@ const { getScraperManager } = require('../scraper');
 const { lookupVenueCoords } = require('../venueCoords');
 
 const cache = new Map();
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
 function formatEvent(e) {
   const tsMs = e.ts_start * 1000;
@@ -19,10 +19,10 @@ function formatEvent(e) {
       : fmtTime(e.ts_start);
   let lat = e.latitude && e.latitude !== '' ? parseFloat(e.latitude) : null;
   let lng = e.longitude && e.longitude !== '' ? parseFloat(e.longitude) : null;
-  if (lat === null || lng === null) {
-    const coords = lookupVenueCoords(e.location);
-    if (coords) { lat = coords.lat; lng = coords.lng; }
-  }
+  // Always normalize to canonical venue coords when matched, so events at the
+  // same venue cluster into one marker regardless of coordinate source.
+  const venueCoords = lookupVenueCoords(e.location) || lookupVenueCoords(e.title);
+  if (venueCoords) { lat = venueCoords.lat; lng = venueCoords.lng; }
   const link = e.href
     ? (e.href.startsWith('http') ? e.href : `https://www.angelo.edu/events/calendar/${e.href.replace(/^\//, '')}`)
     : 'https://www.angelo.edu/events/calendar/';
@@ -66,7 +66,7 @@ router.get('/upcoming', async (req, res) => {
     }
 
     allEvents.sort((a, b) => a.ts_start - b.ts_start);
-    const upcoming = allEvents.slice(0, 25).map(formatEvent);
+    const upcoming = allEvents.map(formatEvent);
 
     cache.set(cacheKey, upcoming);
     if (cache.size > 20) cache.delete(cache.keys().next().value);
