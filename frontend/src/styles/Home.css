@@ -140,6 +140,47 @@
   padding: 0.75rem 0 1.75rem;
 }
 
+.home-welcome-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.home-schedule-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: none;
+  background: #2d3561;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: calc((100% - 20px) / 3);
+  margin-top: 2px;
+  box-shadow: 0 4px 12px rgba(45, 53, 97, 0.45);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-schedule-btn:hover {
+  background: #222850;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(45, 53, 97, 0.55);
+}
+
+.home-schedule-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(45, 53, 97, 0.35);
+}
+
 .home-date {
   font-size: 0.8rem;
   font-weight: 500;
@@ -153,18 +194,11 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
-  background: linear-gradient(135deg, var(--text-primary) 20%, var(--asu-blue) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: var(--text-primary);
+  color: #1a1a1a;
 }
 
 [data-theme="dark"] .home-greeting {
-  background: linear-gradient(135deg, var(--text-primary) 20%, var(--asu-blue-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffffff;
 }
 
 /* ─── 2. Facility Status Section ──────────────────────────── */

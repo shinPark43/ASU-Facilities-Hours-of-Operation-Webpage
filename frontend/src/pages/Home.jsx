@@ -2,9 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlineBookOpen, HiOutlineAcademicCap, HiOutlineSearch } from 'react-icons/hi';
 import { FaDumbbell, FaInstagram, FaUtensils } from 'react-icons/fa';
-import { TbBus } from 'react-icons/tb';
+import { TbBus, TbCalendarEvent } from 'react-icons/tb';
 import { fetchFacilityData, tutoringAPI, calendarAPI, eventsAPI } from '../services/api.js';
 import EventCalendarMap from '../components/EventCalendarMap';
+import ScheduleWidget from '../components/ScheduleWidget';
 import { getCurrentDayName, isClosedTime, parseMultipleTimeRanges } from '../utils/timeUtils.js';
 import '../styles/Home.css';
 
@@ -103,6 +104,7 @@ const Home = () => {
   const [now, setNow] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -341,9 +343,25 @@ const Home = () => {
 
       {/* 1. Welcome Section */}
       <section className="home-welcome">
-        <p className="home-date">{dateStr} · {timeStr}</p>
-        <h1 className="home-greeting">{greeting}</h1>
+        <div className="home-welcome-row">
+          <div>
+            <p className="home-date">{dateStr} · {timeStr}</p>
+            <h1 className="home-greeting">{greeting}</h1>
+          </div>
+          <button
+            className="home-schedule-btn"
+            onClick={() => setShowSchedule(true)}
+            aria-label="My Schedule"
+          >
+            <TbCalendarEvent size={26} />
+            <span>My Schedule</span>
+          </button>
+        </div>
       </section>
+
+      {showSchedule && (
+        <ScheduleWidget onClose={() => setShowSchedule(false)} />
+      )}
 
       {/* 2. Facility Status Grid */}
       <section className="facility-status-section">

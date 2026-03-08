@@ -26,9 +26,15 @@ const VENUE_COORDS = [
   },
   {
     name: 'LeGrand Sports Complex',
-    patterns: ['legrand', 'le grand'],
+    patterns: ['legrand sports', 'legrand stadium', 'le grand sports', 'le grand stadium'],
     lat: 31.435387,
     lng: -100.458126,
+  },
+  {
+    name: 'LeGrand Alumni and Visitors Center',
+    patterns: ['legrand alumni', 'legrand visitor', 'le grand alumni', 'le grand visitor'],
+    lat: 31.43432,
+    lng: -100.45563,
   },
   {
     name: 'ASU Tennis Complex',
@@ -41,6 +47,18 @@ const VENUE_COORDS = [
     patterns: ['houston harte', 'university center'],
     lat: 31.441097,
     lng: -100.466485,
+  },
+  {
+    name: 'Texan Hall',
+    patterns: ['texan hall'],
+    lat: 31.438545,
+    lng: -100.456459,
+  },
+  {
+    name: 'Vincent Building',
+    patterns: ['vincent building', 'vincent hall'],
+    lat: 31.441031,
+    lng: -100.461323,
   },
 ];
 

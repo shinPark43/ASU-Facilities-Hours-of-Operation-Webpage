@@ -327,6 +327,9 @@ const EventCalendarMap = ({ events = [] }) => {
                 </div>
               </div>
             )}
+            {mapActive && mappableEvents.length > 0 && !selectedLocation && (
+              <p className="ecm-map-hint">Tap a marker to view events at that location.</p>
+            )}
           </div>
         </div>
 
