@@ -262,7 +262,7 @@
   background: var(--bg-tertiary);
   border: 1px solid var(--border-light);
   border-radius: 10px;
-  font-size: 0.875rem;
+  font-size: 1rem; /* was 0.875rem — 16px prevents iOS auto-zoom on focus */
   color: var(--text-primary);
   outline: none;
   box-sizing: border-box;
@@ -374,7 +374,7 @@
 }
 
 .schedule-spinner-val {
-  font-size: 1rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
   min-width: 1.6ch;
@@ -447,7 +447,7 @@
 
 .schedule-period-toggle {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   gap: 1px;
   margin-left: 2px;
