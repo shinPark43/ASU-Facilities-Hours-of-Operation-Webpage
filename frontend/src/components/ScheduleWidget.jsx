@@ -41,7 +41,7 @@ const TimeSelector = ({ value, onChange }) => {
       {dropdown && <div className="schedule-spinner-backdrop" onClick={() => setDropdown(null)} />}
 
       <div className="schedule-time-spinner">
-        <button type="button" className="schedule-spinner-btn" onClick={() => stepHour(1)}><HiChevronUp size={13} /></button>
+        <button type="button" className="schedule-spinner-btn" onClick={() => stepHour(1)}><HiChevronUp size={18} /></button>
         <div className="schedule-spinner-val-wrap">
           <span className="schedule-spinner-val" onClick={() => setDropdown(d => d === 'hour' ? null : 'hour')}>{hour12}</span>
           {dropdown === 'hour' && (
@@ -55,13 +55,13 @@ const TimeSelector = ({ value, onChange }) => {
             </div>
           )}
         </div>
-        <button type="button" className="schedule-spinner-btn" onClick={() => stepHour(-1)}><HiChevronDown size={13} /></button>
+        <button type="button" className="schedule-spinner-btn" onClick={() => stepHour(-1)}><HiChevronDown size={18} /></button>
       </div>
 
       <span className="schedule-time-colon">:</span>
 
       <div className="schedule-time-spinner">
-        <button type="button" className="schedule-spinner-btn" onClick={() => stepMinute(1)}><HiChevronUp size={13} /></button>
+        <button type="button" className="schedule-spinner-btn" onClick={() => stepMinute(1)}><HiChevronUp size={18} /></button>
         <div className="schedule-spinner-val-wrap">
           <span className="schedule-spinner-val" onClick={() => setDropdown(d => d === 'minute' ? null : 'minute')}>{String(m).padStart(2, '0')}</span>
           {dropdown === 'minute' && (
@@ -75,7 +75,7 @@ const TimeSelector = ({ value, onChange }) => {
             </div>
           )}
         </div>
-        <button type="button" className="schedule-spinner-btn" onClick={() => stepMinute(-1)}><HiChevronDown size={13} /></button>
+        <button type="button" className="schedule-spinner-btn" onClick={() => stepMinute(-1)}><HiChevronDown size={18} /></button>
       </div>
 
       <div className="schedule-period-toggle">
