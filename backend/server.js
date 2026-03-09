@@ -11,7 +11,9 @@ const facilityRoutes = require('./src/routes/facilities');
 const tutoringRoutes = require('./src/routes/tutoring');
 const calendarRoutes = require('./src/routes/calendar');
 const eventsRoutes = require('./src/routes/events');
+const embeddingsRoutes = require('./src/routes/embeddings');
 const scraper = require('./src/scraper');
+const { runEmbeddingPipeline } = require('./src/embeddings/embeddingPipeline');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -46,6 +48,7 @@ app.use('/api/facilities', facilityRoutes);
 app.use('/api/tutoring', tutoringRoutes);
 app.use('/api/calendar', calendarRoutes);
 app.use('/api/events', eventsRoutes);
+app.use('/api/embeddings', embeddingsRoutes);
 
 // Enhanced health check endpoint
 app.get('/api/health', async (req, res) => {
@@ -154,6 +157,16 @@ async function startServer() {
       }
     }, {
       timezone: "America/Chicago" // CST/CDT for Texas
+    });
+
+    // Weekly embedding pipeline — runs every Monday at 06:00 UTC (Sunday midnight CST)
+    cron.schedule('0 6 * * 1', async () => {
+      console.log('[Embeddings] Starting weekly embedding pipeline...');
+      try {
+        await runEmbeddingPipeline();
+      } catch (error) {
+        console.error('[Embeddings] Weekly pipeline failed:', error.message);
+      }
     });
 
     // Run scraper on startup (optional - for testing)
