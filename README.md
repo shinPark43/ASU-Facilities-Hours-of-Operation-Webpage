@@ -12,26 +12,26 @@ A full-stack web application providing real-time operating hours for Angelo Stat
   <table>
     <tr>
       <td align="center">
+        <img src="images/screenshots/home-page.png" width="300" alt="Home Page"/>
+        <br/>
+        <em>Home Dashboard</em>
+      </td>
+      <td align="center">
         <img src="images/screenshots/library-page.png" width="300" alt="Library Page"/>
         <br/>
         <em>Porter Henderson Library</em>
       </td>
-      <td align="center">
-        <img src="images/screenshots/recreation-page.png" width="300" alt="Recreation Page"/>
-        <br/>
-        <em>Recreation Center</em>
-      </td>
     </tr>
     <tr>
       <td align="center">
-        <img src="images/screenshots/dining-page.png" width="300" alt="Dining Page"/>
+        <img src="images/screenshots/tutoring-page.png" width="300" alt="Tutoring Page"/>
         <br/>
-        <em>Dining Locations</em>
+        <em>Academic Support Center</em>
       </td>
       <td align="center">
-        <img src="images/screenshots/ramtram-page.png" width="300" alt="Ram Tram Page"/>
+        <img src="images/screenshots/events-map.png" width="300" alt="Campus Events Map"/>
         <br/>
-        <em>Ram Tram Transportation</em>
+        <em>Campus Events Map</em>
       </td>
     </tr>
   </table>
