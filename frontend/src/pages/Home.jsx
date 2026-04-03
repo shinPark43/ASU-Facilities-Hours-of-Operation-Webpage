@@ -440,7 +440,11 @@ const Home = () => {
             View All →
           </a>
         </div>
-        <EventCalendarMap events={campusEvents} />
+        {/* FIGMA CAPTURE — remove after done */}
+        {window.location.hash.includes('figmacapture')
+          ? <div style={{ height: 300, background: 'var(--bg-tertiary)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 14 }}>Campus Events Map</div>
+          : <EventCalendarMap events={campusEvents} />
+        }
       </section>
 
       {/* 5. Instagram CTA */}
