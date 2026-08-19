@@ -142,19 +142,19 @@ async function startServer() {
       timezone: "America/Chicago" // CST/CDT for Texas
     });
 
-    // Weekly scraper for tutoring (runs every Sunday at midnight CST)
-    // Tutoring schedules don't change frequently, so weekly is sufficient
-    cron.schedule('0 0 * * 0', async () => {
-      console.log('🕐 Running weekly tutoring scraper...');
-      try {
-        await scraper.scrapeSpecificFacility('tutoring');
-        console.log('✅ Weekly tutoring scrape completed successfully');
-      } catch (error) {
-        console.error('❌ Weekly tutoring scrape failed:', error);
-      }
-    }, {
-      timezone: "America/Chicago" // CST/CDT for Texas
-    });
+    // Weekly tutoring scraper paused — Fall 2026 schedule not yet available
+    // Uncomment when the semester schedule goes live
+    // cron.schedule('0 0 * * 0', async () => {
+    //   console.log('🕐 Running weekly tutoring scraper...');
+    //   try {
+    //     await scraper.scrapeSpecificFacility('tutoring');
+    //     console.log('✅ Weekly tutoring scrape completed successfully');
+    //   } catch (error) {
+    //     console.error('❌ Weekly tutoring scrape failed:', error);
+    //   }
+    // }, {
+    //   timezone: "America/Chicago" // CST/CDT for Texas
+    // });
 
     // Run scraper on startup (optional - for testing)
     // Only scrapes daily facilities, not tutoring (to save time during dev)
