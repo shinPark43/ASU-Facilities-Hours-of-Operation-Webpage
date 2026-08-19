@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { tutoringAPI } from '../services/api.js';
 import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
+import { TbCalendarEvent } from 'react-icons/tb';
+
+// Set to true during semester transitions when the schedule isn't posted yet
+const COMING_SOON = true;
 
 // Tutoring notice data - can be moved to backend later
 const TUTORING_MEMO = {
@@ -31,6 +35,10 @@ const Tutoring = () => {
   const [showNoticePopup, setShowNoticePopup] = useState(false);
 
   useEffect(() => {
+    if (COMING_SOON) {
+      setLoading(false);
+      return;
+    }
     const fetchTutoringData = async () => {
       try {
         setLoading(true);
@@ -217,6 +225,88 @@ const Tutoring = () => {
     return (
       <div className="error">
         {error}
+      </div>
+    );
+  }
+
+  if (COMING_SOON) {
+    return (
+      <div>
+        <AnnouncementBanner
+          items={[
+            "<strong>Free Tutoring</strong> - Available to all ASU students, no appointment necessary",
+            "<strong>Upswing</strong> - 2 hours/week of free online tutoring available",
+            "<strong>Click for more info</strong>"
+          ]}
+          speedSec={280}
+          onClick={() => setShowNoticePopup(true)}
+        />
+
+        {showNoticePopup && (
+          <div className="memo-overlay" onClick={() => setShowNoticePopup(false)}>
+            <div className="memo-popup" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="memo-close"
+                onClick={() => setShowNoticePopup(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+              <div className="memo-content">
+                <div className="memo-section">
+                  <span className="memo-label">notices:</span>
+                  <ul className="memo-list">
+                    {TUTORING_MEMO.notices.map((notice, i) => (
+                      <li key={i}>{notice}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="memo-section memo-links">
+                  <span className="memo-label">links:</span>
+                  <div className="memo-link-list">
+                    <a href={TUTORING_MEMO.links.main} target="_blank" rel="noopener noreferrer">
+                      ASU Tutoring →
+                    </a>
+                    <a href={TUTORING_MEMO.links.upswing} target="_blank" rel="noopener noreferrer">
+                      Upswing →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="page-header-with-square-button">
+          <div className="page-header-content">
+            <h2 className="section-panel-header">Academic Support Center</h2>
+            <p className="section-subtitle">Free tutoring services for ASU students</p>
+          </div>
+        </div>
+
+        <div className="facility-section">
+          <div style={{ textAlign: 'center', padding: '3rem 1rem', minHeight: '35vh',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <TbCalendarEvent size={48} style={{ color: 'var(--primary-color)', marginBottom: '0.75rem' }} />
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+              Fall 2026 Tutor Center Schedule Coming Soon!
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+              Check back once the fall semester begins.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <a
+            href="https://www.angelo.edu/current-students/freshman-college/academic-tutoring.php"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="website-link"
+          >
+            View on ASU Website
+          </a>
+        </div>
       </div>
     );
   }
