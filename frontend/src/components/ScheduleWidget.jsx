@@ -291,7 +291,17 @@ const ScheduleWidget = ({ onClose }) => {
             <div className="schedule-time-range">
               <TimeSelector
                 value={form.startTime}
-                onChange={v => setForm(f => ({ ...f, startTime: v }))}
+                onChange={v => setForm(f => {
+                  const toMins = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+                  const toTime = mins => {
+                    const h = Math.floor(mins / 60);
+                    const m = mins % 60;
+                    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                  };
+                  const duration = Math.max(toMins(f.endTime) - toMins(f.startTime), 0);
+                  const newEndMins = Math.min(toMins(v) + duration, 21 * 60);
+                  return { ...f, startTime: v, endTime: toTime(newEndMins) };
+                })}
               />
               <span className="schedule-time-range-sep">–</span>
               <TimeSelector
