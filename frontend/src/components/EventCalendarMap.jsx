@@ -144,7 +144,7 @@ const IconOutlook = () => (
   </svg>
 );
 
-const EventCalendarMap = ({ events = [] }) => {
+const EventCalendarMap = ({ events = [], loading = false }) => {
   const [theme, setTheme] = useState(
     () => localStorage.getItem('theme') || 'light'
   );
@@ -272,7 +272,9 @@ const EventCalendarMap = ({ events = [] }) => {
       </div>
 
       {filteredEvents.length === 0 && (
-        <p className="ecm-empty-state">No events for {activeFilter.toLowerCase()}.</p>
+        <p className="ecm-empty-state">
+          {loading ? 'Loading events…' : `No events for ${activeFilter.toLowerCase()}.`}
+        </p>
       )}
 
       <div className="ecm-map-group">

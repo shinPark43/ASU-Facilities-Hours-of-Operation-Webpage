@@ -98,7 +98,8 @@ const isCurrentlyRunning = (timeString, now) => {
 
 const Home = () => {
   const [facilityData, setFacilityData] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [facilitiesLoading, setFacilitiesLoading] = useState(true);
+  const [calendarLoading, setCalendarLoading] = useState(true);
   const [calendarEvents, setCalendarEvents] = useState(HIGHLIGHT_CARDS);
   const [campusEvents, setCampusEvents] = useState([]);
   const [now, setNow] = useState(new Date());
@@ -113,39 +114,46 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const fetchAll = async () => {
-      const [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes, calendarRes, eventsRes] = await Promise.allSettled([
+    // Fast path — SQLite + 5-min cache, resolves in ~100ms
+    const fetchFacilities = async () => {
+      const [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes] = await Promise.allSettled([
         fetchFacilityData('library'),
         fetchFacilityData('recreation'),
         fetchFacilityData('dining'),
         fetchFacilityData('ram_tram'),
         tutoringAPI.getAllTutoringData(),
-        calendarAPI.getUpcoming(),
-        eventsAPI.getUpcoming(),
       ]);
 
       const responses = [libraryRes, gymRes, diningRes, ramTramRes, tutoringRes];
       const keys = ['library', 'recreation', 'dining', 'ram_tram', 'tutoring'];
       const results = {};
       keys.forEach((key, i) => {
-        if (responses[i].status === 'fulfilled') {
-          results[key] = responses[i].value;
-        }
+        if (responses[i].status === 'fulfilled') results[key] = responses[i].value;
       });
+
+      setFacilityData(results);
+      setFacilitiesLoading(false);
+    };
+
+    // Slow path — Cheerio (~1-2s) + Puppeteer (~3-10s) on cold cache
+    const fetchCalendarData = async () => {
+      const [calendarRes, eventsRes] = await Promise.allSettled([
+        calendarAPI.getUpcoming(),
+        eventsAPI.getUpcoming(),
+      ]);
 
       if (calendarRes.status === 'fulfilled' && calendarRes.value?.data?.length > 0) {
         setCalendarEvents(calendarRes.value.data);
       }
-
       if (eventsRes.status === 'fulfilled' && eventsRes.value?.data?.length > 0) {
         setCampusEvents(eventsRes.value.data);
       }
 
-      setFacilityData(results);
-      setLoading(false);
+      setCalendarLoading(false);
     };
 
-    fetchAll();
+    fetchFacilities();
+    fetchCalendarData();
   }, []);
 
   const hour = now.getHours();
@@ -204,7 +212,7 @@ const Home = () => {
     if (facility.static) {
       return <span className="facility-status-text link">Schedule →</span>;
     }
-    if (loading) {
+    if (facilitiesLoading) {
       return <div className="status-shimmer" />;
     }
     if (facility.key === 'ram_tram') {
@@ -368,7 +376,7 @@ const Home = () => {
         <h2 className="home-section-title">Facility Status</h2>
         <div className="facility-icon-grid">
           {FACILITY_CONFIGS.map((facility) => {
-            const { isOpen, hoursStr } = (!loading && !facility.static)
+            const { isOpen, hoursStr } = (!facilitiesLoading && !facility.static)
               ? getFacilityStatus(facility.key, facility.sectionKey)
               : { isOpen: false, hoursStr: null };
 
@@ -440,7 +448,7 @@ const Home = () => {
             View All →
           </a>
         </div>
-        <EventCalendarMap events={campusEvents} />
+        <EventCalendarMap events={campusEvents} loading={calendarLoading} />
       </section>
 
       {/* 5. Instagram CTA */}
