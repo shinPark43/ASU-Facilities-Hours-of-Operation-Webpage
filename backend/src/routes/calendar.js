@@ -8,16 +8,27 @@ const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 const CALENDAR_URL = 'https://www.angelo.edu/current-students/registrar/academic_calendar.php';
 
-// Parse "March 1", "March 5 at 5 p.m.", "March 16-20" → Date object (uses first day of range)
+const MONTH_MAP = {
+  Jan: 'January', Feb: 'February', Mar: 'March',  Apr: 'April',
+  May: 'May',     Jun: 'June',     Jul: 'July',   Aug: 'August',
+  Sep: 'September', Sept: 'September', Oct: 'October',
+  Nov: 'November', Dec: 'December',
+};
+
+// Parse "Aug. 21", "Aug. 21 2027", "March 15", "March 15 2027" → Date object
 function parseDateFromDt(dtText) {
-  const match = dtText.match(/([A-Z][a-z]+)\s+(\d+)/);
+  const match = dtText.match(/([A-Z][a-z]+\.?)\s+(\d+)(?:\s+(\d{4}))?/);
   if (!match) return null;
-  const [, monthStr, dayStr] = match;
-  const year = new Date().getFullYear();
-  const date = new Date(`${monthStr} ${dayStr}, ${year}`);
-  // If the date is more than 1 day in the past, try next year (handles Dec→Jan crossover)
-  if (date < new Date(Date.now() - 86400000)) date.setFullYear(year + 1);
-  return date;
+  const [, monthStr, dayStr, yearStr] = match;
+  const fullMonth = MONTH_MAP[monthStr.replace('.', '')] || monthStr;
+  const year = yearStr
+    ? parseInt(yearStr)
+    : (() => {
+        const y = new Date().getFullYear();
+        const d = new Date(`${fullMonth} ${dayStr}, ${y}`);
+        return d < new Date(Date.now() - 86400000) ? y + 1 : y;
+      })();
+  return new Date(`${fullMonth} ${dayStr}, ${year}`);
 }
 
 function classifyEvent(title, eventDate, today) {
@@ -64,7 +75,10 @@ router.get('/upcoming', async (req, res) => {
     const upcoming = [];
     for (const trEl of $('table tr').toArray()) {
       if (upcoming.length >= 5) break;
-      const thText = $(trEl).find('th span').first().text().trim();
+      const thEl = $(trEl).find('th');
+      const mainDate = thEl.find('span').not('.until').not('.lw_date_year').first().text().trim();
+      const explicitYear = thEl.find('.lw_date_year').text().replace(/\D/g, '');
+      const thText = explicitYear ? `${mainDate} ${explicitYear}` : mainDate;
       const tdText = $(trEl).find('td .font-weight-bold').first().text().trim()
                   || $(trEl).find('td').first().text().trim();
       if (!thText || !tdText) continue;
