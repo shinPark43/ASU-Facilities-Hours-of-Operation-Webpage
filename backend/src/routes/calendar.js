@@ -16,18 +16,14 @@ const MONTH_MAP = {
 };
 
 // Parse "Aug. 21", "Aug. 21 2027", "March 15", "March 15 2027" → Date object
+// Year defaults to current year when not explicitly present; no year inference.
 function parseDateFromDt(dtText) {
+  if (!dtText) return null;
   const match = dtText.match(/([A-Z][a-z]+\.?)\s+(\d+)(?:\s+(\d{4}))?/);
   if (!match) return null;
   const [, monthStr, dayStr, yearStr] = match;
   const fullMonth = MONTH_MAP[monthStr.replace('.', '')] || monthStr;
-  const year = yearStr
-    ? parseInt(yearStr)
-    : (() => {
-        const y = new Date().getFullYear();
-        const d = new Date(`${fullMonth} ${dayStr}, ${y}`);
-        return d < new Date(Date.now() - 86400000) ? y + 1 : y;
-      })();
+  const year = yearStr ? parseInt(yearStr, 10) : new Date().getFullYear();
   return new Date(`${fullMonth} ${dayStr}, ${year}`);
 }
 
@@ -76,16 +72,50 @@ router.get('/upcoming', async (req, res) => {
     for (const trEl of $('table tr').toArray()) {
       if (upcoming.length >= 5) break;
       const thEl = $(trEl).find('th');
+
       const mainDate = thEl.find('span').not('.until').not('.lw_date_year').first().text().trim();
       const explicitYear = thEl.find('.lw_date_year').text().replace(/\D/g, '');
       const thText = explicitYear ? `${mainDate} ${explicitYear}` : mainDate;
+
+      const untilRaw = thEl.find('.until').text().trim();
+      const untilText = untilRaw.replace(/^until\s*/i, '').trim();
+
       const tdText = $(trEl).find('td .font-weight-bold').first().text().trim()
                   || $(trEl).find('td').first().text().trim();
       if (!thText || !tdText) continue;
-      const date = parseDateFromDt(thText);
-      if (!date || date < today) continue;
-      const { badge, accentColor } = classifyEvent(tdText, date, today);
-      upcoming.push({ date: thText, title: tdText, badge, accentColor });
+
+      const startDate = parseDateFromDt(thText);
+      if (!startDate) continue;
+
+      // Compute end date; handle cross-year range events (e.g. Dec–Jan scraped in January)
+      let endDate = startDate;
+      if (untilText) {
+        const rawEnd = parseDateFromDt(untilText);
+        if (rawEnd) {
+          const SIXTY_DAYS_MS = 60 * 24 * 60 * 60 * 1000;
+          if (rawEnd < today && (today - rawEnd) > SIXTY_DAYS_MS) {
+            endDate = new Date(rawEnd);
+            endDate.setFullYear(endDate.getFullYear() + 1);
+          } else {
+            endDate = rawEnd;
+          }
+        }
+      }
+
+      // Skip if the event (or its full range) has already ended
+      if (endDate < today) continue;
+
+      const { badge, accentColor } = classifyEvent(tdText, startDate, today);
+
+      const untilShort = untilText.replace(
+        /^(January|February|March|April|May|June|July|August|September|October|November|December)\b/,
+        (m) => m.slice(0, 3) + (m === 'May' ? '' : '.')
+      );
+      const displayDate = untilText
+        ? `${mainDate} \u2013 ${untilShort}`
+        : thText;
+
+      upcoming.push({ date: displayDate, title: tdText, badge, accentColor });
     }
 
     cache.set(cacheKey, upcoming);
