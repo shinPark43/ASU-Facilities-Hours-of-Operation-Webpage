@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import MapGL, { Marker } from 'react-map-gl/mapbox';
+import { HiLocationMarker } from 'react-icons/hi';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../styles/EventCalendarMap.css';
 
@@ -339,6 +340,7 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
           <div className="ecm-sheet" ref={sheetRef}>
             <div className="ecm-sheet-header">
               <span className="ecm-sheet-location">
+                <HiLocationMarker className="ecm-sheet-location-icon" />
                 {selectedLocation[0].location || 'Campus Event'}
               </span>
               <button className="ecm-sheet-back" onClick={() => setSelectedLocation(null)}>

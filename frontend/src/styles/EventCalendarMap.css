@@ -80,22 +80,33 @@
 /* Marker */
 .ecm-marker {
   position: relative;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50% 50% 50% 0;
   background-color: var(--asu-blue, #003f7f);
   border: 2px solid #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   cursor: pointer;
+  transform: rotate(-45deg);
   transition: transform 0.15s ease;
 }
 
+.ecm-marker::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+}
+
 .ecm-marker:hover {
-  transform: scale(1.3);
+  transform: rotate(-45deg) scale(1.3);
 }
 
 .ecm-marker--selected {
-  transform: scale(1.4);
+  transform: rotate(-45deg) scale(1.4);
 }
 
 [data-theme="dark"] .ecm-marker {
@@ -117,6 +128,7 @@
   align-items: center;
   justify-content: center;
   border: 1.5px solid #fff;
+  transform: rotate(45deg);
 }
 
 /* Sheet — snaps below the map card, sharing the same border */
@@ -129,27 +141,48 @@
   animation: ecm-slide-up 0.22s ease;
 }
 
+.ecm-sheet::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-light);
+  margin: 0 auto 12px;
+}
+
 @keyframes ecm-slide-up {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 .ecm-sheet-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  position: relative;
+  padding-right: 28px;
+  margin-bottom: 10px;
 }
 
 .ecm-sheet-location {
-  font-size: 0.72rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--asu-blue, #003f7f);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.ecm-sheet-location-icon {
+  color: var(--asu-blue, #003f7f);
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .ecm-sheet-back {
+  position: absolute;
+  top: 0;
+  right: 0;
   background: none;
   border: none;
   cursor: pointer;
