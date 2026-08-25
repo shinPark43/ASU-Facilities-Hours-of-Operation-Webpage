@@ -14,7 +14,7 @@ const VENUE_COORDS = [
   },
   {
     name: 'Foster Field at 1st Community Credit Union',
-    patterns: ['foster field', '1st community'],
+    patterns: ['foster field'],
     lat: 31.436031,
     lng: -100.453586,
   },
@@ -25,10 +25,16 @@ const VENUE_COORDS = [
     lng: -100.457973,
   },
   {
+    name: 'LeGrand Soccer Complex',
+    patterns: ['legrand soccer', 'le grand soccer'],
+    lat: 31.436477155329733,
+    lng: -100.46059712560547,
+  },
+  {
     name: 'LeGrand Sports Complex',
     patterns: ['legrand sports', 'legrand stadium', 'le grand sports', 'le grand stadium'],
-    lat: 31.435387,
-    lng: -100.458126,
+    lat: 31.435489558079034,
+    lng: -100.45797412698418,
   },
   {
     name: 'LeGrand Alumni and Visitors Center',
