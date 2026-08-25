@@ -50,7 +50,7 @@ const VENUE_COORDS = [
   },
   {
     name: 'Houston Harte University Center',
-    patterns: ['houston harte', 'university center'],
+    patterns: ['houston harte', 'university center', 'davidson conference', 'c.j. davidson', 'cj davidson'],
     lat: 31.441097,
     lng: -100.466485,
   },
@@ -76,7 +76,7 @@ function lookupVenueCoords(locationStr) {
   const lower = locationStr.toLowerCase();
   for (const venue of VENUE_COORDS) {
     if (venue.patterns.some(p => lower.includes(p))) {
-      return { lat: venue.lat, lng: venue.lng };
+      return { lat: venue.lat, lng: venue.lng, name: venue.name };
     }
   }
   return null;

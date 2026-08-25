@@ -32,7 +32,7 @@ function formatEvent(e) {
     title: e.title || 'Untitled Event',
     date,
     time,
-    location: e.location || '',
+    location: venueCoords?.name || (e.location || '').replace(/\s*\([^)]*\)\s*/g, '').trim(),
     lat,
     lng,
     link,
