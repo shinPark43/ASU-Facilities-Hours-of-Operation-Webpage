@@ -2,7 +2,8 @@ const puppeteer = require('puppeteer');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('./database');
-const tutoringDb = require('./tutoring-database');
+const { retryWithBackoff } = require('./utils/retry');
+const academicSupport = require('./scrapers/academicSupport');
 
 // Helper function to wait for a specified time
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -41,26 +42,6 @@ const isValidTimeRange = (startTime, endTime) => {
   return toMinutes(startTime) < toMinutes(endTime);
 };
 
-// Retry utility function with exponential backoff
-const retryWithBackoff = async (operation, operationName, maxRetries = 2, baseDelay = 1000) => {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await operation();
-    } catch (error) {
-      const isLastAttempt = attempt === maxRetries;
-      
-      if (isLastAttempt) {
-        console.error(`❌ ${operationName} failed after ${maxRetries} attempts:`, error.message);
-        throw error;
-      }
-      
-      const delay = baseDelay * Math.pow(2, attempt - 1); // 1s, 2s, 4s...
-      console.warn(`⚠️ ${operationName} failed (attempt ${attempt}/${maxRetries}), retrying in ${delay/1000}s...`);
-      console.warn(`   Error: ${error.message}`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-};
 
 class ScraperManager {
   constructor() {
@@ -150,7 +131,7 @@ class ScraperManager {
       console.log('📖 Scraping tutoring schedule...');
       try {
         results.tutoring = await retryWithBackoff(
-          () => this.scrapeTutoring(browser),
+          () => academicSupport.scrapeTutoring(),
           'Tutoring scraping'
         );
       } catch (error) {
@@ -197,7 +178,7 @@ class ScraperManager {
       case 'ram_tram':
         return await this.scrapeRamTram(browser);
       case 'tutoring':
-        return await this.scrapeTutoring(browser);
+        return await academicSupport.scrapeTutoring();
       default:
         throw new Error(`Unsupported facility type: ${facilityType}`);
     }
@@ -1024,327 +1005,8 @@ class ScraperManager {
     return ramTramHours;
   }
 
-  async scrapeTutoring(browser) {
-    console.log('🔍 Scraping tutoring hours...');
-    
-    let page;
-    try {
-      tutoringDb.logScrapeActivity('started', 'Beginning tutoring hours scrape');
-      
-      page = await browser.newPage();
-      await page.setUserAgent(this.userAgent);
-      
-      await page.goto('https://www.angelo.edu/current-students/freshman-college/academic-tutoring.php', {
-        waitUntil: 'networkidle2',
-        timeout: this.config.timeout
-      });
-      
-      // Wait for accordion content to load
-      await this.waitForContent(page, [
-        '.lw_accordion',
-        'section.lw_accordion_block',
-        'table'
-      ]);
-      
-      await delay(3000);
-      
-      const [tutoringData, mathLabData, writingCenterData] = await Promise.all([
-        this.extractTutoringHours(page),
-        this.scrapeMathLab(),
-        this.scrapeWritingCenter(),
-      ]);
-
-      if (!tutoringData || Object.keys(tutoringData).length === 0) {
-        throw new Error('No tutoring hours data found on the page');
-      }
-      console.log(`📋 Tutoring extraction found ${Object.keys(tutoringData).length} subjects`);
-
-      const mergedData = { ...tutoringData };
-      for (const [label, data] of [['Math Lab', mathLabData], ['Writing Center', writingCenterData]]) {
-        if (data && Object.keys(data).length > 0) {
-          Object.assign(mergedData, data);
-          console.log(`✅ ${label} hours merged with tutoring data`);
-        }
-      }
-
-      // Sort subjects alphabetically
-      const sortedData = {};
-      Object.keys(mergedData).sort((a, b) => a.localeCompare(b)).forEach(key => {
-        sortedData[key] = mergedData[key];
-      });
-
-      const formattedData = this.formatTutoringHours(sortedData);
-      
-      // Update tutoring database
-      const counts = await tutoringDb.updateTutoringData(formattedData);
-      tutoringDb.logScrapeActivity('success', `Updated tutoring data`, counts);
-      
-      console.log('✅ Tutoring hours scraped successfully');
-      return { 
-        success: true, 
-        subjects_count: counts.subjects_count,
-        courses_count: counts.courses_count,
-        sessions_count: counts.sessions_count
-      };
-
-    } catch (error) {
-      console.error('❌ Tutoring scraping failed:', error);
-      tutoringDb.logScrapeActivity('error', error.message);
-      throw error;
-    } finally {
-      if (page) await page.close();
-    }
-  }
-
-  async scrapeMathLab() {
-    console.log('🔍 Scraping Math Lab hours from dedicated page...');
-    try {
-      const { data: html } = await axios.get(
-        'https://www.angelo.edu/current-students/freshman-college/math-lab.php',
-        { timeout: this.config.timeout, headers: { 'User-Agent': this.userAgent } }
-      );
-      const $ = cheerio.load(html);
-
-      const DAY_ABBREVS = {
-        sun: 'Sunday', mon: 'Monday', tue: 'Tuesday',
-        wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday',
-      };
-
-      // Find the table whose first row contains ≥3 day abbreviations
-      let mathLabTable = null;
-      $('table').each((_, table) => {
-        const firstRowText = $(table).find('tr').first().text().toLowerCase();
-        const hits = Object.keys(DAY_ABBREVS).filter(a => firstRowText.includes(a)).length;
-        if (hits >= 3) { mathLabTable = table; return false; }
-      });
-      if (!mathLabTable) return null;
-
-      const rows = $(mathLabTable).find('tr').toArray();
-
-      // Dynamically find the header row (first row with ≥3 day abbrev cells)
-      let headerRowIdx = -1;
-      let days = [];
-      for (let i = 0; i < rows.length; i++) {
-        const cells = $(rows[i]).find('td, th').toArray().map(c => $(c).text().trim().toLowerCase());
-        const mapped = cells.map(t => Object.entries(DAY_ABBREVS).find(([a]) => t.includes(a))?.[1] ?? null);
-        if (mapped.filter(Boolean).length >= 3) { headerRowIdx = i; days = mapped; break; }
-      }
-      if (headerRowIdx === -1 || headerRowIdx + 1 >= rows.length) return null;
-
-      // Parse the row immediately following the header
-      const sessions = [];
-      $(rows[headerRowIdx + 1]).find('td, th').each((i, cell) => {
-        const time = $(cell).text().trim();
-        if (!days[i] || !time || time.toLowerCase() === 'closed') return;
-        sessions.push({ day: days[i], time, location: 'Porter Henderson Library, Room 328' });
-      });
-
-      console.log('✅ Math Lab hours extracted');
-      return sessions.length > 0 ? { 'Math Lab': { 'Math Lab (Drop-in Help)': sessions } } : null;
-
-    } catch (error) {
-      console.error('⚠️ Math Lab scraping failed (continuing without it):', error.message);
-      return null;
-    }
-  }
-
-  async scrapeWritingCenter() {
-    console.log('🔍 Scraping Writing Center hours from dedicated page...');
-    try {
-      const { data: html } = await axios.get(
-        'https://www.angelo.edu/current-students/writing-center/',
-        { timeout: this.config.timeout, headers: { 'User-Agent': this.userAgent } }
-      );
-      const $ = cheerio.load(html);
-
-      const DAY_ABBREVS = {
-        sun: 'Sunday', mon: 'Monday', tue: 'Tuesday',
-        wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday',
-      };
-
-      // Tables use column-per-day layout (same as Math Lab):
-      // row 0: day headers  row 1: time values
-      function parseColumnarTable(tableEl) {
-        const rows = $(tableEl).find('tr').toArray();
-        if (rows.length < 2) return [];
-
-        // Find header row (first row with ≥2 day abbrev cells)
-        let headerRowIdx = -1;
-        let days = [];
-        for (let i = 0; i < rows.length; i++) {
-          const cells = $(rows[i]).find('td, th').toArray().map(c => $(c).text().trim().toLowerCase());
-          const mapped = cells.map(t => Object.entries(DAY_ABBREVS).find(([a]) => t.includes(a))?.[1] ?? null);
-          if (mapped.filter(Boolean).length >= 2) { headerRowIdx = i; days = mapped; break; }
-        }
-        if (headerRowIdx === -1 || headerRowIdx + 1 >= rows.length) return [];
-
-        const sessions = [];
-        $(rows[headerRowIdx + 1]).find('td, th').each((i, cell) => {
-          const time = $(cell).text().trim();
-          if (!days[i] || !time || /^(off|closed)$/i.test(time)) return;
-          sessions.push({ day: days[i], time, location: 'ASU Writing Center' });
-        });
-        return sessions;
-      }
-
-      // Walk elements in document order: track last-seen heading, attach to next valid table
-      const courses = {};
-      let currentHeading = null;
-      $('h1, h2, h3, h4, h5, h6, table').each((_, el) => {
-        const tag = el.tagName.toLowerCase();
-        if (/^h[1-6]$/.test(tag)) {
-          currentHeading = $(el).text().trim() || null;
-        } else if (tag === 'table') {
-          const sessions = parseColumnarTable(el);
-          if (sessions.length >= 2) {
-            const label = currentHeading || `Section ${Object.keys(courses).length + 1}`;
-            courses[label] = sessions;
-          }
-        }
-      });
-
-      console.log('✅ Writing Center hours extracted');
-      return Object.keys(courses).length > 0 ? { 'Writing Center': courses } : null;
-
-    } catch (error) {
-      console.error('⚠️ Writing Center scraping failed (continuing without it):', error.message);
-      return null;
-    }
-  }
-
-  async extractTutoringHours(page) {
-    return await page.evaluate(() => {
-      const tutoringData = {};
-      
-      // Get all accordion sections (subjects)
-      const sections = document.querySelectorAll('section.lw_accordion_block');
-      
-      sections.forEach(section => {
-        // Get subject name from h4
-        const subjectTitle = section.querySelector('h4.lw_accordion_block_title');
-        let subjectName = subjectTitle?.textContent?.trim() || 'Unknown';
-        
-        // Clean up subject name (remove extra whitespace, arrows, etc.)
-        subjectName = subjectName.replace(/\s+/g, ' ').trim();
-        
-        // Skip if it looks like a header or navigation element
-        if (subjectName.toLowerCase().includes('hours of operation') || 
-            subjectName.toLowerCase().includes('schedule')) {
-          return;
-        }
-        
-        // Get all course tables within this subject
-        const contentDiv = section.querySelector('.lw_accordion_block_content');
-        if (!contentDiv) return;
-        
-        const tables = contentDiv.querySelectorAll('div.tableWrap table, table');
-        
-        tables.forEach(table => {
-          // Get course name from caption
-          const caption = table.querySelector('caption');
-          let courseName = caption?.textContent?.trim() || '';
-          
-          // Clean up course name (remove &nbsp; and extra spaces)
-          courseName = courseName.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-          
-          if (!courseName) return;
-          
-          // Get all hour rows - check both tbody and thead (some subjects have data in thead)
-          // Also get rows directly from table in case there's no tbody/thead wrapper
-          let rows = table.querySelectorAll('tbody tr');
-          if (rows.length === 0) {
-            // Fallback: get all tr elements and filter out header rows
-            rows = table.querySelectorAll('tr');
-          }
-          const courseHours = [];
-          let lastValidDay = ''; // Track the last valid day for rows with empty day cells
-          
-          rows.forEach(row => {
-            // Skip header rows (rows with th elements)
-            if (row.querySelector('th')) return;
-            
-            const cells = row.querySelectorAll('td');
-            if (cells.length >= 3) {
-              let day = cells[0]?.textContent?.trim() || '';
-              const time = cells[1]?.textContent?.trim() || '';
-              const location = cells[2]?.textContent?.trim() || '';
-              
-              // Clean up day value - handle &nbsp; (non-breaking space) and empty values
-              day = day.replace(/\u00A0/g, '').trim();
-              
-              // If day is empty but we have time/location, use the last valid day
-              // This handles cases like Upswing rows that continue from previous day
-              if (!day && (time || location)) {
-                day = lastValidDay || 'Online'; // Use last day, or 'Online' as fallback
-              }
-              
-              // Update last valid day if current day is valid
-              if (day && day !== 'Online') {
-                lastValidDay = day;
-              }
-              
-              // Add if we have at least a day and some content
-              if (day && (time || location)) {
-                courseHours.push({
-                  day: day,
-                  time: time || 'TBA',
-                  location: location || 'TBA'
-                });
-              }
-            }
-          });
-          
-          // Store with subject grouping
-          if (!tutoringData[subjectName]) {
-            tutoringData[subjectName] = {};
-          }
-          
-          // Handle multiple courses with same name by merging sessions
-          if (tutoringData[subjectName][courseName]) {
-            tutoringData[subjectName][courseName] = [
-              ...tutoringData[subjectName][courseName],
-              ...courseHours
-            ];
-          } else {
-            tutoringData[subjectName][courseName] = courseHours;
-          }
-        });
-      });
-      return tutoringData;
-    });
-  }
-
-  formatTutoringHours(tutoringData) {
-    // The data is already in the correct format from extraction
-    // Just ensure we have valid structure
-    const formatted = {};
-    
-    for (const [subjectName, courses] of Object.entries(tutoringData)) {
-      if (!subjectName || subjectName === 'Unknown') continue;
-      
-      formatted[subjectName] = {};
-      
-      for (const [courseName, sessions] of Object.entries(courses)) {
-        if (!courseName) continue;
-        
-        // Filter out empty or invalid sessions
-        const validSessions = sessions.filter(session => 
-          session.day && session.day !== ''
-        );
-        
-        if (validSessions.length > 0) {
-          formatted[subjectName][courseName] = validSessions;
-        }
-      }
-      
-      // Remove subject if no valid courses
-      if (Object.keys(formatted[subjectName]).length === 0) {
-        delete formatted[subjectName];
-      }
-    }
-    
-    return formatted;
-  }
+  // scrapeTutoring, extractTutoringHours, scrapeMathLab, scrapeWritingCenter,
+  // and formatTutoringHours have been moved to src/scrapers/academicSupport.js
 
   async handleSundayWeekNavigation(page) {
     const today = new Date();
