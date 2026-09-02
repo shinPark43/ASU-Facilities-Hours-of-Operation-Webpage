@@ -284,4 +284,4 @@ function formatTutoringHours(tutoringData) {
   return formatted;
 }
 
-module.exports = { scrapeTutoring };
+module.exports = { scrapeTutoring, extractTutoringHours, formatTutoringHours, scrapeMathLab, scrapeWritingCenter };
