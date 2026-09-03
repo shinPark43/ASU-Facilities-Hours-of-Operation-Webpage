@@ -196,6 +196,20 @@ describe('extractTutoringHours(html)', () => {
     const result = extractTutoringHours('<html><body><p>No tutoring data here.</p></body></html>');
     expect(result).toEqual({});
   });
+
+  it('extracts Computer Science sessions from thead-only table', () => {
+    const result = extractTutoringHours(fixtureHtml);
+    expect(result['Computer Science*']).toBeDefined();
+    const courses = Object.values(result['Computer Science*']);
+    expect(courses.some(sessions => sessions.length > 0)).toBe(true);
+  });
+
+  it('extracts Health Science Professions sessions from thead-only table', () => {
+    const result = extractTutoringHours(fixtureHtml);
+    expect(result['Health Science Professions']).toBeDefined();
+    const courses = Object.values(result['Health Science Professions']);
+    expect(courses.some(sessions => sessions.length > 0)).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------
