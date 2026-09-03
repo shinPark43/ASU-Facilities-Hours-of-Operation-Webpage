@@ -73,7 +73,7 @@ function extractTutoringHours(html) {
     let subjectName = $(section).find('div.accordion_summary').first().text().trim();
 
     // Normalize whitespace
-    subjectName = subjectName.replace(/\s+/g, ' ').trim();
+    subjectName = subjectName.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
 
     // Skip empty or navigation-like headings
     if (!subjectName ||
@@ -96,7 +96,7 @@ function extractTutoringHours(html) {
       const courseHours = [];
       let lastValidDay = '';
 
-      $(table).find('tbody tr').each((_, row) => {
+      $(table).find('tr').each((_, row) => {
         // Skip header rows
         if ($(row).find('th').length > 0) return;
 
