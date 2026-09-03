@@ -84,7 +84,10 @@ function extractTutoringHours(html) {
 
     $(section).find('div.accordion_content table').each((_, table) => {
       // Caption may contain multiple course names separated by <br>
-      const captionHtml = $(table).find('caption').html() || '';
+      // Remove <small> elements first — they hold supplementary notes, not course names
+      const captionEl = $(table).find('caption');
+      captionEl.find('small').remove();
+      const captionHtml = captionEl.html() || '';
       const courseNames = captionHtml
         .split(/<br\s*\/?>/gi)
         .map(fragment => cheerio.load(fragment).text().replace(/\u00A0/g, ' ').trim())
