@@ -5,7 +5,7 @@ import { AnnouncementBanner } from '../components/AnnouncementBanner.jsx';
 import { TbCalendarEvent } from 'react-icons/tb';
 
 // Set to true during semester transitions when the schedule isn't posted yet
-const COMING_SOON = true;
+const COMING_SOON = false;
 
 // Tutoring notice data - can be moved to backend later
 const TUTORING_MEMO = {
