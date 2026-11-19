@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
   const location = useLocation();
   
   // Check if current page should show tab bar
-  const tabBarPages = ['/home', '/library', '/gym', '/dining', '/tutoring', '/ramtram'];
+  const tabBarPages = ['/home', '/library', '/gym', '/dining', '/tutoring', '/ramtram', '/essentials'];
   const shouldShowTabBar = tabBarPages.includes(location.pathname);
   
   // Check if current page is landing page

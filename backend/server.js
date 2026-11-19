@@ -30,13 +30,22 @@ const limiter = rateLimit({
 });
 
 // Middleware
+const configuredOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+const allowedOrigins = Array.from(new Set([
+  'https://shinpark43.github.io',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  ...configuredOrigins,
+]));
+
 app.use(cors({
-  origin: [
-    'https://shinpark43.github.io',
-    'http://localhost:5173',
-    'http://localhost:3000',
-  ],
-  methods: ['GET', 'OPTIONS'],
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'X-API-Key', 'Authorization'],
 }));
 app.use(express.json({ limit: '10mb' })); // Add request size limit
 app.use('/api/', limiter); // Apply rate limiting to API routes only
@@ -88,8 +97,12 @@ app.get('/', (req, res) => {
       library: '/api/facilities/library',
       recreation: '/api/facilities/recreation',
       dining: '/api/facilities/dining',
+      dining_menu: '/api/facilities/dining/menu',
       ram_tram: '/api/facilities/ram_tram',
-      tutoring: '/api/tutoring'
+      essentials: '/api/facilities/essentials',
+      tutoring: '/api/tutoring',
+      calendar: '/api/calendar/upcoming',
+      events: '/api/events/upcoming'
     }
   });
 });
@@ -142,19 +155,23 @@ async function startServer() {
       timezone: "America/Chicago" // CST/CDT for Texas
     });
 
-    // Weekly tutoring scraper paused — Fall 2026 schedule not yet available
-    // Uncomment when the semester schedule goes live
-    // cron.schedule('0 0 * * 0', async () => {
-    //   console.log('🕐 Running weekly tutoring scraper...');
-    //   try {
-    //     await scraper.scrapeSpecificFacility('tutoring');
-    //     console.log('✅ Weekly tutoring scrape completed successfully');
-    //   } catch (error) {
-    //     console.error('❌ Weekly tutoring scrape failed:', error);
-    //   }
-    // }, {
-    //   timezone: "America/Chicago" // CST/CDT for Texas
-    // });
+    // Weekly tutoring scraper (Sundays at midnight CST/CDT)
+    // Set ENABLE_TUTORING_CRON=false to pause during semester transitions without editing code
+    if (process.env.ENABLE_TUTORING_CRON !== 'false') {
+      cron.schedule('0 0 * * 0', async () => {
+        console.log('🕐 Running weekly tutoring scraper...');
+        try {
+          await scraper.scrapeSpecificFacility('tutoring');
+          console.log('✅ Weekly tutoring scrape completed successfully');
+        } catch (error) {
+          console.error('❌ Weekly tutoring scrape failed:', error);
+        }
+      }, {
+        timezone: "America/Chicago" // CST/CDT for Texas
+      });
+    } else {
+      console.log('⏸️ Weekly tutoring scraper paused (ENABLE_TUTORING_CRON=false)');
+    }
 
     // Run scraper on startup (optional - for testing)
     // Only scrapes daily facilities, not tutoring (to save time during dev)

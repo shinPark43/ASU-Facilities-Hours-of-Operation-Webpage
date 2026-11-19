@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HiOutlineHome, HiOutlineBookOpen, HiOutlineAcademicCap, HiOutlineDotsHorizontal } from 'react-icons/hi';
+import {
+  HiOutlineHome,
+  HiOutlineBookOpen,
+  HiOutlineAcademicCap,
+  HiOutlineDotsHorizontal,
+  HiOutlineOfficeBuilding,
+} from 'react-icons/hi';
 import { FaDumbbell } from 'react-icons/fa';
 import { IoRestaurant } from 'react-icons/io5';
 import { TbBus } from 'react-icons/tb';
@@ -14,11 +20,12 @@ const tabs = [
 ];
 
 const moreItems = [
-  { path: '/tutoring', label: 'Tutoring', IconComponent: HiOutlineAcademicCap },
-  { path: '/ramtram',  label: 'Ram Tram', IconComponent: TbBus },
+  { path: '/tutoring',   label: 'Tutoring',          IconComponent: HiOutlineAcademicCap },
+  { path: '/ramtram',    label: 'Ram Tram',          IconComponent: TbBus },
+  { path: '/essentials', label: 'Campus Essentials', IconComponent: HiOutlineOfficeBuilding },
 ];
 
-const morePages = ['/tutoring', '/ramtram'];
+const morePages = ['/tutoring', '/ramtram', '/essentials'];
 const hiddenPages = ['/landing'];
 
 const MobileTabBar = ({ isHeaderVisible = true }) => {

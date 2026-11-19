@@ -101,11 +101,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Modern font options for 2024 */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+/* Google Fonts are loaded via <link rel="preconnect"> and <link rel="stylesheet"> in index.html */
 
 .modern-font-outfit {
   font-family: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;

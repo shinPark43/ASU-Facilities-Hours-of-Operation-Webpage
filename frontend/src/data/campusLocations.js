@@ -1,0 +1,101 @@
+/**
+ * Angelo State University Ram Tram stop pins & Campus Essential building coordinates
+ * for interactive Mapbox map layers.
+ */
+
+export const RAM_TRAM_STOPS = [
+  {
+    id: 'stop-plaza-verde',
+    name: 'Plaza Verde Stop',
+    routes: ['Gold Route', 'Blue Route'],
+    schedule: 'Tue 4:30 – 8:30 PM (Gold) · Fri 5:30 – 11:30 PM & Sat 11:30 AM – 11:30 PM (Blue)',
+    address: '2010 S Van Buren St, San Angelo, TX 76904',
+    type: 'campus',
+    lat: 31.441069,
+    lng: -100.458498,
+    mapUrl: 'https://maps.google.com/?q=31.441069,-100.458498',
+  },
+  {
+    id: 'stop-centennial-village',
+    name: 'Centennial Village Stop',
+    routes: ['Gold Route', 'Blue Route'],
+    schedule: 'Tue 4:30 – 8:30 PM (Gold) · Fri 5:30 – 11:30 PM & Sat 11:30 AM – 11:30 PM (Blue)',
+    address: '1901 Rosemont Dr, San Angelo, TX 76904',
+    type: 'campus',
+    lat: 31.441941,
+    lng: -100.469106,
+    mapUrl: 'https://maps.google.com/?q=31.441941,-100.469106',
+  },
+  {
+    id: 'stop-heb',
+    name: 'H-E-B (Gold Route)',
+    routes: ['Gold Route'],
+    schedule: 'Tuesdays · 4:30 – 8:30 PM',
+    address: '3301 Sherwood Way, San Angelo, TX 76901',
+    type: 'off-campus',
+    lat: 31.44175,
+    lng: -100.47855,
+    mapUrl: 'https://maps.google.com/?q=HEB+3301+Sherwood+Way+San+Angelo+TX',
+  },
+  {
+    id: 'stop-walmart',
+    name: 'Walmart Supercenter (Gold Route)',
+    routes: ['Gold Route'],
+    schedule: 'Tuesdays · 4:30 – 8:30 PM',
+    address: '5501 Sherwood Way, San Angelo, TX 76901',
+    type: 'off-campus',
+    lat: 31.4258,
+    lng: -100.4919,
+    mapUrl: 'https://maps.google.com/?q=Walmart+5501+Sherwood+Way+San+Angelo+TX',
+  },
+  {
+    id: 'stop-downtown',
+    name: 'Downtown San Angelo (Blue Route)',
+    routes: ['Blue Route'],
+    schedule: 'Fridays 5:30 – 11:30 PM · Saturdays 11:30 AM – 11:30 PM',
+    address: 'Concho Ave & Chadbourne St, San Angelo, TX',
+    type: 'off-campus',
+    lat: 31.4638,
+    lng: -100.4370,
+    mapUrl: 'https://maps.google.com/?q=Downtown+San+Angelo+TX',
+  },
+];
+
+export const CAMPUS_HUBS = [
+  {
+    id: 'hub-library',
+    name: 'Porter Henderson Library',
+    category: 'Library & Study',
+    path: '/library',
+    address: '2601 W Ave N, San Angelo, TX 76909',
+    lat: 31.44260,
+    lng: -100.46310,
+  },
+  {
+    id: 'hub-gym',
+    name: 'CHP Recreation Center',
+    category: 'Gym & Pool',
+    path: '/gym',
+    address: '1823 S Johnson St, San Angelo, TX 76904',
+    lat: 31.44288,
+    lng: -100.46735,
+  },
+  {
+    id: 'hub-hhuc',
+    name: 'Houston Harte University Center',
+    category: 'The CAF · Bookstore · Post Office',
+    path: '/essentials',
+    address: '1910 Rosemont Dr, San Angelo, TX 76904',
+    lat: 31.441097,
+    lng: -100.466485,
+  },
+  {
+    id: 'hub-health',
+    name: 'University Health Clinic',
+    category: 'Shannon Student Clinic',
+    path: '/essentials?tab=University%20Health%20Clinic',
+    address: '2237 S Jackson St, San Angelo, TX 76904',
+    lat: 31.43685,
+    lng: -100.46485,
+  },
+];

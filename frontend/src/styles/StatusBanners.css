@@ -1,0 +1,392 @@
+/* Shared status banners, live open/closing badges, dining menu & matched tutoring styles */
+
+.status-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  border: 1px solid var(--border-light);
+}
+
+.status-banner--warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: var(--text-primary);
+}
+
+.status-banner--info {
+  background: rgba(0, 63, 127, 0.08);
+  border-color: rgba(0, 63, 127, 0.28);
+  color: var(--text-primary);
+}
+
+.status-banner--holiday {
+  background: rgba(168, 104, 32, 0.12);
+  border-color: rgba(168, 104, 32, 0.4);
+  color: var(--text-primary);
+}
+
+.status-banner--finals {
+  background: rgba(181, 68, 78, 0.12);
+  border-color: rgba(181, 68, 78, 0.4);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .status-banner--warning {
+  background: rgba(245, 158, 11, 0.16);
+}
+
+[data-theme="dark"] .status-banner--info {
+  background: rgba(30, 90, 168, 0.22);
+}
+
+.status-banner-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #d97706;
+}
+
+.status-banner--info .status-banner-icon {
+  color: var(--asu-blue);
+}
+
+.status-banner--finals .status-banner-icon {
+  color: #dc2626;
+}
+
+.status-banner-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.status-banner-title {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.status-banner-desc {
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.status-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.status-banner-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  min-block-size: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status-banner-retry:hover {
+  background: var(--bg-tertiary);
+}
+
+.status-banner-dismiss {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  min-width: 28px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.status-banner-dismiss:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+}
+
+/* ── Live Status Pill (Today's Hours cards) ── */
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.live-badge--open {
+  background: rgba(34, 197, 94, 0.14);
+  color: #15803d;
+}
+
+[data-theme="dark"] .live-badge--open {
+  color: #4ade80;
+}
+
+.live-badge--closing {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+}
+
+[data-theme="dark"] .live-badge--closing {
+  color: #fbbf24;
+}
+
+.live-badge--reopens {
+  background: rgba(0, 63, 127, 0.1);
+  color: var(--asu-blue);
+}
+
+.live-badge--closed {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.live-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Dining Daily Menu Panel ── */
+
+.dining-menu-panel {
+  margin-top: 1.25rem;
+  padding: 1rem 1.15rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+}
+
+.dining-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.dining-menu-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dining-menu-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.dining-menu-periods {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.dining-period-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dining-period-btn.active {
+  background: var(--asu-blue);
+  border-color: var(--asu-blue);
+  color: #ffffff;
+}
+
+.dining-stations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.dining-station-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.dining-station-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--asu-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.dining-station-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dining-station-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+.dining-item-cals {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.dining-menu-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* ── Matched Tutoring ("For Your Classes") Section ── */
+
+.matched-tutoring-section {
+  background: var(--bg-secondary);
+  border: 1.5px solid rgba(0, 63, 127, 0.25);
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.matched-tutoring-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.matched-tutoring-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.matched-tutoring-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--asu-blue);
+  background: rgba(0, 63, 127, 0.1);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.matched-tutoring-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.matched-tutoring-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.matched-tutoring-card:hover {
+  border-color: var(--asu-blue);
+  transform: translateY(-1px);
+}
+
+.matched-course-pill {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.matched-tutoring-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.matched-tutoring-course {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.matched-tutoring-meta {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.matched-tutoring-cta {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--asu-blue);
+  white-space: nowrap;
+}
+
+/* ── Campus Essentials Info Meta Card ── */
+
+.essentials-meta-card {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.essentials-meta-card strong {
+  color: var(--text-primary);
+}

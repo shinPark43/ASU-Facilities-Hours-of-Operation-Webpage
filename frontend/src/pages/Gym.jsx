@@ -1,34 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { facilityAPI } from '../services/api.js';
-import { parseMultipleTimeRanges, formatDayWithDate, isClosedTime, isToday } from '../utils/timeUtils.js';
+import { fetchFacilityData } from '../services/api.js';
+import {
+  parseMultipleTimeRanges,
+  formatDayWithDate,
+  isClosedTime,
+  isToday,
+  evaluateFacilityStatus,
+  msUntilNextMinute,
+} from '../utils/timeUtils.js';
+import StaleDataBanner from '../components/StaleDataBanner';
+import LiveStatusBadge from '../components/LiveStatusBadge';
 
 const Gym = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('CHP (Fitness Center)');
-  const [facilities, setFacilities] = useState(null);
+  const [facilityData, setFacilityData] = useState(null);
+  const [now, setNow] = useState(() => new Date());
   const [searchParams] = useSearchParams();
 
-  useEffect(() => {
-    const fetchRecreationHours = async () => {
-      try {
-        setLoading(true);
-        const data = await facilityAPI.getRecreationHours();
-        if (data && data.sections) {
-          setFacilities(data.sections);
-        } else {
-          throw new Error('No recreation hours data available');
-        }
-      } catch (err) {
-        setError(`Error loading recreation hours: ${err.message}`);
-      } finally {
-        setLoading(false);
+  const loadRecreationHours = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await fetchFacilityData('recreation');
+      if (data && data.sections) {
+        setFacilityData(data);
+        const names = Object.keys(data.sections);
+        setActiveTab((prev) => (prev && data.sections[prev] ? prev : names[0] || 'CHP (Fitness Center)'));
+      } else {
+        throw new Error('No recreation hours data available');
       }
-    };
-
-    fetchRecreationHours();
+    } catch (err) {
+      setError(`Error loading recreation hours: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadRecreationHours();
+  }, [loadRecreationHours]);
+
+  useEffect(() => {
+    let intervalId;
+    const timeoutId = setTimeout(() => {
+      setNow(new Date());
+      intervalId = setInterval(() => setNow(new Date()), 60000);
+    }, msUntilNextMinute());
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, []);
+
+  const facilities = facilityData?.sections || null;
 
   useEffect(() => {
     const tabParam = searchParams.get('tab');
@@ -46,26 +73,25 @@ const Gym = () => {
   }
 
   if (error) {
-    return (
-      <div className="error">
-        {error}
-      </div>
-    );
+    return <div className="error">{error}</div>;
   }
 
-  // Generate facility tabs from actual API data
-  const facilityTabs = facilities ? Object.keys(facilities).map(facilityName => ({
-    id: facilityName,
-    label: facilityName
-  })) : [];
-
-  // Set initial active tab when data loads
-  if (facilities && !facilities[activeTab] && facilityTabs.length > 0) {
-    setActiveTab(facilityTabs[0].id);
-  }
+  const facilityTabs = facilities
+    ? Object.keys(facilities).map((facilityName) => ({
+        id: facilityName,
+        label: facilityName,
+      }))
+    : [];
 
   return (
     <div>
+      <StaleDataBanner
+        isFallback={Boolean(facilityData?._isFallback)}
+        source={facilityData?._source}
+        cachedAt={facilityData?._cachedAt}
+        onRetry={loadRecreationHours}
+      />
+
       <div className="page-header-with-square-button">
         <div className="page-header-content">
           <h2 className="section-panel-header">Recreation Center</h2>
@@ -79,6 +105,7 @@ const Gym = () => {
         <div className="facility-tabs">
           {facilityTabs.map((tab) => (
             <button
+              type="button"
               key={tab.id}
               className={`facility-tab ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
@@ -87,10 +114,11 @@ const Gym = () => {
             </button>
           ))}
         </div>
-        
+
         <div className="facility-dropdown-wrapper">
-          <select 
+          <select
             className="facility-dropdown"
+            aria-label="Select recreation facility"
             value={activeTab}
             onChange={(e) => setActiveTab(e.target.value)}
           >
@@ -101,79 +129,84 @@ const Gym = () => {
             ))}
           </select>
         </div>
-        
-        {facilities && Object.keys(facilities).map((facilityName) => (
-          <div
-            key={facilityName}
-            className={`facility-content ${activeTab === facilityName ? 'active' : ''}`}
-          >
-            <h3 className="facility-name">{facilityName}</h3>
-            <div className="facility-hours">
-              {(() => {
-                const todayEntry = Object.entries(facilities[facilityName]).find(([day]) => isToday(day));
-                
-                return (
-                  <>
-                    {todayEntry && (() => {
-                      const [day, hoursValue] = todayEntry;
-                      const timeRanges = parseMultipleTimeRanges(hoursValue);
-                      const dayWithDate = formatDayWithDate(day);
-                      const isClosed = isClosedTime(hoursValue);
-                      
-                      return (
-                        <div key={`today-${day}`} className="today-card">
-                          <div className="today-card-header">Today's Hours</div>
-                          <div className="today-card-date">{dayWithDate}</div>
-                          <div className="today-card-times">
-                            {timeRanges.map((timeRange, index) => (
-                              <div 
-                                key={index} 
-                                className={`today-card-time ${isClosed ? 'closed-not-available' : ''}`}
-                              >
-                                {timeRange}
+
+        {facilities &&
+          Object.keys(facilities).map((facilityName) => {
+            const sectionSchedule = facilities[facilityName];
+            const status = evaluateFacilityStatus(sectionSchedule, now);
+
+            return (
+              <div
+                key={facilityName}
+                className={`facility-content ${activeTab === facilityName ? 'active' : ''}`}
+              >
+                <h3 className="facility-name">{facilityName}</h3>
+                <div className="facility-hours">
+                  {(() => {
+                    const todayEntry = Object.entries(sectionSchedule).find(([day]) => isToday(day, now));
+
+                    return (
+                      <>
+                        {todayEntry && (() => {
+                          const [day, hoursValue] = todayEntry;
+                          const timeRanges = parseMultipleTimeRanges(hoursValue);
+                          const dayWithDate = formatDayWithDate(day);
+                          const isClosed = isClosedTime(hoursValue);
+
+                          return (
+                            <div key={`today-${day}`} className="today-card">
+                              <div className="today-card-header">Today&apos;s Hours</div>
+                              <div className="today-card-date">{dayWithDate}</div>
+                              <LiveStatusBadge status={status} />
+                              <div className="today-card-times">
+                                {timeRanges.map((timeRange, index) => (
+                                  <div
+                                    key={index}
+                                    className={`today-card-time ${isClosed ? 'closed-not-available' : ''}`}
+                                  >
+                                    {timeRange}
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })()}
-                    
-                    {Object.entries(facilities[facilityName]).map(([day, hours]) => {
-                      const timeRanges = parseMultipleTimeRanges(hours);
-                      const dayWithDate = formatDayWithDate(day);
-                      const isClosed = isClosedTime(hours);
-                      
-                      return (
-                        <div key={day} className="hours-row">
-                          <span className="day-name">{dayWithDate}</span>
-                          <div className="hours-time-container">
-                            {timeRanges.map((timeRange, index) => (
-                              <span 
-                                key={index} 
-                                className={`hours-time ${isClosed ? 'closed-not-available' : ''}`}
-                              >
-                                {timeRange}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </>
-                );
-              })()}
-            </div>
-          </div>
-        ))}
+                            </div>
+                          );
+                        })()}
+
+                        {Object.entries(sectionSchedule).map(([day, dayHours]) => {
+                          const timeRanges = parseMultipleTimeRanges(dayHours);
+                          const dayWithDate = formatDayWithDate(day);
+                          const isClosed = isClosedTime(dayHours);
+
+                          return (
+                            <div key={day} className="hours-row">
+                              <span className="day-name">{dayWithDate}</span>
+                              <div className="hours-time-container">
+                                {timeRanges.map((timeRange, index) => (
+                                  <span
+                                    key={index}
+                                    className={`hours-time ${isClosed ? 'closed-not-available' : ''}`}
+                                  >
+                                    {timeRange}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            );
+          })}
       </div>
-      
-      <div className="hours-info">
-        Hours may vary during holidays and special events.
-      </div>
-      
-      <a 
-        href="https://www.angelo.edu/life-on-campus/play/university-recreation/urec-hours-of-operation.php" 
-        target="_blank" 
+
+      <div className="hours-info">Hours may vary during holidays and special events.</div>
+
+      <a
+        href="https://www.angelo.edu/life-on-campus/play/university-recreation/urec-hours-of-operation.php"
+        target="_blank"
         rel="noopener noreferrer"
         className="website-link"
       >

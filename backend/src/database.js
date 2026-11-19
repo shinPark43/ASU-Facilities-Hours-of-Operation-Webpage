@@ -137,6 +137,12 @@ function insertDefaultFacilities() {
         type: 'ram_tram',
         description: 'Campus transportation system',
         website_url: 'https://www.angelo.edu/life-on-campus/live/parking-and-transportation/ram-tram.php'
+      },
+      {
+        name: 'Campus Essentials',
+        type: 'essentials',
+        description: 'Ram Central Station Bookstore, Mail Services (Post Office), and University Health Clinic',
+        website_url: 'https://www.angelo.edu/life-on-campus/'
       }
     ];
 

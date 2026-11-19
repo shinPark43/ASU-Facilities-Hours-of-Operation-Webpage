@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { HiOutlineMenu, HiOutlineX, HiOutlineHome, HiOutlineInformationCircle,
-         HiOutlineDownload, HiOutlineBookOpen, HiOutlineAcademicCap } from 'react-icons/hi';
+         HiOutlineDownload, HiOutlineBookOpen, HiOutlineAcademicCap, HiOutlineOfficeBuilding } from 'react-icons/hi';
 import { FaInstagram, FaDumbbell } from 'react-icons/fa';
 import { IoRestaurant } from 'react-icons/io5';
 import { TbBus } from 'react-icons/tb';
@@ -18,8 +18,9 @@ const HamburgerMenu = () => {
     { path: '/library',  label: 'Library',        icon: HiOutlineBookOpen },
     { path: '/gym',      label: 'Gym',            icon: FaDumbbell },
     { path: '/dining',   label: 'Dining',         icon: IoRestaurant },
-    { path: '/tutoring', label: 'Tutoring',       icon: HiOutlineAcademicCap },
-    { path: '/ramtram',  label: 'Ram Tram',       icon: TbBus },
+    { path: '/tutoring',   label: 'Tutoring',          icon: HiOutlineAcademicCap },
+    { path: '/ramtram',    label: 'Ram Tram',          icon: TbBus },
+    { path: '/essentials', label: 'Campus Essentials', icon: HiOutlineOfficeBuilding },
   ];
 
   const utilityItems = [

@@ -73,6 +73,25 @@
   transition: opacity 0.15s;
 }
 
+.schedule-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.schedule-export-btn:hover {
+  background: var(--border-light);
+}
+
 .schedule-add-btn:hover {
   opacity: 0.85;
 }
@@ -188,6 +207,8 @@
 /* Course blocks */
 
 .schedule-course-block {
+  border: none;
+  text-align: left;
   border-radius: 5px;
   padding: 3px 5px;
   overflow: hidden;
@@ -198,6 +219,22 @@
   flex-direction: column;
   gap: 1px;
   transition: filter 0.15s;
+}
+
+.schedule-block-tutoring-tag {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 0.5rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.schedule-spinner-val {
+  background: transparent;
+  border: none;
 }
 
 .schedule-course-block:hover {
@@ -663,4 +700,71 @@
   font-size: 0.6rem;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+.schedule-detail-actions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-light);
+}
+
+.schedule-detail-action-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.schedule-detail-action-btn:hover {
+  background: var(--border-light);
+}
+
+.schedule-detail-tutoring {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 0 10px;
+  border-top: 1px solid var(--border-light);
+}
+
+.schedule-detail-tutoring-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--asu-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.schedule-detail-tutoring-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 63, 127, 0.25);
+  background: rgba(0, 63, 127, 0.07);
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.schedule-detail-tutoring-btn:hover {
+  background: rgba(0, 63, 127, 0.14);
 }

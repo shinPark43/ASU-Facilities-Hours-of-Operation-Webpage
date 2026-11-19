@@ -47,10 +47,11 @@ jobs:
         
     - name: Build application
       env:
-        # Set your backend API URL here
+        # Support both Vite and legacy CRA secret names
+        VITE_API_URL: ${{ secrets.REACT_APP_API_URL }}
+        VITE_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
         REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
         REACT_APP_MAPBOX_TOKEN: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
-        # PUBLIC_URL will be derived from homepage in package.json
       run: |
         cd frontend
         npm run build
@@ -61,7 +62,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: frontend/build
+        path: frontend/dist
         
     - name: Deploy to GitHub Pages
       id: deployment

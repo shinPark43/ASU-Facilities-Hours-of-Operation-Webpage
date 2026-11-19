@@ -7,6 +7,7 @@ import Library from './pages/Library';
 import Dining from './pages/Dining';
 import RamTram from './pages/RamTram';
 import Tutoring from './pages/Tutoring';
+import Essentials from './pages/Essentials';
 import About from './pages/About';
 import HowToInstall from './pages/HowToInstall';
 import Landing from './pages/Landing';
@@ -24,10 +25,10 @@ function App() {
           <Route path="/dining" element={<Dining />} />
           <Route path="/ramtram" element={<RamTram />} />
           <Route path="/tutoring" element={<Tutoring />} />
+          <Route path="/essentials" element={<Essentials />} />
           <Route path="/about" element={<About />} />
           <Route path="/install" element={<HowToInstall />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
-          {/* Catch all undefined routes and redirect to home */}
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </Layout>

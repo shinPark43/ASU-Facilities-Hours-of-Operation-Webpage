@@ -1113,6 +1113,125 @@ class ScraperManager {
     }
   }
 
+  async scrapeDiningMenu(venue = 'the-caf') {
+    const safeVenue = String(venue || 'the-caf').replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'the-caf';
+    const sourceUrl = `https://new.dineoncampus.com/Angelo/whats-on-the-menu/${safeVenue}/`;
+    const todayIso = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+
+    const browser = await this.getBrowser();
+    const page = await browser.newPage();
+    try {
+      await page.setUserAgent(this.userAgent);
+
+      const capturedPeriods = [];
+      page.on('response', async (res) => {
+        const url = res.url();
+        if (url.includes('api.dineoncampus.com') && url.includes('/menu') && res.status() === 200) {
+          try {
+            const json = await res.json();
+            const menuObj = json?.menu || json;
+            const periods = menuObj?.periods;
+            if (Array.isArray(periods) && periods.length > 0) {
+              capturedPeriods.push(...periods);
+            } else if (periods && periods.name && Array.isArray(periods.categories)) {
+              capturedPeriods.push(periods);
+            }
+          } catch {
+            // Ignore non-JSON or opaque responses
+          }
+        }
+      });
+
+      await page.goto(sourceUrl, {
+        waitUntil: 'networkidle2',
+        timeout: 25000,
+      });
+      await delay(2500);
+
+      // Prefer structured JSON intercepted from DineOnCampus API responses
+      if (capturedPeriods.length > 0) {
+        const normalizedPeriods = capturedPeriods
+          .map((period) => ({
+            name: period.name || 'Menu',
+            stations: (period.categories || []).map((cat) => ({
+              name: cat.name || 'Station',
+              items: (cat.items || []).map((item) => ({
+                name: item.name || '',
+                calories: item.calories != null ? String(item.calories) : null,
+                dietary: Array.isArray(item.filters)
+                  ? item.filters.map((f) => f.name).filter(Boolean)
+                  : [],
+              })).filter((item) => item.name),
+            })).filter((station) => station.items.length > 0),
+          }))
+          .filter((period) => period.stations.length > 0);
+
+        if (normalizedPeriods.length > 0) {
+          return {
+            venue: safeVenue,
+            date: todayIso,
+            sourceUrl,
+            available: true,
+            periods: normalizedPeriods,
+          };
+        }
+      }
+
+      // Fallback: extract visible menu stations/items from DOM
+      const domPeriods = await page.evaluate(() => {
+        const title = document.title || '';
+        if (/attention required|cloudflare|just a moment/i.test(title)) {
+          return [];
+        }
+
+        const stations = [];
+        const stationHeaders = document.querySelectorAll('.menu-station, [class*="station"], table caption, h3, h4');
+        stationHeaders.forEach((header) => {
+          const stationName = header.textContent?.trim();
+          if (!stationName || stationName.length > 60) return;
+          const container = header.closest('section, .card, table, div') || header.parentElement;
+          if (!container) return;
+          const itemNodes = container.querySelectorAll('.menu-item-name, [class*="item-name"], li, td:first-child');
+          const items = [];
+          const seen = new Set();
+          itemNodes.forEach((node) => {
+            const text = node.textContent?.replace(/\s+/g, ' ').trim();
+            if (text && text.length > 2 && text.length < 90 && text !== stationName && !seen.has(text)) {
+              seen.add(text);
+              items.push({ name: text, calories: null, dietary: [] });
+            }
+          });
+          if (items.length > 0) {
+            stations.push({ name: stationName, items: items.slice(0, 20) });
+          }
+        });
+
+        if (stations.length === 0) return [];
+        return [{ name: "Today's Menu", stations: stations.slice(0, 10) }];
+      });
+
+      return {
+        venue: safeVenue,
+        date: todayIso,
+        sourceUrl,
+        available: domPeriods.length > 0,
+        periods: domPeriods,
+      };
+    } catch (error) {
+      console.warn(`⚠️ Dining menu scrape failed for ${safeVenue}:`, error.message);
+      return {
+        venue: safeVenue,
+        date: todayIso,
+        sourceUrl,
+        available: false,
+        periods: [],
+        message: 'Live menu temporarily unavailable. Open DineOnCampus to view today’s full menu.',
+      };
+    } finally {
+      await page.close();
+    }
+  }
+
   async close() {
     if (this.browser) {
       console.log('🔄 Closing browser instance...');

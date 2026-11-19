@@ -1,12 +1,22 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import MapGL, { Marker } from 'react-map-gl/mapbox';
 import { HiLocationMarker } from 'react-icons/hi';
+import { TbBus } from 'react-icons/tb';
+import { RAM_TRAM_STOPS, CAMPUS_HUBS } from '../data/campusLocations.js';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../styles/EventCalendarMap.css';
 
-const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
+const MAPBOX_TOKEN =
+  import.meta.env.VITE_MAPBOX_TOKEN ||
+  import.meta.env.REACT_APP_MAPBOX_TOKEN;
 
 const FILTERS = ['Today', 'This Week', 'Next Week'];
+const LAYERS = [
+  { id: 'events', label: 'Events' },
+  { id: 'ramtram', label: 'Ram Tram Stops' },
+  { id: 'hubs', label: 'Campus Hubs' },
+];
 
 function getChicagoBoundaries() {
   const now = new Date();
@@ -26,21 +36,21 @@ function getChicagoBoundaries() {
 
   const chicagoDayOfWeek = new Date(
     new Date(`${chicagoDateStr}T12:00:00Z`).toLocaleString('en-US', { timeZone: 'America/Chicago' })
-  ).getDay(); // 0=Sun, 1=Mon...
+  ).getDay();
   const daysFromMonday = (chicagoDayOfWeek + 6) % 7;
 
-  const thisMonStr    = addDays(chicagoDateStr, -daysFromMonday);
-  const nextMonStr    = addDays(thisMonStr, 7);
+  const thisMonStr = addDays(chicagoDateStr, -daysFromMonday);
+  const nextMonStr = addDays(thisMonStr, 7);
   const nextSunEndStr = addDays(nextMonStr, 7);
-  const tomorrowStr   = addDays(chicagoDateStr, 1);
+  const tomorrowStr = addDays(chicagoDateStr, 1);
 
   return {
-    todayStart:    chicagoMidnight(chicagoDateStr) / 1000,
-    todayEnd:      chicagoMidnight(tomorrowStr)    / 1000,
-    thisWeekStart: chicagoMidnight(thisMonStr)     / 1000,
-    thisWeekEnd:   chicagoMidnight(nextMonStr)     / 1000,
-    nextWeekStart: chicagoMidnight(nextMonStr)     / 1000,
-    nextWeekEnd:   chicagoMidnight(nextSunEndStr)  / 1000,
+    todayStart: chicagoMidnight(chicagoDateStr) / 1000,
+    todayEnd: chicagoMidnight(tomorrowStr) / 1000,
+    thisWeekStart: chicagoMidnight(thisMonStr) / 1000,
+    thisWeekEnd: chicagoMidnight(nextMonStr) / 1000,
+    nextWeekStart: chicagoMidnight(nextMonStr) / 1000,
+    nextWeekEnd: chicagoMidnight(nextSunEndStr) / 1000,
   };
 }
 
@@ -49,12 +59,12 @@ const ASU_CENTER = { longitude: -100.4648, latitude: 31.4405 };
 const LIGHT_STYLE = 'mapbox://styles/mapbox/standard';
 const DARK_STYLE = 'mapbox://styles/mapbox/standard-dark';
 
-const pad = n => String(n).padStart(2, '0');
-const fmtUtc = ts => {
+const pad = (n) => String(n).padStart(2, '0');
+const fmtUtc = (ts) => {
   const d = new Date(ts * 1000);
   return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
 };
-const fmtDay = ts => {
+const fmtDay = (ts) => {
   const d = new Date(ts * 1000);
   return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}`;
 };
@@ -79,9 +89,9 @@ const buildGCalUrl = (event) => {
 };
 
 const buildOutlookUrl = (event) => {
-  const toIso = ts => new Date(ts * 1000).toISOString();
+  const toIso = (ts) => new Date(ts * 1000).toISOString();
   const startdt = event.allDay ? fmtDay(event.tsStart) : toIso(event.tsStart);
-  const enddt   = event.allDay
+  const enddt = event.allDay
     ? fmtDay(event.tsEnd ? event.tsEnd + 86400 : event.tsStart + 86400)
     : toIso(event.tsEnd || event.tsStart + 3600);
   const params = new URLSearchParams({
@@ -103,63 +113,74 @@ const downloadIcs = (event) => {
     ? `DTEND;VALUE=DATE:${fmtDay(event.tsEnd ? event.tsEnd + 86400 : event.tsStart + 86400)}`
     : `DTEND:${fmtUtc(event.tsEnd || event.tsStart + 3600)}`;
   const ics = [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ASU Facilities//EN',
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//ASU Facilities//EN',
     'BEGIN:VEVENT',
     `UID:${event.id}@angelo.edu`,
-    dtstart, dtend,
+    dtstart,
+    dtend,
     `SUMMARY:${event.title}`,
     event.location ? `LOCATION:${event.location}` : '',
     `DESCRIPTION:${event.link}`,
-    'END:VEVENT', 'END:VCALENDAR',
-  ].filter(Boolean).join('\r\n');
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ]
+    .filter(Boolean)
+    .join('\r\n');
   const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'event.ics'; a.click();
+  a.href = url;
+  a.download = 'event.ics';
+  a.click();
   URL.revokeObjectURL(url);
 };
 
 const IconCalendar = () => (
-  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="1" y="3" width="14" height="11" rx="2"/>
-    <path d="M1 7h14M5 1v4M11 1v4"/>
+  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="1" y="3" width="14" height="11" rx="2" />
+    <path d="M1 7h14M5 1v4M11 1v4" />
   </svg>
 );
 const IconGoogle = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24">
-    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
   </svg>
 );
 const IconApple = () => (
-  <svg width="12" height="14" viewBox="0 0 56 66" fill="currentColor">
-    <path d="M45.7 35.1c0-8.3 6.8-12.3 7.1-12.5-3.9-5.7-9.9-6.4-12-6.5-5.1-.5-10 3-12.5 3s-6.5-3-10.8-2.9c-5.5.1-10.6 3.2-13.4 8.1-5.8 10-1.5 24.7 4.1 32.8 2.8 4 6 8.4 10.3 8.2 4.1-.2 5.7-2.6 10.7-2.6s6.4 2.6 10.8 2.5c4.4-.1 7.3-4 10-8 3.1-4.5 4.4-8.9 4.5-9.1-.1-.1-8.8-3.4-8.8-13zM37.6 10.6c2.3-2.8 3.8-6.6 3.4-10.4-3.3.1-7.3 2.2-9.7 5-2.1 2.4-4 6.4-3.5 10.2 3.7.3 7.5-1.9 9.8-4.8z"/>
+  <svg width="12" height="14" viewBox="0 0 56 66" fill="currentColor" aria-hidden="true">
+    <path d="M45.7 35.1c0-8.3 6.8-12.3 7.1-12.5-3.9-5.7-9.9-6.4-12-6.5-5.1-.5-10 3-12.5 3s-6.5-3-10.8-2.9c-5.5.1-10.6 3.2-13.4 8.1-5.8 10-1.5 24.7 4.1 32.8 2.8 4 6 8.4 10.3 8.2 4.1-.2 5.7-2.6 10.7-2.6s6.4 2.6 10.8 2.5c4.4-.1 7.3-4 10-8 3.1-4.5 4.4-8.9 4.5-9.1-.1-.1-8.8-3.4-8.8-13zM37.6 10.6c2.3-2.8 3.8-6.6 3.4-10.4-3.3.1-7.3 2.2-9.7 5-2.1 2.4-4 6.4-3.5 10.2 3.7.3 7.5-1.9 9.8-4.8z" />
   </svg>
 );
 const IconOutlook = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-    <rect width="24" height="24" rx="3" fill="#0078D4"/>
-    <path d="M12 5C8.13 5 5 8.13 5 12s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zm0 11c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" fill="white"/>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect width="24" height="24" rx="3" fill="#0078D4" />
+    <path d="M12 5C8.13 5 5 8.13 5 12s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zm0 11c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" fill="white" />
   </svg>
 );
 
-const EventCalendarMap = ({ events = [], loading = false }) => {
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem('theme') || 'light'
-  );
+const EventCalendarMap = ({ events = [], loading = false, initialLayer = 'events' }) => {
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [activeLayer, setActiveLayer] = useState(initialLayer);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedStop, setSelectedStop] = useState(null);
+  const [selectedHub, setSelectedHub] = useState(null);
   const [openCalDropdown, setOpenCalDropdown] = useState(null);
   const [mapActive, setMapActive] = useState(false);
   const [activeFilter, setActiveFilter] = useState('This Week');
   const sheetRef = useRef(null);
 
+  const hasSheetOpen = Boolean(selectedLocation || selectedStop || selectedHub);
+
   useEffect(() => {
-    if (selectedLocation && sheetRef.current) {
+    if (hasSheetOpen && sheetRef.current) {
       sheetRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-  }, [selectedLocation]);
+  }, [hasSheetOpen]);
 
   // Sync with theme changes from Layout
   useEffect(() => {
@@ -174,26 +195,28 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
     return () => observer.disconnect();
   }, []);
 
-  // Clear selection when filter changes
+  // Clear selection when filter or layer changes
   useEffect(() => {
     setSelectedLocation(null);
+    setSelectedStop(null);
+    setSelectedHub(null);
     setOpenCalDropdown(null);
-  }, [activeFilter]);
+  }, [activeFilter, activeLayer]);
 
   const filteredEvents = useMemo(() => {
     const b = getChicagoBoundaries();
     switch (activeFilter) {
       case 'Today':
-        return events.filter(e => e.tsStart >= b.todayStart && e.tsStart < b.todayEnd);
+        return events.filter((e) => e.tsStart >= b.todayStart && e.tsStart < b.todayEnd);
       case 'Next Week':
-        return events.filter(e => e.tsStart >= b.nextWeekStart && e.tsStart < b.nextWeekEnd);
-      default: // 'This Week'
-        return events.filter(e => e.tsStart >= b.thisWeekStart && e.tsStart < b.thisWeekEnd);
+        return events.filter((e) => e.tsStart >= b.nextWeekStart && e.tsStart < b.nextWeekEnd);
+      default:
+        return events.filter((e) => e.tsStart >= b.thisWeekStart && e.tsStart < b.thisWeekEnd);
     }
   }, [events, activeFilter]);
 
-  const mappableEvents   = filteredEvents.filter(e => e.lat != null && e.lng != null);
-  const unmappableEvents = filteredEvents.filter(e => e.lat == null || e.lng == null);
+  const mappableEvents = filteredEvents.filter((e) => e.lat != null && e.lng != null);
+  const unmappableEvents = filteredEvents.filter((e) => e.lat == null || e.lng == null);
 
   const locationGroups = useMemo(() => {
     const groups = new Map();
@@ -207,7 +230,23 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
 
   const handleMarkerClick = useCallback((e, group) => {
     e.originalEvent?.stopPropagation();
+    setSelectedStop(null);
+    setSelectedHub(null);
     setSelectedLocation(group);
+  }, []);
+
+  const handleStopClick = useCallback((e, stop) => {
+    e.originalEvent?.stopPropagation();
+    setSelectedLocation(null);
+    setSelectedHub(null);
+    setSelectedStop(stop);
+  }, []);
+
+  const handleHubClick = useCallback((e, hub) => {
+    e.originalEvent?.stopPropagation();
+    setSelectedLocation(null);
+    setSelectedStop(null);
+    setSelectedHub(hub);
   }, []);
 
   useEffect(() => {
@@ -222,25 +261,46 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
   const renderCalDropdown = (event, compact = false) => (
     <div className="ecm-cal-wrapper">
       <button
+        type="button"
         className={`ecm-cal-btn${compact ? ' ecm-cal-btn--icon' : ''}`}
         title="Add to Calendar"
-        onClick={(e) => { e.stopPropagation(); setOpenCalDropdown(openCalDropdown === event.id ? null : event.id); }}
+        aria-label={compact ? 'Add to Calendar' : undefined}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpenCalDropdown(openCalDropdown === event.id ? null : event.id);
+        }}
       >
         <IconCalendar />
         {!compact && <span>Add to Calendar</span>}
       </button>
       {openCalDropdown === event.id && (
         <div className="ecm-cal-menu">
-          <a href={buildGCalUrl(event)} target="_blank" rel="noopener noreferrer"
-             className="ecm-cal-item" onClick={() => setOpenCalDropdown(null)}>
+          <a
+            href={buildGCalUrl(event)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ecm-cal-item"
+            onClick={() => setOpenCalDropdown(null)}
+          >
             <IconGoogle /> Google
           </a>
-          <button className="ecm-cal-item"
-                  onClick={() => { downloadIcs(event); setOpenCalDropdown(null); }}>
+          <button
+            type="button"
+            className="ecm-cal-item"
+            onClick={() => {
+              downloadIcs(event);
+              setOpenCalDropdown(null);
+            }}
+          >
             <IconApple /> Apple
           </button>
-          <a href={buildOutlookUrl(event)} target="_blank" rel="noopener noreferrer"
-             className="ecm-cal-item" onClick={() => setOpenCalDropdown(null)}>
+          <a
+            href={buildOutlookUrl(event)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ecm-cal-item"
+            onClick={() => setOpenCalDropdown(null)}
+          >
             <IconOutlook /> Outlook
           </a>
         </div>
@@ -248,44 +308,117 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
     </div>
   );
 
+  // Graceful fallback list when Mapbox token isn't configured locally
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="ecm-no-token">
-        Mapbox token not configured. Set <code>REACT_APP_MAPBOX_TOKEN</code> in <code>.env.local</code>.
+      <div className="ecm-container">
+        <div className="ecm-layer-tabs" role="tablist" aria-label="Campus map layer">
+          {LAYERS.map((layer) => (
+            <button
+              key={layer.id}
+              type="button"
+              role="tab"
+              aria-selected={activeLayer === layer.id}
+              className={`ecm-layer-tab${activeLayer === layer.id ? ' ecm-layer-tab--active' : ''}`}
+              onClick={() => setActiveLayer(layer.id)}
+            >
+              {layer.label}
+            </button>
+          ))}
+        </div>
+
+        {activeLayer === 'ramtram' && (
+          <div className="ecm-fallback-list">
+            {RAM_TRAM_STOPS.map((stop) => (
+              <div key={stop.id} className="ecm-sheet-event">
+                <p className="ecm-sheet-title">{stop.name}</p>
+                <p className="ecm-sheet-meta">{stop.routes.join(' · ')} — {stop.schedule}</p>
+                <p className="ecm-sheet-meta">{stop.address}</p>
+                <div className="ecm-sheet-actions">
+                  <a href={stop.mapUrl} target="_blank" rel="noopener noreferrer" className="ecm-sheet-link">
+                    Open in Google Maps →
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeLayer === 'hubs' && (
+          <div className="ecm-fallback-list">
+            {CAMPUS_HUBS.map((hub) => (
+              <div key={hub.id} className="ecm-sheet-event">
+                <p className="ecm-sheet-title">{hub.name}</p>
+                <p className="ecm-sheet-meta">{hub.category} · {hub.address}</p>
+                <div className="ecm-sheet-actions">
+                  <Link to={hub.path} className="ecm-sheet-link">View Hours →</Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeLayer === 'events' && (
+          <div className="ecm-no-token">
+            Map preview requires <code>VITE_MAPBOX_TOKEN</code> (or <code>REACT_APP_MAPBOX_TOKEN</code>) in <code>.env.local</code>.
+          </div>
+        )}
       </div>
     );
   }
 
   return (
     <div className="ecm-container">
-      <div className="ecm-filter-tabs" role="tablist" aria-label="Event date filter">
-        {FILTERS.map(f => (
+      {/* Layer Toggle: Events | Ram Tram Stops | Campus Hubs */}
+      <div className="ecm-layer-tabs" role="tablist" aria-label="Campus map layer">
+        {LAYERS.map((layer) => (
           <button
-            key={f}
+            key={layer.id}
+            type="button"
             role="tab"
-            aria-selected={activeFilter === f}
-            className={`ecm-filter-tab${activeFilter === f ? ' ecm-filter-tab--active' : ''}`}
-            onClick={() => setActiveFilter(f)}
+            aria-selected={activeLayer === layer.id}
+            className={`ecm-layer-tab${activeLayer === layer.id ? ' ecm-layer-tab--active' : ''}`}
+            onClick={() => setActiveLayer(layer.id)}
           >
-            {f}
+            {layer.label}
           </button>
         ))}
       </div>
 
-      {filteredEvents.length === 0 && (
-        <p className="ecm-empty-state">
-          {loading ? 'Loading events…' : `No events for ${activeFilter.toLowerCase()}.`}
-        </p>
+      {/* Event date filter tabs (only when viewing Events layer) */}
+      {activeLayer === 'events' && (
+        <>
+          <div className="ecm-filter-tabs" role="tablist" aria-label="Event date filter">
+            {FILTERS.map((f) => (
+              <button
+                key={f}
+                type="button"
+                role="tab"
+                aria-selected={activeFilter === f}
+                className={`ecm-filter-tab${activeFilter === f ? ' ecm-filter-tab--active' : ''}`}
+                onClick={() => setActiveFilter(f)}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          {filteredEvents.length === 0 && (
+            <p className="ecm-empty-state">
+              {loading ? 'Loading events…' : `No events for ${activeFilter.toLowerCase()}.`}
+            </p>
+          )}
+        </>
       )}
 
       <div className="ecm-map-group">
-        <div className={`ecm-map-card${selectedLocation ? ' ecm-map-card--open' : ''}`}>
+        <div className={`ecm-map-card${hasSheetOpen ? ' ecm-map-card--open' : ''}`}>
           <div className="ecm-map-wrapper">
             <MapGL
               initialViewState={{
                 ...ASU_CENTER,
-                zoom: 16,
-                pitch: 50,
+                zoom: activeLayer === 'ramtram' ? 13.5 : 15.5,
+                pitch: 45,
                 bearing: -15,
               }}
               style={{ width: '100%', height: '100%' }}
@@ -296,33 +429,91 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
               dragRotate={mapActive}
               touchZoomRotate={mapActive}
               keyboard={mapActive}
-              onClick={mapActive ? () => setSelectedLocation(null) : undefined}
+              onClick={
+                mapActive
+                  ? () => {
+                      setSelectedLocation(null);
+                      setSelectedStop(null);
+                      setSelectedHub(null);
+                    }
+                  : undefined
+              }
             >
-              {locationGroups.map(group => {
-                const isSelected = selectedLocation &&
-                  selectedLocation[0].lat === group[0].lat &&
-                  selectedLocation[0].lng === group[0].lng;
-                return (
-                  <Marker
-                    key={`${group[0].lat},${group[0].lng}`}
-                    longitude={group[0].lng}
-                    latitude={group[0].lat}
-                    anchor="bottom"
-                    onClick={e => handleMarkerClick(e, group)}
-                  >
-                    <div
-                      className={`ecm-marker${isSelected ? ' ecm-marker--selected' : ''}`}
-                      title={group.length > 1 ? `${group.length} events` : group[0].title}
+              {/* Layer 1: Campus Events */}
+              {activeLayer === 'events' &&
+                locationGroups.map((group) => {
+                  const isSelected =
+                    selectedLocation &&
+                    selectedLocation[0].lat === group[0].lat &&
+                    selectedLocation[0].lng === group[0].lng;
+                  return (
+                    <Marker
+                      key={`${group[0].lat},${group[0].lng}`}
+                      longitude={group[0].lng}
+                      latitude={group[0].lat}
+                      anchor="bottom"
+                      onClick={(e) => handleMarkerClick(e, group)}
                     >
-                      {group.length > 1 && (
-                        <span className="ecm-marker-badge">{group.length}</span>
-                      )}
-                    </div>
-                  </Marker>
-                );
-              })}
+                      <div
+                        className={`ecm-marker${isSelected ? ' ecm-marker--selected' : ''}`}
+                        title={group.length > 1 ? `${group.length} events` : group[0].title}
+                      >
+                        {group.length > 1 && <span className="ecm-marker-badge">{group.length}</span>}
+                      </div>
+                    </Marker>
+                  );
+                })}
 
+              {/* Layer 2: Ram Tram Stops */}
+              {activeLayer === 'ramtram' &&
+                RAM_TRAM_STOPS.map((stop) => {
+                  const isSelected = selectedStop?.id === stop.id;
+                  const isGoldOnly = stop.routes.length === 1 && stop.routes[0].includes('Gold');
+                  const isBlueOnly = stop.routes.length === 1 && stop.routes[0].includes('Blue');
+                  const pinVariant = isGoldOnly
+                    ? ' ecm-bus-marker--gold'
+                    : isBlueOnly
+                      ? ' ecm-bus-marker--blue'
+                      : ' ecm-bus-marker--both';
+                  return (
+                    <Marker
+                      key={stop.id}
+                      longitude={stop.lng}
+                      latitude={stop.lat}
+                      anchor="bottom"
+                      onClick={(e) => handleStopClick(e, stop)}
+                    >
+                      <div
+                        className={`ecm-bus-marker${pinVariant}${isSelected ? ' ecm-bus-marker--selected' : ''}`}
+                        title={stop.name}
+                      >
+                        <TbBus size={14} aria-hidden="true" />
+                      </div>
+                    </Marker>
+                  );
+                })}
+
+              {/* Layer 3: Campus Hubs */}
+              {activeLayer === 'hubs' &&
+                CAMPUS_HUBS.map((hub) => {
+                  const isSelected = selectedHub?.id === hub.id;
+                  return (
+                    <Marker
+                      key={hub.id}
+                      longitude={hub.lng}
+                      latitude={hub.lat}
+                      anchor="bottom"
+                      onClick={(e) => handleHubClick(e, hub)}
+                    >
+                      <div
+                        className={`ecm-marker ecm-marker--hub${isSelected ? ' ecm-marker--selected' : ''}`}
+                        title={hub.name}
+                      />
+                    </Marker>
+                  );
+                })}
             </MapGL>
+
             {!mapActive && (
               <div className="ecm-map-overlay" onClick={() => setMapActive(true)}>
                 <div className="ecm-map-overlay-hint">
@@ -330,20 +521,30 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
                 </div>
               </div>
             )}
-            {mapActive && mappableEvents.length > 0 && !selectedLocation && (
-              <p className="ecm-map-hint">Tap a marker to view events at that location.</p>
+
+            {mapActive && !hasSheetOpen && (
+              <p className="ecm-map-hint">
+                {activeLayer === 'ramtram'
+                  ? 'Tap a bus pin for Ram Tram stop routes & directions.'
+                  : activeLayer === 'hubs'
+                    ? 'Tap a building pin to jump to its hours.'
+                    : mappableEvents.length > 0
+                      ? 'Tap a marker to view events at that location.'
+                      : ''}
+              </p>
             )}
           </div>
         </div>
 
+        {/* Sheet: Selected Event Location */}
         {selectedLocation && (
           <div className="ecm-sheet" ref={sheetRef}>
             <div className="ecm-sheet-header">
               <span className="ecm-sheet-location">
-                <HiLocationMarker className="ecm-sheet-location-icon" />
+                <HiLocationMarker className="ecm-sheet-location-icon" aria-hidden="true" />
                 {selectedLocation[0].location || 'Campus Event'}
               </span>
-              <button className="ecm-sheet-back" onClick={() => setSelectedLocation(null)}>
+              <button type="button" className="ecm-sheet-back" onClick={() => setSelectedLocation(null)} aria-label="Close details">
                 ✕
               </button>
             </div>
@@ -351,24 +552,30 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
             {selectedLocation.length === 1 ? (
               <div className="ecm-sheet-event">
                 <p className="ecm-sheet-title">{selectedLocation[0].title}</p>
-                <p className="ecm-sheet-meta">{selectedLocation[0].date} · {selectedLocation[0].time}</p>
+                <p className="ecm-sheet-meta">
+                  {selectedLocation[0].date} · {selectedLocation[0].time}
+                </p>
                 <div className="ecm-sheet-actions">
-                  <a href={selectedLocation[0].link} target="_blank" rel="noopener noreferrer"
-                     className="ecm-sheet-link">View Event →</a>
+                  <a href={selectedLocation[0].link} target="_blank" rel="noopener noreferrer" className="ecm-sheet-link">
+                    View Event →
+                  </a>
                   {renderCalDropdown(selectedLocation[0])}
                 </div>
               </div>
             ) : (
               <ul className="ecm-sheet-list">
-                {selectedLocation.map(ev => (
+                {selectedLocation.map((ev) => (
                   <li key={ev.id} className="ecm-sheet-list-item">
                     <div className="ecm-sheet-item-text">
                       <p className="ecm-sheet-title">{ev.title}</p>
-                      <p className="ecm-sheet-meta">{ev.date} · {ev.time}</p>
+                      <p className="ecm-sheet-meta">
+                        {ev.date} · {ev.time}
+                      </p>
                     </div>
                     <div className="ecm-sheet-item-links">
-                      <a href={ev.link} target="_blank" rel="noopener noreferrer"
-                         className="ecm-sheet-link">View →</a>
+                      <a href={ev.link} target="_blank" rel="noopener noreferrer" className="ecm-sheet-link">
+                        View →
+                      </a>
                       {renderCalDropdown(ev)}
                     </div>
                   </li>
@@ -377,15 +584,74 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
             )}
           </div>
         )}
+
+        {/* Sheet: Selected Ram Tram Stop */}
+        {selectedStop && (
+          <div className="ecm-sheet" ref={sheetRef}>
+            <div className="ecm-sheet-header">
+              <span className="ecm-sheet-location">
+                <TbBus className="ecm-sheet-location-icon" aria-hidden="true" />
+                {selectedStop.name}
+              </span>
+              <button type="button" className="ecm-sheet-back" onClick={() => setSelectedStop(null)} aria-label="Close details">
+                ✕
+              </button>
+            </div>
+            <div className="ecm-sheet-event">
+              <div className="ecm-route-pills">
+                {selectedStop.routes.map((route) => (
+                  <span
+                    key={route}
+                    className={`ecm-route-pill ${route.includes('Gold') ? 'ecm-route-pill--gold' : 'ecm-route-pill--blue'}`}
+                  >
+                    {route}
+                  </span>
+                ))}
+              </div>
+              <p className="ecm-sheet-meta">{selectedStop.schedule}</p>
+              <p className="ecm-sheet-meta">{selectedStop.address}</p>
+              <div className="ecm-sheet-actions">
+                <a href={selectedStop.mapUrl} target="_blank" rel="noopener noreferrer" className="ecm-sheet-link">
+                  Directions →
+                </a>
+                <Link to="/ramtram" className="ecm-sheet-link">
+                  Full Ram Tram Schedule →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Sheet: Selected Campus Hub */}
+        {selectedHub && (
+          <div className="ecm-sheet" ref={sheetRef}>
+            <div className="ecm-sheet-header">
+              <span className="ecm-sheet-location">
+                <HiLocationMarker className="ecm-sheet-location-icon" aria-hidden="true" />
+                {selectedHub.name}
+              </span>
+              <button type="button" className="ecm-sheet-back" onClick={() => setSelectedHub(null)} aria-label="Close details">
+                ✕
+              </button>
+            </div>
+            <div className="ecm-sheet-event">
+              <p className="ecm-sheet-title">{selectedHub.category}</p>
+              <p className="ecm-sheet-meta">{selectedHub.address}</p>
+              <div className="ecm-sheet-actions">
+                <Link to={selectedHub.path} className="ecm-sheet-link">
+                  View Hours →
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {!selectedLocation && unmappableEvents.length > 0 && (
+      {activeLayer === 'events' && !selectedLocation && unmappableEvents.length > 0 && (
         <>
-          <p className="ecm-no-location-hint">
-            These events don't have a pinned campus location.
-          </p>
+          <p className="ecm-no-location-hint">These events don&apos;t have a pinned campus location.</p>
           <div className="ecm-no-location-strip">
-            {unmappableEvents.map(event => (
+            {unmappableEvents.map((event) => (
               <div key={event.id} className="ecm-no-location-card">
                 <div className="ecm-no-location-top">
                   <span className="ecm-no-location-badge">EVENT</span>
@@ -396,8 +662,9 @@ const EventCalendarMap = ({ events = [], loading = false }) => {
                   </span>
                 </div>
                 <div className="ecm-no-location-actions">
-                  <a href={event.link} target="_blank" rel="noopener noreferrer"
-                     className="ecm-sheet-link">View →</a>
+                  <a href={event.link} target="_blank" rel="noopener noreferrer" className="ecm-sheet-link">
+                    View →
+                  </a>
                   {renderCalDropdown(event, true)}
                 </div>
               </div>

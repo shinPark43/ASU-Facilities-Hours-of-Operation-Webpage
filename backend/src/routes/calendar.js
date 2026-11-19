@@ -115,7 +115,26 @@ router.get('/upcoming', async (req, res) => {
         ? `${mainDate} \u2013 ${untilShort}`
         : thText;
 
-      upcoming.push({ date: displayDate, title: tdText, badge, accentColor });
+      const toIsoDate = (d) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      };
+      const msPerDay = 24 * 60 * 60 * 1000;
+      const daysUntil = Math.round((startDate.getTime() - today.getTime()) / msPerDay);
+      const isActive = startDate <= today && today <= endDate;
+
+      upcoming.push({
+        date: displayDate,
+        title: tdText,
+        badge,
+        accentColor,
+        startDate: toIsoDate(startDate),
+        endDate: toIsoDate(endDate),
+        daysUntil,
+        isActive,
+      });
     }
 
     cache.set(cacheKey, upcoming);

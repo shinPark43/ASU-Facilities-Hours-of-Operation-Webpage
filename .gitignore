@@ -1,7 +1,10 @@
 node_modules/
+dist/
+build/
 *.log
 *.tmp 
 .env
+.env.local
 
 # SQLite WAL mode files (temporary files created automatically)
 *.db-shm
